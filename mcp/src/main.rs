@@ -54,7 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let app = Route::new()
             .at(
                 "/sse",
-                sse_endpoint(move || {
+                sse_endpoint(move |_| {
                     let tools = Longport::new(quote_context.clone(), trade_context.clone());
                     McpServer::new().tools(tools)
                 }),
