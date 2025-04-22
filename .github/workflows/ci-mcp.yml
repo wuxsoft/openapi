@@ -73,5 +73,5 @@ jobs:
         with:
           name: longport-mcp-${{ matrix.settings.target }}
           path: |
-            longport-mcp-*.tar.gz
-            longport-mcp-*.zip
+            longport-mcp-${{ matrix.settings.target }}.tar.gz
+            longport-mcp-${{ matrix.settings.target }}.zip
