@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use serde::{Deserialize, Deserializer, Serializer, de::Error};
+use serde::{Deserialize, Deserializer, Serializer, de::Error as _, ser::Error as _};
 use time::{Date, OffsetDateTime};
 
 pub(crate) mod date_opt {
@@ -18,7 +18,7 @@ pub(crate) mod date_opt {
                 &value,
                 time::macros::format_description!("[year]-[month]-[day]"),
             )
-            .map_err(|_| Error::custom("invalid date"))?;
+            .map_err(D::Error::custom)?;
             Ok(Some(datetime))
         } else {
             Ok(None)
@@ -48,10 +48,8 @@ pub(crate) mod timestamp {
         D: Deserializer<'de>,
     {
         let value = String::deserialize(deserializer)?;
-        let value = value
-            .parse::<i64>()
-            .map_err(|_| Error::custom("invalid timestamp"))?;
-        OffsetDateTime::from_unix_timestamp(value).map_err(|_| Error::custom("invalid timestamp"))
+        let value = value.parse::<i64>().map_err(D::Error::custom)?;
+        OffsetDateTime::from_unix_timestamp(value).map_err(D::Error::custom)
     }
 
     pub(crate) fn serialize<S>(datetime: &OffsetDateTime, serializer: S) -> Result<S::Ok, S::Error>
@@ -69,13 +67,16 @@ pub(crate) mod timestamp_opt {
     where
         D: Deserializer<'de>,
     {
-        let value = String::deserialize(deserializer)?;
-        let value = value
-            .parse::<i64>()
-            .map_err(|_| Error::custom("invalid timestamp"))?;
+        let Some(value) = <Option<String>>::deserialize(deserializer)? else {
+            return Ok(None);
+        };
+        if value.is_empty() {
+            return Ok(None);
+        }
+
+        let value = value.parse::<i64>().map_err(D::Error::custom)?;
         if value != 0 {
-            let datetime = OffsetDateTime::from_unix_timestamp(value)
-                .map_err(|_| Error::custom("invalid timestamp"))?;
+            let datetime = OffsetDateTime::from_unix_timestamp(value).map_err(D::Error::custom)?;
             Ok(Some(datetime))
         } else {
             Ok(None)
@@ -91,6 +92,43 @@ pub(crate) mod timestamp_opt {
     {
         match datetime {
             Some(datetime) => serializer.collect_str(&datetime.unix_timestamp()),
+            None => serializer.serialize_none(),
+        }
+    }
+}
+
+pub(crate) mod rfc3339_opt {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<OffsetDateTime>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let Some(value) = <Option<String>>::deserialize(deserializer)? else {
+            return Ok(None);
+        };
+        if value.is_empty() {
+            return Ok(None);
+        }
+        let datetime =
+            OffsetDateTime::parse(&value, &time::format_description::well_known::Rfc3339)
+                .map_err(D::Error::custom)?;
+        Ok(Some(datetime))
+    }
+
+    pub(crate) fn serialize<S>(
+        datetime: &Option<OffsetDateTime>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match datetime {
+            Some(datetime) => serializer.collect_str(
+                &datetime
+                    .format(&time::format_description::well_known::Rfc3339)
+                    .map_err(S::Error::custom)?,
+            ),
             None => serializer.serialize_none(),
         }
     }
@@ -139,9 +177,7 @@ pub(crate) mod decimal_empty_is_0 {
     {
         let value = String::deserialize(deserializer)?;
         if !value.is_empty() {
-            let n = value
-                .parse::<Decimal>()
-                .map_err(|err| Error::custom(err.to_string()))?;
+            let n = value.parse::<Decimal>().map_err(D::Error::custom)?;
             Ok(n)
         } else {
             Ok(Decimal::ZERO)
@@ -170,9 +206,7 @@ pub(crate) mod decimal_opt_empty_is_none {
     {
         let value = String::deserialize(deserializer)?;
         if !value.is_empty() {
-            let n = value
-                .parse::<Decimal>()
-                .map_err(|err| Error::custom(err.to_string()))?;
+            let n = value.parse::<Decimal>().map_err(D::Error::custom)?;
             Ok(Some(n))
         } else {
             Ok(None)
@@ -200,9 +234,7 @@ pub(crate) mod decimal_opt_0_is_none {
         D: Deserializer<'de>,
     {
         let value = String::deserialize(deserializer)?;
-        let n = value
-            .parse::<Decimal>()
-            .map_err(|err| Error::custom(err.to_string()))?;
+        let n = value.parse::<Decimal>().map_err(D::Error::custom)?;
         if !n.is_zero() { Ok(Some(n)) } else { Ok(None) }
     }
 }

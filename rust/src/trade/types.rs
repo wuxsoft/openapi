@@ -121,7 +121,10 @@ pub struct Execution {
     /// Security code
     pub symbol: String,
     /// Trade done time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub trade_done_at: OffsetDateTime,
     /// Executed quantity
     pub quantity: Decimal,
@@ -251,7 +254,10 @@ pub struct Order {
     #[serde(with = "serde_utils::decimal_opt_0_is_none")]
     pub executed_price: Option<Decimal>,
     /// Submitted time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub submitted_at: OffsetDateTime,
     /// Order side
     pub side: OrderSide,
@@ -275,10 +281,16 @@ pub struct Order {
     #[serde(with = "serde_utils::date_opt")]
     pub expire_date: Option<Date>,
     /// Last updated time
-    #[serde(with = "serde_utils::timestamp_opt")]
+    #[serde(
+        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
     pub updated_at: Option<OffsetDateTime>,
     /// Conditional order trigger time
-    #[serde(with = "serde_utils::timestamp_opt")]
+    #[serde(
+        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
     pub trigger_at: Option<OffsetDateTime>,
     /// `TSMAMT` / `TSLPAMT` order trailing amount
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
@@ -363,7 +375,10 @@ pub struct OrderHistoryDetail {
     /// Execution or error message
     pub msg: String,
     /// Occurrence time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub time: OffsetDateTime,
 }
 
@@ -423,7 +438,10 @@ pub struct OrderDetail {
     #[serde(with = "serde_utils::decimal_opt_0_is_none")]
     pub executed_price: Option<Decimal>,
     /// Submitted time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub submitted_at: OffsetDateTime,
     /// Order side
     pub side: OrderSide,
@@ -447,10 +465,16 @@ pub struct OrderDetail {
     #[serde(with = "serde_utils::date_opt")]
     pub expire_date: Option<Date>,
     /// Last updated time
-    #[serde(with = "serde_utils::timestamp_opt")]
+    #[serde(
+        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
     pub updated_at: Option<OffsetDateTime>,
     /// Conditional order trigger time
-    #[serde(with = "serde_utils::timestamp_opt")]
+    #[serde(
+        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
     pub trigger_at: Option<OffsetDateTime>,
     /// `TSMAMT` / `TSLPAMT` order trailing amount
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
@@ -612,7 +636,10 @@ pub struct CashFlow {
     /// Cash currency
     pub currency: String,
     /// Business time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub business_time: OffsetDateTime,
     /// Associated Stock code information
     #[serde(with = "serde_utils::symbol_opt")]
@@ -649,7 +676,10 @@ pub struct FundPosition {
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub current_net_asset_value: Decimal,
     /// Current equity time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub net_asset_value_day: OffsetDateTime,
     /// Fund name
     pub symbol_name: String,

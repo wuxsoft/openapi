@@ -1,5 +1,5 @@
 {
   "name": "LongPort OpenAPI SDK",
   "disableSources": true,
-  "sort": "source-order"
+  "sort": ["source-order"]
 }

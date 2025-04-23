@@ -87,7 +87,7 @@ pub struct Trade {
     /// Volume
     pub volume: i64,
     /// Time of trading
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     /// Trade type
     ///
@@ -310,7 +310,7 @@ pub struct PrePostQuote {
     /// Latest price
     pub last_done: Decimal,
     /// Time of latest price
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     /// Volume
     pub volume: i64,
@@ -357,7 +357,7 @@ pub struct SecurityQuote {
     /// Low
     pub low: Decimal,
     /// Time of latest price
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     /// Volume
     pub volume: i64,
@@ -438,7 +438,7 @@ pub struct OptionQuote {
     /// Low
     pub low: Decimal,
     /// Time of latest price
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     /// Volume
     pub volume: i64,
@@ -553,7 +553,7 @@ pub struct WarrantQuote {
     /// Low
     pub low: Decimal,
     /// Time of latest price
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     /// Volume
     pub volume: i64,
@@ -680,7 +680,7 @@ pub struct IntradayLine {
     /// Close price of the minute
     pub price: Decimal,
     /// Start time of the minute
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     /// Volume
     pub volume: i64,
@@ -721,7 +721,7 @@ pub struct Candlestick {
     /// Turnover
     pub turnover: Decimal,
     /// Timestamp
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(with = "time::serde::rfc3339")]
     pub timestamp: OffsetDateTime,
     /// Trade session
     pub trade_session: TradeSession,
@@ -1236,7 +1236,7 @@ pub struct WatchlistSecurity {
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub watched_price: Option<Decimal>,
     /// Watched time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(with = "time::serde::rfc3339")]
     pub watched_at: OffsetDateTime,
 }
 

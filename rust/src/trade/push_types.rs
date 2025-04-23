@@ -47,10 +47,16 @@ pub struct PushOrderChanged {
     /// Order status
     pub status: OrderStatus,
     /// Submitted time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub submitted_at: OffsetDateTime,
     /// Last updated time
-    #[serde(with = "serde_utils::timestamp")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub updated_at: OffsetDateTime,
     /// Order trigger price
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
@@ -63,7 +69,10 @@ pub struct PushOrderChanged {
     #[serde(with = "serde_utils::trigger_status")]
     pub trigger_status: Option<TriggerStatus>,
     /// Conditional order trigger time
-    #[serde(with = "serde_utils::timestamp_opt")]
+    #[serde(
+        deserialize_with = "serde_utils::timestamp_opt::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
     pub trigger_at: Option<OffsetDateTime>,
     /// Trailing amount
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]

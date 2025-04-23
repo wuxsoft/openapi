@@ -20,7 +20,7 @@ export LONGPORT_ACCESS_TOKEN="Access Token get from user center"
 
 _Setting environment variables(Windows)_
 
-```powershell
+```bash
 setx LONGPORT_APP_KEY "App Key get from user center"
 setx LONGPORT_APP_SECRET "App Secret get from user center"
 setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
