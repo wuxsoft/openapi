@@ -27,7 +27,8 @@ use crate::{
         },
         types::{
             CCandlestickOwned, CCapitalDistributionResponseOwned, CCapitalFlowLineOwned,
-            CCreateWatchlistGroup, CIntradayLineOwned, CIssuerInfoOwned, CMarketTradingDaysOwned,
+            CCreateWatchlistGroup, CHistoryMarketTemperatureResponseOwned, CIntradayLineOwned,
+            CIssuerInfoOwned, CMarketTemperatureOwned, CMarketTradingDaysOwned,
             CMarketTradingSessionOwned, COptionQuoteOwned, CParticipantInfoOwned, CPushBrokers,
             CPushBrokersOwned, CPushCandlestick, CPushCandlestickOwned, CPushDepth,
             CPushDepthOwned, CPushQuote, CPushQuoteOwned, CPushTrades, CPushTradesOwned,
@@ -1178,7 +1179,6 @@ pub unsafe extern "C" fn lb_quote_context_realtime_candlesticks(
 }
 
 /// Get security list
-/// data in the local storage.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_quote_context_security_list(
     ctx: *const CQuoteContext,
@@ -1194,5 +1194,45 @@ pub unsafe extern "C" fn lb_quote_context_security_list(
             .await?
             .into();
         Ok(rows)
+    });
+}
+
+/// Get current market temperature
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_quote_context_market_temperature(
+    ctx: *const CQuoteContext,
+    market: CMarket,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CMarketTemperatureOwned> =
+            CCow::new(ctx_inner.market_temperature(market.into()).await?);
+        Ok(resp)
+    });
+}
+
+/// Get historical market temperature
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_quote_context_history_market_temperature(
+    ctx: *const CQuoteContext,
+    market: CMarket,
+    start: *const CDate,
+    end: *const CDate,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    let start = (*start).into();
+    let end = (*end).into();
+
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CHistoryMarketTemperatureResponseOwned> = CCow::new(
+            ctx_inner
+                .history_market_temperature(market.into(), start, end)
+                .await?,
+        );
+        Ok(resp)
     });
 }

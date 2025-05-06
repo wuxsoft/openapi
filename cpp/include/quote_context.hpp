@@ -245,6 +245,19 @@ public:
     SecurityListCategory category,
     AsyncCallback<QuoteContext, std::vector<Security>> callback) const;
 
+  /// Get current market temperature
+  void market_temperature(
+    Market market,
+    AsyncCallback<QuoteContext, MarketTemperature> callback) const;
+
+  /// Get historical market temperature
+  void history_market_temperature(
+    Market market,
+    Date start,
+    Date end,
+    AsyncCallback<QuoteContext, HistoryMarketTemperatureResponse> callback)
+    const;
+
   /// Get real-time quotes
   ///
   /// Get real-time quotes of the subscribed symbols, it always returns the

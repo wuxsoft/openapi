@@ -1315,6 +1315,73 @@ QuoteContext::security_list(
 }
 
 void
+QuoteContext::market_temperature(
+  Market market,
+  AsyncCallback<QuoteContext, MarketTemperature> callback) const
+{
+  lb_quote_context_market_temperature(
+    ctx_,
+    convert(market),
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, MarketTemperature>(
+          res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        MarketTemperature resp =
+          convert((const lb_market_temperature_t*)res->data);
+        (*callback_ptr)(AsyncResult<QuoteContext, MarketTemperature>(
+          ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(AsyncResult<QuoteContext, MarketTemperature>(
+          ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, MarketTemperature>(callback));
+}
+
+void
+QuoteContext::history_market_temperature(
+  Market market,
+  Date start,
+  Date end,
+  AsyncCallback<QuoteContext, HistoryMarketTemperatureResponse> callback) const
+{
+  auto start2 = convert(&start);
+  auto end2 = convert(&end);
+
+  lb_quote_context_history_market_temperature(
+    ctx_,
+    convert(market),
+    &start2,
+    &end2,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext,
+                                     HistoryMarketTemperatureResponse>(
+          res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
+        HistoryMarketTemperatureResponse resp =
+          convert((const lb_history_market_temperature_response_t*)res->data);
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, HistoryMarketTemperatureResponse>(
+            ctx, std::move(status), &resp));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, HistoryMarketTemperatureResponse>(
+            ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, HistoryMarketTemperatureResponse>(
+      callback));
+}
+
+void
 QuoteContext::realtime_quote(
   const std::vector<std::string>& symbols,
   AsyncCallback<QuoteContext, std::vector<RealtimeQuote>> callback) const

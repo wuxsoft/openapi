@@ -373,6 +373,28 @@ typedef enum lb_filter_warrant_in_out_bounds_type_t {
 } lb_filter_warrant_in_out_bounds_type_t;
 
 /**
+ * Data granularity
+ */
+typedef enum lb_granularity_t {
+  /**
+   * Unknown
+   */
+  GranularityUnknown,
+  /**
+   * Daily
+   */
+  GranularityDaily,
+  /**
+   * Weekly
+   */
+  GranularityWeekly,
+  /**
+   * Monthly
+   */
+  GranularityMonthly,
+} lb_granularity_t;
+
+/**
  * Language identifer
  */
 typedef enum lb_language_t {
@@ -1749,7 +1771,7 @@ typedef void (*lb_order_changed_callback_t)(const struct lb_trade_context_t*,
                                             void*);
 
 /**
- * Options for get histroy executions request
+ * Options for get history executions request
  */
 typedef struct lb_get_history_executions_options_t {
   /**
@@ -3695,6 +3717,47 @@ typedef struct lb_quote_package_detail_t {
   int64_t end_at;
 } lb_quote_package_detail_t;
 
+/**
+ * Market temperature
+ */
+typedef struct lb_market_temperature_t {
+  /**
+   * Temperature value
+   */
+  int32_t temperature;
+  /**
+   * Temperature description
+   */
+  const char *description;
+  /**
+   * Market valuation
+   */
+  int32_t valuation;
+  /**
+   * Market sentiment
+   */
+  int32_t sentiment;
+  /**
+   * Time
+   */
+  int64_t timestamp;
+} lb_market_temperature_t;
+
+typedef struct lb_history_market_temperature_response_t {
+  /**
+   * Granularity
+   */
+  enum lb_granularity_t granularity;
+  /**
+   * Records
+   */
+  const struct lb_market_temperature_t *records;
+  /**
+   * Number of records
+   */
+  uintptr_t num_records;
+} lb_history_market_temperature_response_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -4215,13 +4278,30 @@ void lb_quote_context_realtime_candlesticks(const struct lb_quote_context_t *ctx
 
 /**
  * Get security list
- * data in the local storage.
  */
 void lb_quote_context_security_list(const struct lb_quote_context_t *ctx,
                                     enum lb_market_t market,
                                     enum lb_security_list_category_t category,
                                     lb_async_callback_t callback,
                                     void *userdata);
+
+/**
+ * Get current market temperature
+ */
+void lb_quote_context_market_temperature(const struct lb_quote_context_t *ctx,
+                                         enum lb_market_t market,
+                                         lb_async_callback_t callback,
+                                         void *userdata);
+
+/**
+ * Get historical market temperature
+ */
+void lb_quote_context_history_market_temperature(const struct lb_quote_context_t *ctx,
+                                                 enum lb_market_t market,
+                                                 const struct lb_date_t *start,
+                                                 const struct lb_date_t *end,
+                                                 lb_async_callback_t callback,
+                                                 void *userdata);
 
 void lb_trade_context_new(const struct lb_config_t *config,
                           lb_async_callback_t callback,
@@ -4264,7 +4344,7 @@ void lb_trade_context_unsubscribe(const struct lb_trade_context_t *ctx,
 /**
  * Get history executions
  *
- * @param[in] opts Options for get histroy executions request (can be null)
+ * @param[in] opts Options for get history executions request (can be null)
  */
 void lb_trade_context_history_executions(const struct lb_trade_context_t *ctx,
                                          const struct lb_get_history_executions_options_t *opts,

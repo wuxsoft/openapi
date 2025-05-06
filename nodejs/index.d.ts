@@ -442,6 +442,17 @@ export const enum TradeSessions {
   /** All trade sessions */
   All = 1
 }
+/** Data granularity */
+export const enum Granularity {
+  /** Unknown */
+  Unknown = 0,
+  /** Daily */
+  Daily = 1,
+  /** Weekly */
+  Weekly = 2,
+  /** Monthly */
+  Monthly = 3
+}
 /** Options for get cash flow request */
 export interface EstimateMaxPurchaseQuantityOptions {
   symbol: string
@@ -467,7 +478,7 @@ export interface GetCashFlowOptions {
   /** Page size */
   size?: number
 }
-/** Options for get histroy executions request */
+/** Options for get history executions request */
 export interface GetHistoryExecutionsOptions {
   /** Security symbol */
   symbol?: string
@@ -476,7 +487,7 @@ export interface GetHistoryExecutionsOptions {
   /** End time */
   endAt?: Date
 }
-/** Options for get histroy orders request */
+/** Options for get history orders request */
 export interface GetHistoryOrdersOptions {
   /** Security symbol */
   symbol?: string
@@ -1481,6 +1492,36 @@ export class QuoteContext {
    */
   securityList(market: Market, category: SecurityListCategory): Promise<Array<Security>>
   /**
+   * Get current market temperature
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext, Market } = require("longport")
+   *
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.marketTemperature(Market.HK))
+   *   .then((resp) => console.log(resp.toString()));
+   * ```
+   */
+  marketTemperature(market: Market): Promise<MarketTemperature>
+  /**
+   * Get historical market temperature
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, QuoteContext, Market, NaiveDate } = require("longport")
+   *
+   * let config = Config.fromEnv();
+   * QuoteContext.new(config)
+   *   .then((ctx) => ctx.historyMarketTemperature(Market.HK, new NaiveDate(2023, 1, 20), new NaiveDate(2023, 2, 20)))
+   *   .then((resp) => console.log(resp.toString()));
+   * ```
+   */
+  historyMarketTemperature(market: Market, startDate: NaiveDate, end: NaiveDate): Promise<HistoryMarketTemperatureResponse>
+  /**
    * Get real-time quote
    *
    * #### Example
@@ -1910,6 +1951,8 @@ export class Candlestick {
   get turnover(): Decimal
   /** Timestamp */
   get timestamp(): Date
+  /** Trade session */
+  get tradeSession(): TradeSession
 }
 /** Strike price info */
 export class StrikePriceInfo {
@@ -2091,8 +2134,6 @@ export class PushTrades {
 export class PushCandlestick {
   toString(): string
   toJSON(): any
-  /** Trade session */
-  get tradeSession(): TradeSession
   /** Period type */
   get period(): Period
   /** Candlestick */
@@ -2279,6 +2320,30 @@ export class QuotePackageDetail {
   get startAt(): Date
   /** End time */
   get endAt(): Date
+}
+/** Market temperature */
+export class MarketTemperature {
+  toString(): string
+  toJSON(): any
+  /** Temperature value */
+  get temperature(): number
+  /** Temperature description */
+  get description(): string
+  /** Market valuation */
+  get valuation(): number
+  /** Market sentiment */
+  get sentiment(): number
+  /** Time */
+  get timestamp(): Date
+}
+/** History market temperature response */
+export class HistoryMarketTemperatureResponse {
+  toString(): string
+  toJSON(): any
+  /** Granularity */
+  get granularity(): Granularity
+  /** Records */
+  get records(): Array<MarketTemperature>
 }
 /** Naive date type */
 export class NaiveDate {

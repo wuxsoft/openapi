@@ -7,13 +7,13 @@ use crate::{
     blocking::runtime::BlockingRuntime,
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-        FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, IntradayLine, IssuerInfo,
-        MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period, PushEvent,
-        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
-        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
-        SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType, StrikePriceInfo,
-        SubFlags, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
-        WarrantStatus, WarrantType, WatchlistGroup,
+        FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, HistoryMarketTemperatureResponse,
+        IntradayLine, IssuerInfo, MarketTemperature, MarketTradingDays, MarketTradingSession,
+        OptionQuote, ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
+        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
+        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
+        SortOrderType, StrikePriceInfo, SubFlags, Subscription, Trade, TradeSessions, WarrantInfo,
+        WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
     },
 };
 
@@ -851,6 +851,61 @@ impl QuoteContextSync {
     ) -> Result<Vec<Security>> {
         self.rt
             .call(move |ctx| async move { ctx.security_list(market, category).await })
+    }
+
+    /// Get current market temperature
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, Market, blocking::QuoteContextSync};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    ///
+    /// let resp = ctx.market_temperature(Market::HK)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn market_temperature(&self, market: Market) -> Result<MarketTemperature> {
+        self.rt
+            .call(move |ctx| async move { ctx.market_temperature(market).await })
+    }
+
+    /// Get historical market temperature
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, Market, blocking::QuoteContextSync};
+    /// use time::macros::date;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    ///
+    /// let resp =
+    ///     ctx.history_market_temperature(Market::HK, date!(2023 - 01 - 01), date!(2023 - 01 - 31))?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn history_market_temperature(
+        &self,
+        market: Market,
+        start_date: Date,
+        end: Date,
+    ) -> Result<HistoryMarketTemperatureResponse> {
+        self.rt.call(move |ctx| async move {
+            ctx.history_market_temperature(market, start_date, end)
+                .await
+        })
     }
 
     /// Get real-time quotes

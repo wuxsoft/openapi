@@ -136,6 +136,11 @@ public class SdkNative {
                         SecurityListCategory category,
                         AsyncCallback callback);
 
+        public static native void quoteContextMarketTemperature(long context, Market market, AsyncCallback callback);
+
+        public static native void quoteContextHistoryMarketTemperature(long context, Market market, LocalDate start,
+                        LocalDate end, AsyncCallback callback);
+
         public static native void quoteContextRealtimeQuote(long context, String[] symbols, AsyncCallback callback);
 
         public static native void quoteContextRealtimeDepth(long context, String symbol, AsyncCallback callback);

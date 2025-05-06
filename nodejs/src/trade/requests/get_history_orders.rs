@@ -6,7 +6,7 @@ use crate::{
     utils::from_datetime,
 };
 
-/// Options for get histroy orders request
+/// Options for get history orders request
 #[napi_derive::napi(object)]
 pub struct GetHistoryOrdersOptions {
     /// Security symbol

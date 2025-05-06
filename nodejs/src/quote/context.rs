@@ -14,7 +14,8 @@ use crate::{
         requests::{CreateWatchlistGroup, DeleteWatchlistGroup, UpdateWatchlistGroup},
         types::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, IntradayLine, IssuerInfo,
+            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
+            HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
             MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
             QuotePackageDetail, RealtimeQuote, Security, SecurityBrokers, SecurityCalcIndex,
             SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo, SortOrderType,
@@ -1008,6 +1009,53 @@ impl QuoteContext {
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Get current market temperature
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, QuoteContext, Market } = require("longport")
+    ///
+    /// let config = Config.fromEnv();
+    /// QuoteContext.new(config)
+    ///   .then((ctx) => ctx.marketTemperature(Market.HK))
+    ///   .then((resp) => console.log(resp.toString()));
+    /// ```
+    #[napi]
+    pub async fn market_temperature(&self, market: Market) -> Result<MarketTemperature> {
+        self.ctx
+            .market_temperature(market.into())
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Get historical market temperature
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { Config, QuoteContext, Market, NaiveDate } = require("longport")
+    ///
+    /// let config = Config.fromEnv();
+    /// QuoteContext.new(config)
+    ///   .then((ctx) => ctx.historyMarketTemperature(Market.HK, new NaiveDate(2023, 1, 20), new NaiveDate(2023, 2, 20)))
+    ///   .then((resp) => console.log(resp.toString()));
+    /// ```
+    #[napi]
+    pub async fn history_market_temperature(
+        &self,
+        market: Market,
+        start_date: &NaiveDate,
+        end: &NaiveDate,
+    ) -> Result<HistoryMarketTemperatureResponse> {
+        self.ctx
+            .history_market_temperature(market.into(), start_date.0, end.0)
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Get real-time quote

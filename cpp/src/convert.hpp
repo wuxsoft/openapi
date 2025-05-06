@@ -20,8 +20,11 @@ using longport::quote::Depth;
 using longport::quote::DerivativeType;
 using longport::quote::FilterWarrantExpiryDate;
 using longport::quote::FilterWarrantInOutBoundsType;
+using longport::quote::Granularity;
+using longport::quote::HistoryMarketTemperatureResponse;
 using longport::quote::IntradayLine;
 using longport::quote::IssuerInfo;
+using longport::quote::MarketTemperature;
 using longport::quote::MarketTradingDays;
 using longport::quote::MarketTradingSession;
 using longport::quote::OptionDirection;
@@ -2099,6 +2102,46 @@ convert(TradeSessions ts)
     default:
       throw std::invalid_argument("unreachable");
   }
+}
+
+inline MarketTemperature
+convert(const lb_market_temperature_t* mt)
+{
+  return MarketTemperature{ mt->temperature,
+                            mt->description,
+                            mt->valuation,
+                            mt->sentiment,
+                            mt->timestamp };
+}
+
+inline Granularity
+convert(lb_granularity_t granularity)
+{
+  switch (granularity) {
+    case GranularityUnknown:
+      return Granularity::Unknown;
+    case GranularityDaily:
+      return Granularity::Daily;
+    case GranularityWeekly:
+      return Granularity::Weekly;
+    case GranularityMonthly:
+      return Granularity::Monthly;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline HistoryMarketTemperatureResponse
+convert(const lb_history_market_temperature_response_t* resp)
+{
+  std::vector<MarketTemperature> records;
+  std::transform(resp->records,
+                 resp->records + resp->num_records,
+                 std::back_inserter(records),
+                 [](auto item) { return convert(&item); });
+  std::vector<MarketTemperature> records;
+  return HistoryMarketTemperatureResponse{ convert(resp->granularity),
+                                           records };
 }
 
 } // namespace convert

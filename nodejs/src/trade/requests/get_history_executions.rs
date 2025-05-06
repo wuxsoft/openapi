@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 
 use crate::utils::from_datetime;
 
-/// Options for get histroy executions request
+/// Options for get history executions request
 #[napi_derive::napi(object)]
 pub struct GetHistoryExecutionsOptions {
     /// Security symbol

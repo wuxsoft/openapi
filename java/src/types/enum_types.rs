@@ -326,6 +326,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longport/quote/Granularity",
+    longport::quote::Granularity,
+    [Unknown, Daily, Weekly, Monthly]
+);
+
+impl_java_enum!(
     "com/longport/trade/OrderSide",
     longport::trade::OrderSide,
     [Unknown, Buy, Sell]

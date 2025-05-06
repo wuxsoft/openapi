@@ -51,6 +51,9 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::Security>()?;
     parent.add_class::<types::SecurityListCategory>()?;
     parent.add_class::<types::TradeSessions>()?;
+    parent.add_class::<types::MarketTemperature>()?;
+    parent.add_class::<types::Granularity>()?;
+    parent.add_class::<types::HistoryMarketTemperatureResponse>()?;
 
     parent.add_class::<context::QuoteContext>()?;
     Ok(())

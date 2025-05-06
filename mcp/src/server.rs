@@ -441,7 +441,7 @@ impl Longport {
     /// Get the historical orders of the current account.
     ///
     /// does not include today's orders
-    async fn histroy_orders(
+    async fn history_orders(
         &self,
         /// if not provided, default to all symbols
         symbol: Option<String>,

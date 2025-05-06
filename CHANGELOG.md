@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # [3.0.0] Unreleased
 
 - add support extended hours candlesticks
+- add market temperature api
 
 # [2.1.8] 2025-01-27
 

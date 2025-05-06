@@ -1385,3 +1385,48 @@ pub enum TradeSessions {
     /// All trade sessions
     All,
 }
+
+/// Market temperature
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longport::quote::MarketTemperature")]
+pub struct MarketTemperature {
+    /// Temperature value
+    temperature: i32,
+    /// Temperature description
+    description: String,
+    /// Market valuation
+    valuation: i32,
+    /// Market sentiment
+    sentiment: i32,
+    /// Time
+    #[js(datetime)]
+    timestamp: DateTime<Utc>,
+}
+
+/// Data granularity
+#[napi_derive::napi]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
+#[js(remote = "longport::quote::Granularity")]
+pub enum Granularity {
+    /// Unknown
+    Unknown,
+    /// Daily
+    Daily,
+    /// Weekly
+    Weekly,
+    /// Monthly
+    Monthly,
+}
+
+/// History market temperature response
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longport::quote::HistoryMarketTemperatureResponse")]
+pub struct HistoryMarketTemperatureResponse {
+    /// Granularity
+    granularity: Granularity,
+    /// Records
+    #[js(array)]
+    records: Vec<MarketTemperature>,
+}

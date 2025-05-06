@@ -15,7 +15,8 @@ use crate::{
         push::handle_push_event,
         types::{
             AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, IntradayLine, IssuerInfo,
+            FilterWarrantExpiryDate, FilterWarrantInOutBoundsType,
+            HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
             MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period,
             QuotePackageDetail, RealtimeQuote, SecuritiesUpdateMode, Security, SecurityBrokers,
             SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote,
@@ -541,6 +542,27 @@ impl QuoteContext {
             .into_iter()
             .map(TryInto::try_into)
             .collect()
+    }
+
+    /// Get current market temperature
+    pub fn market_temperature(&self, market: Market) -> PyResult<MarketTemperature> {
+        self.ctx
+            .market_temperature(market.into())
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    /// Get historical market temperature
+    pub fn history_market_temperature(
+        &self,
+        market: Market,
+        start_date: PyDateWrapper,
+        end: PyDateWrapper,
+    ) -> PyResult<HistoryMarketTemperatureResponse> {
+        self.ctx
+            .history_market_temperature(market.into(), start_date.0, end.0)
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Get real-time quote

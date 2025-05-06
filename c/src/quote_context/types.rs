@@ -2,18 +2,19 @@ use std::os::raw::c_char;
 
 use longport::quote::{
     Brokers, Candlestick, CapitalDistribution, CapitalDistributionResponse, CapitalFlowLine, Depth,
-    IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionDirection,
-    OptionQuote, OptionType, ParticipantInfo, Period, PrePostQuote, PushBrokers, PushCandlestick,
-    PushDepth, PushQuote, PushTrades, QuotePackageDetail, RealtimeQuote, Security, SecurityBoard,
-    SecurityBrokers, SecurityCalcIndex, SecurityDepth, SecurityQuote, SecurityStaticInfo,
-    StrikePriceInfo, Subscription, Trade, TradeDirection, TradeSession, TradeStatus,
-    TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup, WatchlistSecurity,
+    HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+    MarketTradingDays, MarketTradingSession, OptionDirection, OptionQuote, OptionType,
+    ParticipantInfo, Period, PrePostQuote, PushBrokers, PushCandlestick, PushDepth, PushQuote,
+    PushTrades, QuotePackageDetail, RealtimeQuote, Security, SecurityBoard, SecurityBrokers,
+    SecurityCalcIndex, SecurityDepth, SecurityQuote, SecurityStaticInfo, StrikePriceInfo,
+    Subscription, Trade, TradeDirection, TradeSession, TradeStatus, TradingSessionInfo,
+    WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup, WatchlistSecurity,
 };
 
 use crate::{
     quote_context::enum_types::{
-        COptionDirection, COptionType, CPeriod, CSecuritiesUpdateMode, CSecurityBoard,
-        CTradeDirection, CTradeSession, CTradeStatus, CWarrantStatus, CWarrantType,
+        CGranularity, COptionDirection, COptionType, CPeriod, CSecuritiesUpdateMode,
+        CSecurityBoard, CTradeDirection, CTradeSession, CTradeStatus, CWarrantStatus, CWarrantType,
     },
     types::{CDate, CDecimal, CMarket, COption, CString, CTime, CVec, ToFFI},
 };
@@ -685,22 +686,22 @@ pub struct CSecurityStaticInfo {
 
 #[derive(Debug)]
 pub(crate) struct CSecurityStaticInfoOwned {
-    pub symbol: CString,
-    pub name_cn: CString,
-    pub name_en: CString,
-    pub name_hk: CString,
-    pub exchange: CString,
-    pub currency: CString,
-    pub lot_size: i32,
-    pub total_shares: i64,
-    pub circulating_shares: i64,
-    pub hk_shares: i64,
-    pub eps: CDecimal,
-    pub eps_ttm: CDecimal,
-    pub bps: CDecimal,
-    pub dividend_yield: CDecimal,
-    pub stock_derivatives: u8,
-    pub board: SecurityBoard,
+    symbol: CString,
+    name_cn: CString,
+    name_en: CString,
+    name_hk: CString,
+    exchange: CString,
+    currency: CString,
+    lot_size: i32,
+    total_shares: i64,
+    circulating_shares: i64,
+    hk_shares: i64,
+    eps: CDecimal,
+    eps_ttm: CDecimal,
+    bps: CDecimal,
+    dividend_yield: CDecimal,
+    stock_derivatives: u8,
+    board: SecurityBoard,
 }
 
 impl From<SecurityStaticInfo> for CSecurityStaticInfoOwned {
@@ -1503,11 +1504,11 @@ pub struct CIntradayLine {
 
 #[derive(Debug)]
 pub(crate) struct CIntradayLineOwned {
-    pub price: CDecimal,
-    pub timestamp: i64,
-    pub volume: i64,
-    pub turnover: CDecimal,
-    pub avg_price: CDecimal,
+    price: CDecimal,
+    timestamp: i64,
+    volume: i64,
+    turnover: CDecimal,
+    avg_price: CDecimal,
 }
 
 impl From<IntradayLine> for CIntradayLineOwned {
@@ -2805,10 +2806,10 @@ pub struct CSecurity {
 
 #[derive(Debug)]
 pub(crate) struct CSecurityOwned {
-    pub symbol: CString,
-    pub name_cn: CString,
-    pub name_en: CString,
-    pub name_hk: CString,
+    symbol: CString,
+    name_cn: CString,
+    name_en: CString,
+    name_hk: CString,
 }
 
 impl From<Security> for CSecurityOwned {
@@ -2864,11 +2865,11 @@ pub struct CQuotePackageDetail {
 
 #[derive(Debug)]
 pub(crate) struct CQuotePackageDetailOwned {
-    pub key: CString,
-    pub name: CString,
-    pub description: CString,
-    pub start_at: i64,
-    pub end_at: i64,
+    key: CString,
+    name: CString,
+    description: CString,
+    start_at: i64,
+    end_at: i64,
 }
 
 impl From<QuotePackageDetail> for CQuotePackageDetailOwned {
@@ -2907,6 +2908,115 @@ impl ToFFI for CQuotePackageDetailOwned {
             description: description.to_ffi_type(),
             start_at: *start_at,
             end_at: *end_at,
+        }
+    }
+}
+
+/// Market temperature
+#[repr(C)]
+pub struct CMarketTemperature {
+    /// Temperature value
+    pub temperature: i32,
+    /// Temperature description
+    pub description: *const c_char,
+    /// Market valuation
+    pub valuation: i32,
+    /// Market sentiment
+    pub sentiment: i32,
+    /// Time
+    pub timestamp: i64,
+}
+
+#[derive(Debug)]
+pub(crate) struct CMarketTemperatureOwned {
+    temperature: i32,
+    description: CString,
+    valuation: i32,
+    sentiment: i32,
+    timestamp: i64,
+}
+
+impl From<MarketTemperature> for CMarketTemperatureOwned {
+    fn from(info: MarketTemperature) -> Self {
+        let MarketTemperature {
+            temperature,
+            description,
+            valuation,
+            sentiment,
+            timestamp,
+        } = info;
+        CMarketTemperatureOwned {
+            temperature,
+            description: description.into(),
+            valuation,
+            sentiment,
+            timestamp: timestamp.unix_timestamp(),
+        }
+    }
+}
+
+impl ToFFI for CMarketTemperatureOwned {
+    type FFIType = CMarketTemperature;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CMarketTemperatureOwned {
+            temperature,
+            description,
+            valuation,
+            sentiment,
+            timestamp,
+        } = self;
+        CMarketTemperature {
+            temperature: *temperature,
+            description: description.to_ffi_type(),
+            valuation: *valuation,
+            sentiment: *sentiment,
+            timestamp: *timestamp,
+        }
+    }
+}
+
+#[repr(C)]
+pub struct CHistoryMarketTemperatureResponse {
+    /// Granularity
+    pub granularity: CGranularity,
+    /// Records
+    pub records: *const CMarketTemperature,
+    /// Number of records
+    pub num_records: usize,
+}
+
+#[derive(Debug)]
+pub(crate) struct CHistoryMarketTemperatureResponseOwned {
+    granularity: CGranularity,
+    records: CVec<CMarketTemperatureOwned>,
+}
+
+impl From<HistoryMarketTemperatureResponse> for CHistoryMarketTemperatureResponseOwned {
+    fn from(info: HistoryMarketTemperatureResponse) -> Self {
+        let HistoryMarketTemperatureResponse {
+            granularity,
+            records,
+        } = info;
+        CHistoryMarketTemperatureResponseOwned {
+            granularity: granularity.into(),
+            records: records.into(),
+        }
+    }
+}
+
+impl ToFFI for CHistoryMarketTemperatureResponseOwned {
+    type FFIType = CHistoryMarketTemperatureResponse;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CHistoryMarketTemperatureResponseOwned {
+            granularity,
+            records,
+        } = self;
+        CHistoryMarketTemperatureResponse {
+            granularity: *granularity,
+            records: records.to_ffi_type(),
+            num_records: records.len(),
         }
     }
 }

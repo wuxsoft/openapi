@@ -1203,6 +1203,43 @@ enum class TradeSessions
   All,
 };
 
+/// Market temperature
+struct MarketTemperature
+{
+  /// Temperature value
+  int32_t temperature;
+  /// Temperature description
+  std::string description;
+  /// Market valuation
+  int32_t valuation;
+  /// Market sentiment
+  int32_t sentiment;
+  /// Time
+  int64_t timestamp;
+};
+
+/// Data granularity
+enum Granularity
+{
+  /// Unknown
+  Unknown,
+  /// Daily
+  Daily,
+  /// Weekly
+  Weekly,
+  /// Monthly
+  Monthly,
+};
+
+/// History market temperature response
+struct HistoryMarketTemperatureResponse
+{
+  /// Granularity
+  Granularity granularity;
+  /// Records
+  std::vector<MarketTemperature> records;
+};
+
 } // namespace quote
 
 namespace trade {
@@ -1225,7 +1262,7 @@ struct Execution
   Decimal price;
 };
 
-/// Options for get histroy executions request
+/// Options for get history executions request
 struct GetHistoryExecutionsOptions
 {
   /// Start time

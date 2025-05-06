@@ -1344,3 +1344,47 @@ pub(crate) enum TradeSessions {
     Normal,
     All,
 }
+
+/// Market temperature
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::MarketTemperature")]
+pub(crate) struct MarketTemperature {
+    /// Temperature value
+    temperature: i32,
+    /// Temperature description
+    description: String,
+    /// Market valuation
+    valuation: i32,
+    /// Market sentiment
+    sentiment: i32,
+    /// Time
+    timestamp: PyOffsetDateTimeWrapper,
+}
+
+/// Data granularity
+#[pyclass(eq, eq_int)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::Granularity")]
+pub(crate) enum Granularity {
+    /// Unknown
+    Unknown,
+    /// Daily
+    Daily,
+    /// Weekly
+    Weekly,
+    /// Monthly
+    Monthly,
+}
+
+/// History market temperature response
+#[pyclass]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::HistoryMarketTemperatureResponse")]
+pub(crate) struct HistoryMarketTemperatureResponse {
+    /// Granularity
+    granularity: Granularity,
+    /// Records
+    #[py(array)]
+    records: Vec<MarketTemperature>,
+}

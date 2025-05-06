@@ -2597,6 +2597,79 @@ class TradeSessions:
         """
 
 
+class MarketTemperature:
+    """
+    Market temperature
+    """
+
+    temperature: int
+    """
+    Temperature value
+    """
+
+    description: str
+    """
+    Temperature description
+    """
+
+    valuation: int
+    """
+    Market valuation
+    """
+
+    sentiment: int
+    """
+    Market sentiment
+    """
+
+    timestamp: datetime
+    """
+    Time
+    """
+
+
+class Granularity:
+    """
+    Data granularity
+    """
+
+    class Unknown(Granularity):
+        """
+        Unknown
+        """
+
+    class Daily(Granularity):
+        """
+        Daily
+        """
+
+    class Weekly(Granularity):
+        """
+        Weekly
+        """
+
+    class Monthly(Granularity):
+        """
+        Monthly
+        """
+
+
+class HistoryMarketTemperatureResponse:
+    """
+    History market temperature response
+    """
+
+    granularity: Type[Granularity]
+    """
+    Granularity
+    """
+
+    records: List[MarketTemperature]
+    """
+    Records
+    """
+
+
 class QuoteContext:
     """
     Quote context

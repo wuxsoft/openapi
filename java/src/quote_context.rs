@@ -1116,3 +1116,46 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSecurityLi
         Ok(())
     })
 }
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextMarketTemperature(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    market: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let market: Market = FromJValue::from_jvalue(env, market.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(context.ctx.market_temperature(market).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextHistoryMarketTemperature(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    market: JObject,
+    start: JObject,
+    end: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let market: Market = FromJValue::from_jvalue(env, market.into())?;
+        let start: Date = FromJValue::from_jvalue(env, start.into())?;
+        let end: Date = FromJValue::from_jvalue(env, end.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .history_market_temperature(market, start, end)
+                .await?)
+        })?;
+        Ok(())
+    })
+}

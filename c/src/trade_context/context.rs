@@ -228,7 +228,7 @@ pub unsafe extern "C" fn lb_trade_context_unsubscribe(
 
 /// Get history executions
 ///
-/// @param[in] opts Options for get histroy executions request (can be null)
+/// @param[in] opts Options for get history executions request (can be null)
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_trade_context_history_executions(
     ctx: *const CTradeContext,

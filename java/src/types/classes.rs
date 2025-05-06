@@ -930,3 +930,19 @@ impl_java_class!(
     longport::quote::QuotePackageDetail,
     [key, name, description, start_at, end_at]
 );
+
+impl_java_class!(
+    "com/longport/quote/MarketTemperature",
+    longport::quote::MarketTemperature,
+    [temperature, description, valuation, sentiment, timestamp]
+);
+
+impl_java_class!(
+    "com/longport/quote/HistoryMarketTemperatureResponse",
+    longport::quote::HistoryMarketTemperatureResponse,
+    [
+        granularity,
+        #[java(objarray)]
+        records
+    ]
+);

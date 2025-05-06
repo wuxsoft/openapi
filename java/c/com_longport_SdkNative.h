@@ -50,10 +50,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_httpClientRequest
 /*
  * Class:     com_longport_SdkNative
  * Method:    newConfig
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/longport/Language;ZLcom/longport/PushCandlestickMode;Z)J
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/longport/Language;ZLcom/longport/PushCandlestickMode;ZLjava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newConfig
-  (JNIEnv *, jclass, jstring, jstring, jstring, jstring, jstring, jstring, jobject, jboolean, jobject, jboolean);
+  (JNIEnv *, jclass, jstring, jstring, jstring, jstring, jstring, jstring, jobject, jboolean, jobject, jboolean, jstring);
 
 /*
  * Class:     com_longport_SdkNative
@@ -178,10 +178,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextUnsubscribe
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextSubscribeCandlesticks
- * Signature: (JLjava/lang/String;Lcom/longport/quote/Period;Lcom/longport/AsyncCallback;)V
+ * Signature: (JLjava/lang/String;Lcom/longport/quote/Period;Lcom/longport/quote/TradeSessions;Lcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextSubscribeCandlesticks
-  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject, jobject);
 
 /*
  * Class:     com_longport_SdkNative
@@ -274,26 +274,26 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextIntraday
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextCandlesticks
- * Signature: (JLjava/lang/String;Lcom/longport/quote/Period;ILcom/longport/quote/AdjustType;Lcom/longport/AsyncCallback;)V
+ * Signature: (JLjava/lang/String;Lcom/longport/quote/Period;ILcom/longport/quote/AdjustType;Lcom/longport/quote/TradeSessions;Lcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextCandlesticks
-  (JNIEnv *, jclass, jlong, jstring, jobject, jint, jobject, jobject);
+  (JNIEnv *, jclass, jlong, jstring, jobject, jint, jobject, jobject, jobject);
 
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextHistoryCandlesticksByOffset
- * Signature: (JLjava/lang/String;Lcom/longport/quote/Period;Lcom/longport/quote/AdjustType;ZLjava/time/LocalDateTime;ILcom/longport/AsyncCallback;)V
+ * Signature: (JLjava/lang/String;Lcom/longport/quote/Period;Lcom/longport/quote/AdjustType;ZLjava/time/LocalDateTime;ILcom/longport/quote/TradeSessions;Lcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextHistoryCandlesticksByOffset
-  (JNIEnv *, jclass, jlong, jstring, jobject, jobject, jboolean, jobject, jint, jobject);
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject, jboolean, jobject, jint, jobject, jobject);
 
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextHistoryCandlesticksByDate
- * Signature: (JLjava/lang/String;Lcom/longport/quote/Period;Lcom/longport/quote/AdjustType;Ljava/time/LocalDate;Ljava/time/LocalDate;Lcom/longport/AsyncCallback;)V
+ * Signature: (JLjava/lang/String;Lcom/longport/quote/Period;Lcom/longport/quote/AdjustType;Ljava/time/LocalDate;Ljava/time/LocalDate;Lcom/longport/quote/TradeSessions;Lcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextHistoryCandlesticksByDate
-  (JNIEnv *, jclass, jlong, jstring, jobject, jobject, jobject, jobject, jobject);
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject, jobject, jobject, jobject, jobject);
 
 /*
  * Class:     com_longport_SdkNative
@@ -406,6 +406,22 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextUpdateWatchlistGr
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextSecurityList
   (JNIEnv *, jclass, jlong, jobject, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    quoteContextMarketTemperature
+ * Signature: (JLcom/longport/Market;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextMarketTemperature
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    quoteContextHistoryMarketTemperature
+ * Signature: (JLcom/longport/Market;Ljava/time/LocalDate;Ljava/time/LocalDate;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextHistoryMarketTemperature
+  (JNIEnv *, jclass, jlong, jobject, jobject, jobject, jobject);
 
 /*
  * Class:     com_longport_SdkNative

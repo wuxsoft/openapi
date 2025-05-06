@@ -124,6 +124,9 @@ cpp_compat = true
 "CSecurityListCategory" = "lb_security_list_category_t"
 "CQuotePackageDetail" = "lb_quote_package_detail_t"
 "CTradeSessions" = "lb_trade_sessions_t"
+"CGranularity" = "lb_granularity_t"
+"CMarketTemperature" = "lb_market_temperature_t"
+"CHistoryMarketTemperatureResponse" = "lb_history_market_temperature_response_t"
 
 [export]
 include = [
@@ -160,4 +163,6 @@ include = [
     "CSecurityCalcIndex",
     "CWarrantInfo",
     "CQuotePackageDetail",
+    "CMarketTemperature",
+    "CHistoryMarketTemperatureResponse",
 ]

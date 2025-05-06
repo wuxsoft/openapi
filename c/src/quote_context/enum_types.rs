@@ -606,3 +606,22 @@ pub enum CTradeSessions {
     #[c(remote = "All")]
     TradeSessionsAll = 100,
 }
+
+/// Data granularity
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longport::quote::Granularity")]
+#[repr(C)]
+pub enum CGranularity {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    GranularityUnknown,
+    /// Daily
+    #[c(remote = "Daily")]
+    GranularityDaily,
+    /// Weekly
+    #[c(remote = "Weekly")]
+    GranularityWeekly,
+    /// Monthly
+    #[c(remote = "Monthly")]
+    GranularityMonthly,
+}

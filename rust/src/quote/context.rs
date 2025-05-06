@@ -12,12 +12,12 @@ use crate::{
     Config, Error, Language, Market, Result,
     quote::{
         AdjustType, CalcIndex, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
-        IntradayLine, IssuerInfo, MarketTradingDays, MarketTradingSession, OptionQuote,
-        ParticipantInfo, Period, PushEvent, QuotePackageDetail, RealtimeQuote,
-        RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
-        SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-        StrikePriceInfo, Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote,
-        WarrantType, WatchlistGroup,
+        HistoryMarketTemperatureResponse, IntradayLine, IssuerInfo, MarketTemperature,
+        MarketTradingDays, MarketTradingSession, OptionQuote, ParticipantInfo, Period, PushEvent,
+        QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
+        RequestUpdateWatchlistGroup, Security, SecurityBrokers, SecurityCalcIndex, SecurityDepth,
+        SecurityListCategory, SecurityQuote, SecurityStaticInfo, StrikePriceInfo, Subscription,
+        Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
         core::{Command, Core},
@@ -1471,6 +1471,96 @@ impl QuoteContext {
             .await?
             .0
             .list)
+    }
+
+    /// Get current market temperature
+    ///
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/market_temperature>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, Market, quote::QuoteContext};
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    ///
+    /// let resp = ctx.market_temperature(Market::HK).await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn market_temperature(&self, market: Market) -> Result<MarketTemperature> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            market: Market,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/quote/market_temperature")
+            .query_params(Request { market })
+            .response::<Json<MarketTemperature>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get historical market temperature
+    ///
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/history_market_temperature>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, Market, quote::QuoteContext};
+    /// use time::macros::date;
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let config = Arc::new(Config::from_env()?);
+    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    ///
+    /// let resp = ctx
+    ///     .history_market_temperature(Market::HK, date!(2023 - 01 - 01), date!(2023 - 01 - 31))
+    ///     .await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn history_market_temperature(
+        &self,
+        market: Market,
+        start_date: Date,
+        end: Date,
+    ) -> Result<HistoryMarketTemperatureResponse> {
+        #[derive(Debug, Serialize)]
+        struct Request {
+            market: Market,
+            start_date: String,
+            end: String,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/quote/history_market_temperature")
+            .query_params(Request {
+                market,
+                start_date: format_date(start_date),
+                end: format_date(end),
+            })
+            .response::<Json<HistoryMarketTemperatureResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
     }
 
     /// Get real-time quotes

@@ -324,7 +324,7 @@ impl ToFFI for CExecutionOwned {
     }
 }
 
-/// Options for get histroy executions request
+/// Options for get history executions request
 #[repr(C)]
 pub struct CGetHistoryExecutionsOptions {
     /// Start time (can be null)
@@ -1356,9 +1356,9 @@ pub struct CMarginRatio {
 
 #[derive(Debug)]
 pub(crate) struct CMarginRatioOwned {
-    pub im_factor: CDecimal,
-    pub mm_factor: CDecimal,
-    pub fm_factor: CDecimal,
+    im_factor: CDecimal,
+    mm_factor: CDecimal,
+    fm_factor: CDecimal,
 }
 
 impl From<MarginRatio> for CMarginRatioOwned {
@@ -1405,11 +1405,11 @@ pub struct COrderHistoryDetail {
 
 #[derive(Debug)]
 pub(crate) struct COrderHistoryDetailOwned {
-    pub(crate) price: CDecimal,
-    pub(crate) quantity: CDecimal,
-    pub(crate) status: COrderStatus,
-    pub(crate) msg: CString,
-    pub(crate) time: i64,
+    price: CDecimal,
+    quantity: CDecimal,
+    status: COrderStatus,
+    msg: CString,
+    time: i64,
 }
 
 impl From<OrderHistoryDetail> for COrderHistoryDetailOwned {
@@ -1460,10 +1460,10 @@ pub struct COrderChargeFee {
 
 #[derive(Debug)]
 pub(crate) struct COrderChargeFeeOwned {
-    pub(crate) code: CString,
-    pub(crate) name: CString,
-    pub(crate) amount: CDecimal,
-    pub(crate) currency: CString,
+    code: CString,
+    name: CString,
+    amount: CDecimal,
+    currency: CString,
 }
 
 impl From<OrderChargeFee> for COrderChargeFeeOwned {
@@ -1511,9 +1511,9 @@ pub struct COrderChargeItem {
 
 #[derive(Debug)]
 pub(crate) struct COrderChargeItemOwned {
-    pub(crate) code: CChargeCategoryCode,
-    pub(crate) name: CString,
-    pub(crate) fees: CVec<COrderChargeFeeOwned>,
+    code: CChargeCategoryCode,
+    name: CString,
+    fees: CVec<COrderChargeFeeOwned>,
 }
 
 impl From<OrderChargeItem> for COrderChargeItemOwned {
@@ -1556,11 +1556,11 @@ pub struct COrderChargeDetail {
 #[derive(Debug)]
 pub(crate) struct COrderChargeDetailOwned {
     /// Total charges amount
-    pub(crate) total_amount: CDecimal,
+    total_amount: CDecimal,
     /// Settlement currency
-    pub(crate) currency: CString,
+    currency: CString,
     /// Order charge items
-    pub(crate) items: CVec<COrderChargeItemOwned>,
+    items: CVec<COrderChargeItemOwned>,
 }
 
 impl From<OrderChargeDetail> for COrderChargeDetailOwned {

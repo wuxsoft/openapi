@@ -1252,8 +1252,6 @@ pub struct WatchlistGroup {
     pub securities: Vec<WatchlistSecurity>,
 }
 
-impl_default_for_enum_string!(OptionType, OptionDirection, WarrantType, SecurityBoard);
-
 /// An request for create watchlist group
 #[derive(Debug, Clone)]
 pub struct RequestCreateWatchlistGroup {
@@ -1768,3 +1766,59 @@ impl TradeSessions {
         }
     }
 }
+
+/// Market temperature
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MarketTemperature {
+    /// Temperature value
+    pub temperature: i32,
+    /// Temperature description
+    pub description: String,
+    /// Market valuation
+    pub valuation: i32,
+    /// Market sentiment
+    pub sentiment: i32,
+    /// Time
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize",
+        alias = "updated_at"
+    )]
+    pub timestamp: OffsetDateTime,
+}
+
+/// Data granularity
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum Granularity {
+    /// Unknown
+    Unknown,
+    /// Daily
+    #[strum(serialize = "daily")]
+    Daily,
+    /// Weekly
+    #[strum(serialize = "weekly")]
+    Weekly,
+    /// Monthly
+    #[strum(serialize = "monthly")]
+    Monthly,
+}
+
+/// History market temperature response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HistoryMarketTemperatureResponse {
+    /// Granularity
+    #[serde(rename = "type")]
+    pub granularity: Granularity,
+    /// Records
+    #[serde(rename = "list")]
+    pub records: Vec<MarketTemperature>,
+}
+
+impl_serde_for_enum_string!(Granularity);
+impl_default_for_enum_string!(
+    OptionType,
+    OptionDirection,
+    WarrantType,
+    SecurityBoard,
+    Granularity
+);
