@@ -1,11 +1,11 @@
-use longport_proto::quote::{self, Period, PushQuoteTag, TradeSession, TradeStatus};
+use longport_proto::quote::{self, Period, PushQuoteTag, TradeStatus};
 use prost::Message;
 use rust_decimal::Decimal;
 use time::OffsetDateTime;
 
 use crate::{
     Error, Result,
-    quote::{Brokers, Candlestick, Depth, Trade, cmd_code},
+    quote::{Brokers, Candlestick, Depth, Trade, TradeSession, cmd_code},
 };
 
 /// Quote message
@@ -148,7 +148,11 @@ fn parse_push_quote(data: &[u8]) -> Result<(PushEvent, PushQuoteTag)> {
                 volume: push_quote.volume,
                 turnover: push_quote.turnover.parse().unwrap_or_default(),
                 trade_status: TradeStatus::try_from(push_quote.trade_status).unwrap_or_default(),
-                trade_session: TradeSession::try_from(push_quote.trade_session).unwrap_or_default(),
+                trade_session: longport_proto::quote::TradeSession::try_from(
+                    push_quote.trade_session,
+                )
+                .unwrap_or_default()
+                .into(),
                 current_volume: push_quote.current_volume,
                 current_turnover: push_quote.current_turnover.parse().unwrap_or_default(),
             }),

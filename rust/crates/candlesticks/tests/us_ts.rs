@@ -1,5 +1,5 @@
 use longport_candlesticks::{
-    TRADE_SESSION_NORMAL, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST, TRADE_SESSION_PRE,
+    TRADE_SESSION_INTRADAY, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST, TRADE_SESSION_PRE,
     markets::US,
 };
 use time::macros::datetime;
@@ -40,15 +40,15 @@ fn us_trade_session() {
 
     assert_eq!(
         market.candlestick_trade_session(datetime!(2024-1-1 9:30:00 -5)),
-        Some(TRADE_SESSION_NORMAL)
+        Some(TRADE_SESSION_INTRADAY)
     );
     assert_eq!(
         market.candlestick_trade_session(datetime!(2024-1-1 12:30:00 -5)),
-        Some(TRADE_SESSION_NORMAL)
+        Some(TRADE_SESSION_INTRADAY)
     );
     assert_eq!(
         market.candlestick_trade_session(datetime!(2024-1-1 15:59:59 -5)),
-        Some(TRADE_SESSION_NORMAL)
+        Some(TRADE_SESSION_INTRADAY)
     );
 
     assert_eq!(

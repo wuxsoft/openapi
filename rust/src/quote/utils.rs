@@ -1,8 +1,10 @@
 use longport_candlesticks::{
-    TRADE_SESSION_NORMAL, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST, TRADE_SESSION_PRE,
+    TRADE_SESSION_INTRADAY, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST, TRADE_SESSION_PRE,
     TradeSessionType,
 };
 use time::Date;
+
+use crate::quote::TradeSession;
 
 #[inline]
 pub(crate) fn parse_date(date: &str) -> Result<Date, time::error::Parse> {
@@ -17,11 +19,11 @@ pub(crate) fn format_date(date: Date) -> String {
         .unwrap()
 }
 
-pub(crate) fn convert_trade_session(ts: longport_proto::quote::TradeSession) -> TradeSessionType {
+pub(crate) fn convert_trade_session(ts: TradeSession) -> TradeSessionType {
     match ts {
-        longport_proto::quote::TradeSession::PreTrade => TRADE_SESSION_PRE,
-        longport_proto::quote::TradeSession::NormalTrade => TRADE_SESSION_NORMAL,
-        longport_proto::quote::TradeSession::PostTrade => TRADE_SESSION_POST,
-        longport_proto::quote::TradeSession::OvernightTrade => TRADE_SESSION_OVERNIGHT,
+        TradeSession::Intraday => TRADE_SESSION_INTRADAY,
+        TradeSession::Pre => TRADE_SESSION_PRE,
+        TradeSession::Post => TRADE_SESSION_POST,
+        TradeSession::Overnight => TRADE_SESSION_OVERNIGHT,
     }
 }

@@ -98,8 +98,8 @@ impl Longport {
         /// (required)
         forward_adjust: bool,
         ///  trade sessions (required)
-        /// - normal: regular trading hours
-        /// - all: all trading hours (normal, pre, post, overnight)
+        /// - intraday: regular trading hours
+        /// - all: all trading hours (intraday, pre, post, overnight)
         trade_sessions: String,
     ) -> Result<impl IntoContents, Error> {
         let period = match period.as_str() {
@@ -129,7 +129,7 @@ impl Longport {
             }
         };
         let trade_sessions = match trade_sessions.as_str() {
-            "normal" => TradeSessions::Normal,
+            "intraday" => TradeSessions::Intraday,
             "all" => TradeSessions::All,
             _ => {
                 return Err(Error::ParseField {

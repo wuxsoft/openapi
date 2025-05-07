@@ -48,16 +48,16 @@ pub enum CTradeStatus {
 #[repr(C)]
 pub enum CTradeSession {
     /// Trading
-    #[c(remote = "NormalTrade")]
-    TradeSessionNormal,
+    #[c(remote = "Intraday")]
+    TradeSessionIntraday,
     /// Pre-Trading
-    #[c(remote = "PreTrade")]
+    #[c(remote = "Pre")]
     TradeSessionPre,
     /// Post-Trading
-    #[c(remote = "PostTrade")]
+    #[c(remote = "Post")]
     TradeSessionPost,
     /// Post-Trading
-    #[c(remote = "OvernightTrade")]
+    #[c(remote = "Overnight")]
     TradeSessionOvernight,
 }
 
@@ -599,10 +599,10 @@ pub enum CSecurityListCategory {
 #[c(remote = "longport::quote::TradeSessions")]
 #[repr(C)]
 pub enum CTradeSessions {
-    /// Normal trade session
-    #[c(remote = "Normal")]
-    TradeSessionsNormal = 0,
-    /// All trade sessions
+    /// Intraday
+    #[c(remote = "Intraday")]
+    TradeSessionsIntraday = 0,
+    /// All
     #[c(remote = "All")]
     TradeSessionsAll = 100,
 }

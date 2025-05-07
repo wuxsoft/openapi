@@ -138,7 +138,7 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, event_handler)?;
     ///
-    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Normal)?;
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)?;
     /// sleep(Duration::from_secs(30));
     /// # Ok(())
     /// # }
@@ -447,7 +447,7 @@ impl QuoteContextSync {
     ///     Period::Day,
     ///     10,
     ///     AdjustType::NoAdjust,
-    ///     TradeSessions::Normal,
+    ///     TradeSessions::Intraday,
     /// )?;
     /// println!("{:?}", resp);
     /// # Ok(())
@@ -1059,7 +1059,7 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Normal)?;
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)?;
     /// sleep(Duration::from_secs(5));
     ///
     /// let resp = ctx.realtime_candlesticks("AAPL.US", Period::OneMinute, 10)?;

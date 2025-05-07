@@ -180,13 +180,13 @@ struct Subscription
 /// Trade session
 enum class TradeSession
 {
-  /// Trading
-  Normal,
-  /// Pre-Trading
+  /// Intraday
+  Intraday,
+  /// Pre-Market
   Pre,
-  /// Post-Trading
+  /// Post-Market
   Post,
-  /// Overnight-Trading
+  /// Overnight
   Overnight,
 };
 
@@ -1197,9 +1197,9 @@ struct QuotePackageDetail
 /// Trade sessions
 enum class TradeSessions
 {
-  /// Normal trade session
-  Normal,
-  /// All trade sessions
+  /// Intraday
+  Intraday,
+  /// All
   All,
 };
 

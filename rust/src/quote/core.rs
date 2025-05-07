@@ -10,7 +10,7 @@ use longport_httpcli::HttpClient;
 use longport_proto::quote::{
     self, AdjustType, MarketTradeDayRequest, MarketTradeDayResponse, MultiSecurityRequest, Period,
     PushQuoteTag, SecurityCandlestickRequest, SecurityCandlestickResponse,
-    SecurityStaticInfoResponse, SubscribeRequest, TradeSession, UnsubscribeRequest,
+    SecurityStaticInfoResponse, SubscribeRequest, UnsubscribeRequest,
 };
 use longport_wscli::{
     CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsClientError, WsEvent, WsSession,
@@ -28,7 +28,7 @@ use crate::{
     quote::{
         Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, PushTrades,
         RealtimeQuote, SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade,
-        TradeSessions, cmd_code,
+        TradeSession, TradeSessions, cmd_code,
         store::{Candlesticks, Store, TailCandlestick, get_market},
         sub_flags::SubFlags,
         types::QuotePackageDetail,
@@ -831,7 +831,7 @@ impl Core {
     }
 
     fn merge_candlesticks_by_quote(&mut self, symbol: &str, push_quote: &PushQuote) {
-        if push_quote.trade_session != TradeSession::NormalTrade {
+        if push_quote.trade_session != TradeSession::Intraday {
             return;
         }
 
@@ -844,7 +844,7 @@ impl Core {
         let half_days = self.trading_days.half_days(market_type);
 
         if let Some(candlesticks) = security_data.candlesticks.get_mut(&Period::Day) {
-            let ts = convert_trade_session(push_quote.trade_session);
+            let ts = convert_trade_session(push_quote.trade_session.into());
             let action = candlesticks.merge_quote(
                 ts,
                 market_type,
@@ -879,7 +879,7 @@ impl Core {
             let ts = convert_trade_session(trade.trade_session);
 
             for (period, candlesticks) in &mut security_data.candlesticks {
-                if *period >= Period::Day && !ts.is_normal() {
+                if *period >= Period::Day && !ts.is_intraday() {
                     continue;
                 }
 
@@ -894,7 +894,7 @@ impl Core {
                 update_and_push_candlestick(
                     candlesticks,
                     ts,
-                    trade.trade_session,
+                    trade.trade_session.into(),
                     symbol,
                     *period,
                     action,

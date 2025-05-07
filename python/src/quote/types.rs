@@ -55,16 +55,12 @@ pub(crate) enum TradeStatus {
 #[py(remote = "longport::quote::TradeSession")]
 pub(crate) enum TradeSession {
     /// Trading
-    #[py(remote = "NormalTrade")]
-    Normal,
-    /// Pre-Trading
-    #[py(remote = "PreTrade")]
+    Intraday,
+    /// Pre-Market
     Pre,
-    /// Post-Trading
-    #[py(remote = "PostTrade")]
+    /// Post-Market
     Post,
-    /// Overnight-Trading
-    #[py(remote = "OvernightTrade")]
+    /// Overnight
     Overnight,
 }
 
@@ -1341,7 +1337,7 @@ pub(crate) struct QuotePackageDetail {
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::TradeSessions")]
 pub(crate) enum TradeSessions {
-    Normal,
+    Intraday,
     All,
 }
 

@@ -1001,7 +1001,7 @@ typedef enum lb_trade_session_t {
   /**
    * Trading
    */
-  TradeSessionNormal,
+  TradeSessionIntraday,
   /**
    * Pre-Trading
    */
@@ -1021,11 +1021,11 @@ typedef enum lb_trade_session_t {
  */
 typedef enum lb_trade_sessions_t {
   /**
-   * Normal trade session
+   * Intraday
    */
-  TradeSessionsNormal = 0,
+  TradeSessionsIntraday = 0,
   /**
-   * All trade sessions
+   * All
    */
   TradeSessionsAll = 100,
 } lb_trade_sessions_t;

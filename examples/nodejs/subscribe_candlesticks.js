@@ -9,7 +9,7 @@ async function main() {
   globalCtx.subscribeCandlesticks(
     "AAPL.US",
     Period.Min_1,
-    TradeSessions.Normal
+    TradeSessions.Intraday
   );
 }
 

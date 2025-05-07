@@ -15,7 +15,7 @@ class Main {
                                         .getHistoryCandlesticksByOffset("700.HK", Period.Day, AdjustType.NoAdjust,
                                                         false,
                                                         LocalDateTime.of(2023, 8, 18, 0, 0, 0, 0), 10,
-                                                        TradeSessions.Normal)
+                                                        TradeSessions.Intraday)
                                         .get();
                         System.out.println(Arrays.toString(candlesticks));
 
@@ -25,7 +25,7 @@ class Main {
                         Candlestick[] candlesticks2 = ctx
                                         .getHistoryCandlesticksByDate("700.HK", Period.Day, AdjustType.NoAdjust,
                                                         LocalDate.of(2022, 5, 5), LocalDate.of(2022, 6, 23),
-                                                        TradeSessions.Normal)
+                                                        TradeSessions.Intraday)
                                         .get();
                         System.out.println(Arrays.toString(candlesticks2));
                 }

@@ -92,17 +92,13 @@ pub enum TradeStatus {
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
 #[js(remote = "longport::quote::TradeSession")]
 pub enum TradeSession {
-    /// Trading
-    #[js(remote = "NormalTrade")]
-    Normal,
-    /// Pre-Trading
-    #[js(remote = "PreTrade")]
+    /// Intraday
+    Intraday,
+    /// Pre-Market
     Pre,
-    /// Post-Trading
-    #[js(remote = "PostTrade")]
+    /// Post-Market
     Post,
-    /// Overnight-Trading
-    #[js(remote = "OvernightTrade")]
+    /// Overnight
     Overnight,
 }
 
@@ -1380,9 +1376,9 @@ pub struct QuotePackageDetail {
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq)]
 #[js(remote = "longport::quote::TradeSessions")]
 pub enum TradeSessions {
-    /// Normal trade session
-    Normal,
-    /// All trade sessions
+    /// Intraday
+    Intraday,
+    /// All
     All,
 }
 

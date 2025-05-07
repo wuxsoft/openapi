@@ -300,7 +300,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Normal)
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)
     ///     .await?;
     /// while let Some(msg) = receiver.recv().await {
     ///     println!("{:?}", msg);
@@ -746,7 +746,7 @@ impl QuoteContext {
     ///         Period::Day,
     ///         10,
     ///         AdjustType::NoAdjust,
-    ///         TradeSessions::Normal,
+    ///         TradeSessions::Intraday,
     ///     )
     ///     .await?;
     /// println!("{:?}", resp);
@@ -1752,7 +1752,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Normal)
+    /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)
     ///     .await?;
     /// tokio::time::sleep(Duration::from_secs(5)).await;
     ///

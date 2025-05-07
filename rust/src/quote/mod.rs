@@ -11,7 +11,7 @@ mod types;
 mod utils;
 
 pub use context::QuoteContext;
-pub use longport_proto::quote::{AdjustType, Period, TradeSession, TradeStatus};
+pub use longport_proto::quote::{AdjustType, Period, TradeStatus};
 pub use push_types::{
     PushBrokers, PushCandlestick, PushDepth, PushEvent, PushEventDetail, PushQuote, PushTrades,
 };
@@ -24,7 +24,7 @@ pub use types::{
     ParticipantInfo, PrePostQuote, QuotePackageDetail, RealtimeQuote, RequestCreateWatchlistGroup,
     RequestUpdateWatchlistGroup, SecuritiesUpdateMode, Security, SecurityBoard, SecurityBrokers,
     SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
-    SortOrderType, StrikePriceInfo, Subscription, Trade, TradeDirection, TradeSessions,
-    TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus, WarrantType,
-    WatchlistGroup, WatchlistSecurity,
+    SortOrderType, StrikePriceInfo, Subscription, Trade, TradeDirection, TradeSession,
+    TradeSessions, TradingSessionInfo, WarrantInfo, WarrantQuote, WarrantSortBy, WarrantStatus,
+    WarrantType, WatchlistGroup, WatchlistSecurity,
 };

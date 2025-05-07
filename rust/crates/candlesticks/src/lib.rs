@@ -7,7 +7,7 @@ mod types;
 
 pub use candlestick::Candlestick;
 pub use market::{
-    Days, Market, TRADE_SESSION_NORMAL, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST,
+    Days, Market, TRADE_SESSION_INTRADAY, TRADE_SESSION_OVERNIGHT, TRADE_SESSION_POST,
     TRADE_SESSION_PRE, TradeSession, TradeSessionType, UpdateAction,
 };
 pub use types::{Period, Quote, Trade, UpdateFields};

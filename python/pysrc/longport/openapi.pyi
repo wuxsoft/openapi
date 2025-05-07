@@ -1228,19 +1228,19 @@ class TradeSession:
     Trade session
     """
 
-    class Normal(TradeSession):
+    class Intraday(TradeSession):
         """
-        Trading
+        Intraday
         """
 
     class Pre(TradeSession):
         """
-        Pre-Trading
+        Pre-Market
         """
 
     class Post(TradeSession):
         """
-        Post-Trading
+        Post-Market
         """
 
     class Overnight(TradeSession):
@@ -2587,14 +2587,14 @@ class TradeSessions:
     Trade sessions
     """
 
-    class Normal(TradeSessions):
+    class Intraday(TradeSessions):
         """
-        Normal trade session
+        Intraday
         """
 
     class All(TradeSessions):
         """
-        All trade sessions
+        All
         """
 
 
@@ -2767,7 +2767,7 @@ class QuoteContext:
                 ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
         """
 
-    def subscribe_candlesticks(self, symbol: str, period: Type[Period], trade_sessions: Type[TradeSessions] = TradeSessions.Normal) -> List[Candlestick]:
+    def subscribe_candlesticks(self, symbol: str, period: Type[Period], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
         """
         Subscribe security candlesticks
 
@@ -2787,7 +2787,7 @@ class QuoteContext:
                     print(symbol, event)
 
                 ctx.set_on_candlestick(on_candlestick)
-                ctx.subscribe_candlesticks("700.HK", Period.Min_1, TradeSessions.Normal)
+                ctx.subscribe_candlesticks("700.HK", Period.Min_1, TradeSessions.Intraday)
                 sleep(30)
         """
 
@@ -3013,7 +3013,7 @@ class QuoteContext:
                 print(resp)
         """
 
-    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType], trade_sessions: Type[TradeSessions] = TradeSessions.Normal) -> List[Candlestick]:
+    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
         """
         Get security candlesticks
 
@@ -3036,11 +3036,11 @@ class QuoteContext:
                 ctx = QuoteContext(config)
 
                 resp = ctx.candlesticks(
-                    "700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Normal)
+                    "700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday)
                 print(resp)
         """
 
-    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int, time: Optional[datetime] = None, trade_sessions: Type[TradeSessions] = TradeSessions.Normal) -> List[Candlestick]:
+    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int, time: Optional[datetime] = None, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
         """
         Get security history candlesticks by offset
 
@@ -3054,7 +3054,7 @@ class QuoteContext:
             trade_sessions: Trade sessions
         """
 
-    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date], end: Optional[date], trade_sessions: Type[TradeSessions] = TradeSessions.Normal) -> List[Candlestick]:
+    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date], end: Optional[date], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
         """
         Get security history candlesticks by date
 

@@ -95,13 +95,13 @@ export const enum TradeStatus {
 }
 /** Trade session */
 export const enum TradeSession {
-  /** Trading */
-  Normal = 0,
-  /** Pre-Trading */
+  /** Intraday */
+  Intraday = 0,
+  /** Pre-Market */
   Pre = 1,
-  /** Post-Trading */
+  /** Post-Market */
   Post = 2,
-  /** Overnight-Trading */
+  /** Overnight */
   Overnight = 3
 }
 /** Quote type of subscription */
@@ -437,9 +437,9 @@ export const enum SecurityListCategory {
 }
 /** Trade sessions */
 export const enum TradeSessions {
-  /** Normal trade session */
-  Normal = 0,
-  /** All trade sessions */
+  /** Intraday */
+  Intraday = 0,
+  /** All */
   All = 1
 }
 /** Data granularity */
@@ -1257,7 +1257,7 @@ export class QuoteContext {
    *
    * let config = Config.fromEnv()
    * QuoteContext.new(config)
-   *   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Normal))
+   *   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday))
    *   .then((resp) => {
    *     for (let obj of resp) {
    *       console.log(obj.toString());

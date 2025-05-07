@@ -49,7 +49,7 @@ pub struct TradeSessionType(usize);
 impl std::fmt::Debug for TradeSessionType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self.0 {
-            0 => write!(f, "normal"),
+            0 => write!(f, "intraday"),
             1 => write!(f, "pre"),
             2 => write!(f, "post"),
             3 => write!(f, "overnight"),
@@ -60,12 +60,12 @@ impl std::fmt::Debug for TradeSessionType {
 
 impl TradeSessionType {
     #[inline]
-    pub fn is_normal(&self) -> bool {
-        *self == TRADE_SESSION_NORMAL
+    pub fn is_intraday(&self) -> bool {
+        *self == TRADE_SESSION_INTRADAY
     }
 }
 
-pub const TRADE_SESSION_NORMAL: TradeSessionType = TradeSessionType(0);
+pub const TRADE_SESSION_INTRADAY: TradeSessionType = TradeSessionType(0);
 pub const TRADE_SESSION_PRE: TradeSessionType = TradeSessionType(1);
 pub const TRADE_SESSION_POST: TradeSessionType = TradeSessionType(2);
 pub const TRADE_SESSION_OVERNIGHT: TradeSessionType = TradeSessionType(3);
@@ -119,7 +119,7 @@ impl Market {
     {
         use Period::*;
 
-        assert!(ts.is_normal() || (!ts.is_normal() && period.is_minute()));
+        assert!(ts.is_intraday() || (!ts.is_intraday() && period.is_minute()));
 
         let t = t.to_timezone(self.timezone);
         let time = t.time();

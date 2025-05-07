@@ -193,7 +193,7 @@ public class QuoteContext implements AutoCloseable {
      *             ctx.setOnCandlestick((symbol, event) -> {
      *                 System.out.printf("%s\t%s\n", symbol, event);
      *             });
-     *             ctx.subscribeCandlesticks("700.HK", Period.Min_1, TradeSessions.Normal).get();
+     *             ctx.subscribeCandlesticks("700.HK", Period.Min_1, TradeSessions.Intraday).get();
      *             Thread.sleep(30000);
      *         }
      *     }
@@ -550,7 +550,8 @@ public class QuoteContext implements AutoCloseable {
      *     public static void main(String[] args) throws Exception {
      *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             Candlestick[] resp = ctx
-     *                     .getCandlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Normal).get();
+     *                     .getCandlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday)
+     *                     .get();
      *             for (Candlestick obj : resp) {
      *                 System.out.println(obj);
      *             }

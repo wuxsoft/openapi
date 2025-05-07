@@ -526,8 +526,8 @@ inline TradeSession
 convert(lb_trade_session_t ty)
 {
   switch (ty) {
-    case TradeSessionNormal:
-      return TradeSession::Normal;
+    case TradeSessionsIntraday:
+      return TradeSession::Intraday;
     case TradeSessionPre:
       return TradeSession::Pre;
     case TradeSessionPost:
@@ -2095,8 +2095,8 @@ inline lb_trade_sessions_t
 convert(TradeSessions ts)
 {
   switch (ts) {
-    case TradeSessions::Normal:
-      return TradeSessionsNormal;
+    case TradeSessions::Intraday:
+      return TradeSessionsIntraday;
     case TradeSessions::All:
       return TradeSessionsAll;
     default:

@@ -1,3 +1,6 @@
+import java.io.ObjectInputFilter.Config;
+import java.time.Period;
+
 import com.longport.*;
 import com.longport.quote.*;
 
@@ -7,7 +10,7 @@ class Main {
             ctx.setOnCandlestick((symbol, event) -> {
                 System.out.printf("%s\t%s\n", symbol, event);
             });
-            ctx.subscribeCandlesticks("AAPL.US", Period.Min_1, TradeSessions.Normal).get();
+            ctx.subscribeCandlesticks("AAPL.US", Period.Min_1, TradeSessions.Intraday).get();
             Thread.sleep(30000);
         }
     }

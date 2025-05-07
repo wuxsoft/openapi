@@ -1,8 +1,8 @@
 package com.longport.quote;
 
 public enum TradeSession {
-    NormalTrade,
-    PreTrade,
-    PostTrade,
-    OvernightTrade,
+    Intraday,
+    Pre,
+    Post,
+    Overnight,
 }

@@ -152,7 +152,7 @@ impl QuoteContext {
     }
 
     /// Subscribe security candlesticks
-    #[pyo3(signature = (symbol, period, trade_sessions = TradeSessions::Normal))]
+    #[pyo3(signature = (symbol, period, trade_sessions = TradeSessions::Intraday))]
     fn subscribe_candlesticks(
         &self,
         symbol: String,
@@ -266,7 +266,7 @@ impl QuoteContext {
     }
 
     /// Get security candlesticks
-    #[pyo3(signature = (symbol, period, count, adjust_type, trade_sessions = TradeSessions::Normal))]
+    #[pyo3(signature = (symbol, period, count, adjust_type, trade_sessions = TradeSessions::Intraday))]
     fn candlesticks(
         &self,
         symbol: String,
@@ -290,7 +290,7 @@ impl QuoteContext {
     }
 
     /// Get security history candlesticks by offset
-    #[pyo3(signature = (symbol, period, adjust_type, forward, count, time = None, trade_sessions = TradeSessions::Normal))]
+    #[pyo3(signature = (symbol, period, adjust_type, forward, count, time = None, trade_sessions = TradeSessions::Intraday))]
     #[allow(clippy::too_many_arguments)]
     fn history_candlesticks_by_offset(
         &self,
@@ -319,7 +319,7 @@ impl QuoteContext {
     }
 
     /// Get security history candlesticks by offset
-    #[pyo3(signature = (symbol, period, adjust_type, start = None, end = None,trade_sessions = TradeSessions::Normal))]
+    #[pyo3(signature = (symbol, period, adjust_type, start = None, end = None,trade_sessions = TradeSessions::Intraday))]
     fn history_candlesticks_by_date(
         &self,
         symbol: String,

@@ -547,7 +547,7 @@ impl QuoteContext {
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
-    ///   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Normal))
+    ///   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday))
     ///   .then((resp) => {
     ///     for (let obj of resp) {
     ///       console.log(obj.toString());

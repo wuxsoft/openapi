@@ -1,4 +1,4 @@
-use longport_proto::quote::{self, Period, TradeSession, TradeStatus};
+use longport_proto::quote::{self, Period, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -10,6 +10,31 @@ use crate::{
     quote::{SubFlags, utils::parse_date},
     serde_utils,
 };
+
+/// Trade session type
+#[derive(Debug, Default, Copy, Clone, Hash, Eq, PartialEq, Serialize, Deserialize)]
+pub enum TradeSession {
+    /// Intraday
+    #[default]
+    Intraday,
+    /// Pre-market
+    Pre,
+    /// Post-market
+    Post,
+    /// Overnight
+    Overnight,
+}
+
+impl From<longport_proto::quote::TradeSession> for TradeSession {
+    fn from(value: longport_proto::quote::TradeSession) -> Self {
+        match value {
+            longport_proto::quote::TradeSession::NormalTrade => Self::Intraday,
+            longport_proto::quote::TradeSession::PreTrade => Self::Pre,
+            longport_proto::quote::TradeSession::PostTrade => Self::Post,
+            longport_proto::quote::TradeSession::OvernightTrade => Self::Overnight,
+        }
+    }
+}
 
 /// Subscription
 #[derive(Debug, Clone)]
@@ -139,7 +164,9 @@ impl TryFrom<quote::Trade> for Trade {
                 .map_err(|err| Error::parse_field_error("timestamp", err))?,
             trade_type: trade.trade_type,
             direction: trade.direction.into(),
-            trade_session: TradeSession::try_from(trade.trade_session).unwrap_or_default(),
+            trade_session: longport_proto::quote::TradeSession::try_from(trade.trade_session)
+                .unwrap_or_default()
+                .into(),
         })
     }
 }
@@ -740,8 +767,9 @@ impl TryFrom<quote::Candlestick> for Candlestick {
             turnover: value.turnover.parse().unwrap_or_default(),
             timestamp: OffsetDateTime::from_unix_timestamp(value.timestamp)
                 .map_err(|err| Error::parse_field_error("timestamp", err))?,
-            trade_session: TradeSession::try_from(value.trade_session)
-                .map_err(|err| Error::parse_field_error("trade_session", err))?,
+            trade_session: longport_proto::quote::TradeSession::try_from(value.trade_session)
+                .map_err(|err| Error::parse_field_error("trade_session", err))?
+                .into(),
         })
     }
 }
@@ -1109,7 +1137,9 @@ impl TryFrom<quote::TradePeriod> for TradingSessionInfo {
                 .map_err(|err| Error::parse_field_error("beg_time", err))?,
             end_time: parse_time(value.end_time)
                 .map_err(|err| Error::parse_field_error("end_time", err))?,
-            trade_session: TradeSession::try_from(value.trade_session).unwrap_or_default(),
+            trade_session: longport_proto::quote::TradeSession::try_from(value.trade_session)
+                .unwrap_or_default()
+                .into(),
         })
     }
 }
@@ -1751,9 +1781,9 @@ impl TryFrom<quote::user_quote_level_detail::PackageDetail> for QuotePackageDeta
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum TradeSessions {
-    /// Normal trade session
-    Normal = 0,
-    /// All trade sessions
+    /// Intraday
+    Intraday = 0,
+    /// All
     All = 100,
 }
 
@@ -1761,7 +1791,7 @@ impl TradeSessions {
     #[inline]
     pub(crate) fn contains(&self, session: TradeSession) -> bool {
         match self {
-            TradeSessions::Normal => session == TradeSession::NormalTrade,
+            TradeSessions::Intraday => session == TradeSession::Intraday,
             TradeSessions::All => true,
         }
     }
