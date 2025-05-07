@@ -94,6 +94,16 @@ longport-mcp --sse --bind 127.0.0.1:3000
 
 ## Configuration
 
+### Readonly mode
+
+To run the server in read-only mode, set the flag `--readonly`:
+
+```bash
+longport-mcp --readonly
+```
+
+This will prevent the server from submitting orders to the exchange.
+
 ### Enable logging
 
 To enable logging, set the flag `--log-dir` to the directory where you want to store the logs:
