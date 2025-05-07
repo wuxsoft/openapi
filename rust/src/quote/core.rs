@@ -182,7 +182,7 @@ impl Core {
                 cmd_code::QUERY_USER_QUOTE_PROFILE,
                 None,
                 quote::UserQuoteProfileRequest {
-                    language: config.language.unwrap_or_default().to_string(),
+                    language: config.language.to_string(),
                 },
             )
             .await?;

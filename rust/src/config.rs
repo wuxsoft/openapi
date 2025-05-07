@@ -2,6 +2,7 @@ use std::{
     collections::HashMap,
     fmt::{self, Display},
     path::{Path, PathBuf},
+    str::FromStr,
     sync::Arc,
 };
 
@@ -47,6 +48,19 @@ impl Language {
     }
 }
 
+impl FromStr for Language {
+    type Err = ();
+
+    fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
+        match s {
+            "zh-CN" => Ok(Language::ZH_CN),
+            "zh-HK" => Ok(Language::ZH_HK),
+            "en" => Ok(Language::EN),
+            _ => Err(()),
+        }
+    }
+}
+
 impl Display for Language {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.as_str())
@@ -72,7 +86,7 @@ pub struct Config {
     pub(crate) enable_overnight: Option<bool>,
     pub(crate) push_candlestick_mode: Option<PushCandlestickMode>,
     pub(crate) enable_print_quote_packages: bool,
-    pub(crate) language: Option<Language>,
+    pub(crate) language: Language,
     pub(crate) log_path: Option<PathBuf>,
 }
 
@@ -87,7 +101,7 @@ impl Config {
             http_cli_config: HttpClientConfig::new(app_key, app_secret, access_token),
             quote_ws_url: None,
             trade_ws_url: None,
-            language: None,
+            language: Language::EN,
             enable_overnight: None,
             push_candlestick_mode: None,
             enable_print_quote_packages: true,
@@ -102,6 +116,8 @@ impl Config {
     ///
     /// # Variables
     ///
+    /// - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
+    ///   (Default: `en`)
     /// - `LONGPORT_APP_KEY` - App key
     /// - `LONGPORT_APP_SECRET` - App secret
     /// - `LONGPORT_ACCESS_TOKEN` - Access token
@@ -122,6 +138,10 @@ impl Config {
         let _ = dotenv::dotenv();
 
         let http_cli_config = HttpClientConfig::from_env()?;
+        let language = std::env::var("LONGPORT_LANGUAGE")
+            .ok()
+            .and_then(|value| value.parse::<Language>().ok())
+            .unwrap_or(Language::EN);
         let quote_ws_url = std::env::var("LONGPORT_QUOTE_WS_URL").ok();
         let trade_ws_url = std::env::var("LONGPORT_TRADE_WS_URL").ok();
         let enable_overnight = std::env::var("LONGPORT_ENABLE_OVERNIGHT")
@@ -143,7 +163,7 @@ impl Config {
             http_cli_config,
             quote_ws_url,
             trade_ws_url,
-            language: None,
+            language,
             enable_overnight,
             push_candlestick_mode,
             enable_print_quote_packages,
@@ -192,10 +212,7 @@ impl Config {
     ///
     /// Default: `Language::EN`
     pub fn language(self, language: Language) -> Self {
-        Self {
-            language: Some(language),
-            ..self
-        }
+        Self { language, ..self }
     }
 
     /// Enable overnight quote
@@ -229,10 +246,7 @@ impl Config {
     /// Create metadata for auth/reconnect request
     pub fn create_metadata(&self) -> HashMap<String, String> {
         let mut metadata = HashMap::new();
-        metadata.insert(
-            "accept-language".to_string(),
-            self.language.unwrap_or_default().to_string(),
-        );
+        metadata.insert("accept-language".to_string(), self.language.to_string());
         if self.enable_overnight.unwrap_or_default() {
             metadata.insert("need_over_night_quote".to_string(), "true".to_string());
         }
@@ -241,17 +255,15 @@ impl Config {
 
     #[inline]
     pub(crate) fn create_http_client(&self) -> HttpClient {
-        HttpClient::new(self.http_cli_config.clone()).header(
-            header::ACCEPT_LANGUAGE,
-            self.language.unwrap_or_default().as_str(),
-        )
+        HttpClient::new(self.http_cli_config.clone())
+            .header(header::ACCEPT_LANGUAGE, self.language.as_str())
     }
 
     fn create_ws_request(&self, url: &str) -> tokio_tungstenite::tungstenite::Result<Request<()>> {
         let mut request = url.into_client_request()?;
         request.headers_mut().append(
             header::ACCEPT_LANGUAGE,
-            HeaderValue::from_str(self.language.unwrap_or_default().as_str()).unwrap(),
+            HeaderValue::from_str(self.language.as_str()).unwrap(),
         );
         Ok(request)
     }

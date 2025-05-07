@@ -82,7 +82,7 @@ impl QuoteContext {
             );
         });
 
-        let language = config.language.unwrap_or_default();
+        let language = config.language;
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();

@@ -801,6 +801,8 @@ export class Config {
    *
    * # Variables
    *
+   * - `LONGPORT_LANGUAGE` - Language identifier, `zh-CN`, `zh-HK` or `en`
+   *   (Default: `en`)
    * - `LONGPORT_APP_KEY` - App key
    * - `LONGPORT_APP_SECRET` - App secret
    * - `LONGPORT_ACCESS_TOKEN` - Access token

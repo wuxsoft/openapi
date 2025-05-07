@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add support extended hours candlesticks
 - add market temperature api
+- add support use environment variable `LONGPORT_LANGUAGE` to set the response language
 
 # [2.1.8] 2025-01-27
 
