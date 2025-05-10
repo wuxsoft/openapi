@@ -807,6 +807,36 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
+     * Get capital distribution
+     * 
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             CapitalDistributionResponse resp = ctx.getCapitalDistribution("700.HK").get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param symbol Security code
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<CapitalDistributionResponse> getCapitalDistribution(String symbol)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextCapitalDistribution(this.raw, symbol, callback);
+        });
+    }
+
+    /**
      * Get history candlesticks by offset
      * 
      * @param symbol        Security symbol
@@ -875,7 +905,7 @@ public class QuoteContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
-     *             CapitalDistributionResponse resp = ctx.getWatchlist().get();
+     *             WatchlistGroup[] resp = ctx.getWatchlist().get();
      *             System.out.println(resp);
      *         }
      *     }
