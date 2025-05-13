@@ -1856,3 +1856,55 @@ impl_default_for_enum_string!(
     SecurityBoard,
     Granularity
 );
+
+#[cfg(test)]
+mod tests {
+    use serde::Deserialize;
+
+    use crate::{Market, quote::WatchlistGroup};
+
+    #[test]
+    fn watch_list() {
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            groups: Vec<WatchlistGroup>,
+        }
+
+        let json = r#"
+        {
+            "groups": [
+                {
+                    "id": "1",
+                    "name": "Test",
+                    "securities": [
+                        {
+                            "symbol": "AAPL",
+                            "market": "US",
+                            "name": "Apple Inc.",
+                            "watched_price": "150.0",
+                            "watched_at": "1633036800"
+                        }
+                    ]
+                }
+            ]
+        }
+        "#;
+
+        let response: Response = serde_json::from_str(json).unwrap();
+        assert_eq!(response.groups.len(), 1);
+        assert_eq!(response.groups[0].id, 1);
+        assert_eq!(response.groups[0].name, "Test");
+        assert_eq!(response.groups[0].securities.len(), 1);
+        assert_eq!(response.groups[0].securities[0].symbol, "AAPL");
+        assert_eq!(response.groups[0].securities[0].market, Market::US);
+        assert_eq!(response.groups[0].securities[0].name, "Apple Inc.");
+        assert_eq!(
+            response.groups[0].securities[0].watched_price,
+            Some(decimal!(150.0))
+        );
+        assert_eq!(
+            response.groups[0].securities[0].watched_at.unix_timestamp(),
+            1633036800
+        );
+    }
+}
