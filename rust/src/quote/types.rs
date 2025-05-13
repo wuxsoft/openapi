@@ -1266,7 +1266,10 @@ pub struct WatchlistSecurity {
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub watched_price: Option<Decimal>,
     /// Watched time
-    #[serde(with = "time::serde::rfc3339")]
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
     pub watched_at: OffsetDateTime,
 }
 
