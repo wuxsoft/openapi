@@ -1042,10 +1042,76 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Security[]> securityList(Market market, SecurityListCategory category)
+    public CompletableFuture<Security[]> getSecurityList(Market market, SecurityListCategory category)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.quoteContextSecurityList(this.raw, market, category, callback);
+        });
+    }
+
+    /**
+     * Get current market temperature
+     * 
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             MarketTemperature resp = ctx.getMarketTemperature(Market.HK).get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param market
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException
+     */
+    public CompletableFuture<MarketTemperature> getMarketTemperature(Market market)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextMarketTemperature(raw, market, callback);
+        });
+    }
+
+    /**
+     * Get historical market temperature
+     * 
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             HistoryMarketTemperatureResponse resp = ctx
+     *                     .getHistoryMarketTemperature(Market.HK, LocalDate.of(2025, 1, 20), LocalDate.of(2025, 2, 20))
+     *                     .get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param market Market
+     * @param start  Start date
+     * @param end    End date
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<HistoryMarketTemperatureResponse> getHistoryMarketTemperature(Market market,
+            LocalDate start,
+            LocalDate end)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextHistoryMarketTemperature(raw, market, start, end, callback);
         });
     }
 
