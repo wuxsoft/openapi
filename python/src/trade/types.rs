@@ -569,6 +569,17 @@ pub(crate) struct CashInfo {
     currency: String,
 }
 
+/// Frozen transaction fee
+#[pyclass]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::trade::FrozenTransactionFee")]
+pub(crate) struct FrozenTransactionFee {
+    /// Currency
+    pub currency: String,
+    /// Frozen transaction fee amount
+    pub frozen_transaction_fee: PyDecimal,
+}
+
 /// Account balance
 #[pyclass]
 #[derive(Debug, PyObject)]
@@ -597,6 +608,9 @@ pub(crate) struct AccountBalance {
     pub maintenance_margin: PyDecimal,
     /// Buy power
     pub buy_power: PyDecimal,
+    /// Frozen transaction fees
+    #[py(array)]
+    pub frozen_transaction_fees: Vec<FrozenTransactionFee>,
 }
 
 #[pyclass(eq, eq_int)]

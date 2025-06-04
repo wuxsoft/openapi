@@ -674,6 +674,12 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longport/trade/FrozenTransactionFee",
+    longport::trade::FrozenTransactionFee,
+    [currency, frozen_transaction_fee]
+);
+
+impl_java_class!(
     "com/longport/trade/AccountBalance",
     longport::trade::AccountBalance,
     [
@@ -688,7 +694,9 @@ impl_java_class!(
         net_assets,
         init_margin,
         maintenance_margin,
-        buy_power
+        buy_power,
+        #[java(objarray)]
+        frozen_transaction_fees
     ]
 );
 

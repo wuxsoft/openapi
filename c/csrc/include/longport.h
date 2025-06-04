@@ -2838,6 +2838,20 @@ typedef struct lb_order_t {
 /**
  * Account balance
  */
+typedef struct lb_frozen_transaction_fee_t {
+  /**
+   * Total cash
+   */
+  const char *currency;
+  /**
+   * Maximum financing amount
+   */
+  const struct lb_decimal_t *frozen_transaction_fee;
+} lb_frozen_transaction_fee_t;
+
+/**
+ * Account balance
+ */
 typedef struct lb_cash_info_t {
   /**
    * Withdraw cash
@@ -2913,6 +2927,14 @@ typedef struct lb_account_balance_t {
    * Buy power
    */
   const struct lb_decimal_t *buy_power;
+  /**
+   * Frozen transaction fees
+   */
+  const struct lb_frozen_transaction_fee_t *frozen_transaction_fees;
+  /**
+   * Number of frozen transaction fees
+   */
+  uintptr_t num_frozen_transaction_fees;
 } lb_account_balance_t;
 
 /**

@@ -540,6 +540,15 @@ pub struct CashInfo {
     pub currency: String,
 }
 
+/// Frozen transaction fee
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FrozenTransactionFee {
+    /// Currency
+    pub currency: String,
+    /// Frozen transaction fee amount
+    pub frozen_transaction_fee: Decimal,
+}
+
 /// Account balance
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AccountBalance {
@@ -571,6 +580,8 @@ pub struct AccountBalance {
     /// Buy power
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub buy_power: Decimal,
+    /// Frozen transaction fees
+    pub frozen_transaction_fees: Vec<FrozenTransactionFee>,
 }
 
 /// Balance type

@@ -569,6 +569,17 @@ pub struct CashInfo {
     currency: String,
 }
 
+/// Frozen transaction fee
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longport::trade::FrozenTransactionFee")]
+pub struct FrozenTransactionFee {
+    /// Currency
+    currency: String,
+    /// Frozen transaction fee amount
+    frozen_transaction_fee: Decimal,
+}
+
 /// Account balance
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
@@ -597,6 +608,9 @@ pub struct AccountBalance {
     maintenance_margin: Decimal,
     /// Buy power
     buy_power: Decimal,
+    /// Frozen transaction fees
+    #[js(array)]
+    frozen_transaction_fees: Vec<FrozenTransactionFee>,
 }
 
 #[napi_derive::napi]

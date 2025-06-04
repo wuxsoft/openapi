@@ -15,6 +15,7 @@ public class AccountBalance {
     private BigDecimal initMargin;
     private BigDecimal maintenanceMargin;
     private BigDecimal buyPower;
+    private FrozenTransactionFee[] frozenTransactionFees;
 
     public BigDecimal getTotalCash() {
         return totalCash;
@@ -60,12 +61,16 @@ public class AccountBalance {
         return buyPower;
     }
 
+    public FrozenTransactionFee[] getFrozenTransactionFees() {
+        return frozenTransactionFees;
+    }
+
     @Override
     public String toString() {
         return "AccountBalance [totalCash=" + totalCash + ", maxFinanceAmount=" + maxFinanceAmount
                 + ", remainingFinanceAmount=" + remainingFinanceAmount + ", riskLevel=" + riskLevel + ", marginCall="
                 + marginCall + ", currency=" + currency + ", cashInfos=" + Arrays.toString(cashInfos) + ", netAssets="
                 + netAssets + ", initMargin=" + initMargin + ", maintenanceMargin=" + maintenanceMargin + ", buyPower="
-                + buyPower + "]";
+                + buyPower + ", frozenTransactionFees=" + Arrays.toString(frozenTransactionFees) + "]";
     }
 }

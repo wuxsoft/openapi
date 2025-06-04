@@ -4603,6 +4603,18 @@ class CashInfo:
     """
 
 
+class FrozenTransactionFee:
+    currency: str
+    """
+    Currency
+    """
+
+    frozen_transaction_fee: Decimal
+    """
+    Frozen transaction fee
+    """
+
+
 class AccountBalance:
     """
     Account balance
@@ -4655,6 +4667,11 @@ class AccountBalance:
     buy_power: Decimal
     """
     Buy power
+    """
+
+    frozen_transaction_fees: FrozenTransactionFee
+    """
+    Frozen transaction fees
     """
 
 

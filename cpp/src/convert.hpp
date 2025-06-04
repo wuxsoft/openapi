@@ -75,6 +75,7 @@ using longport::trade::ChargeCategoryCode;
 using longport::trade::CommissionFreeStatus;
 using longport::trade::DeductionStatus;
 using longport::trade::Execution;
+using longport::trade::FrozenTransactionFee;
 using longport::trade::FundPosition;
 using longport::trade::FundPositionChannel;
 using longport::trade::FundPositionsResponse;
@@ -1303,6 +1304,15 @@ convert(const lb_cash_info_t* info)
   };
 }
 
+inline FrozenTransactionFee
+convert(const lb_frozen_transaction_fee_t* info)
+{
+  return FrozenTransactionFee{
+    info->currency,
+    Decimal(info->frozen_transaction_fee),
+  };
+}
+
 inline AccountBalance
 convert(const lb_account_balance_t* info)
 {
@@ -1310,6 +1320,13 @@ convert(const lb_account_balance_t* info)
   std::transform(info->cash_infos,
                  info->cash_infos + info->num_cash_infos,
                  std::back_inserter(cash_infos),
+                 [](auto item) { return convert(&item); });
+
+  std::vector<FrozenTransactionFee> frozen_transaction_fees;
+  std::transform(info->frozen_transaction_fees,
+                 info->frozen_transaction_fees +
+                   info->num_frozen_transaction_fees,
+                 std::back_inserter(frozen_transaction_fees),
                  [](auto item) { return convert(&item); });
 
   return AccountBalance{
@@ -1324,6 +1341,7 @@ convert(const lb_account_balance_t* info)
     Decimal(info->init_margin),
     Decimal(info->maintenance_margin),
     Decimal(info->buy_power),
+    frozen_transaction_fees,
   };
 }
 

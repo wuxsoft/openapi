@@ -27,6 +27,7 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::OrderDetail>()?;
     parent.add_class::<types::BalanceType>()?;
     parent.add_class::<types::EstimateMaxPurchaseQuantityResponse>()?;
+    parent.add_class::<types::FrozenTransactionFee>()?;
 
     parent.add_class::<context::TradeContext>()?;
     Ok(())

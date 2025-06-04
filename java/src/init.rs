@@ -159,6 +159,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::trade::Order,
         longport::trade::SubmitOrderResponse,
         longport::trade::CashInfo,
+        longport::trade::FrozenTransactionFee,
         longport::trade::AccountBalance,
         longport::trade::CashFlow,
         longport::trade::FundPositionsResponse,

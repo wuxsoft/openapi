@@ -1650,6 +1650,13 @@ struct CashInfo
   std::string currency;
 };
 
+/// Frozen transaction fee
+struct FrozenTransactionFee
+{
+  std::string currency;
+  Decimal frozen_transaction_fee;
+};
+
 /// Account balance
 struct AccountBalance
 {
@@ -1675,6 +1682,8 @@ struct AccountBalance
   Decimal maintenance_margin;
   /// Buy power
   Decimal buy_power;
+  /// Frozen transaction fees
+  std::vector<FrozenTransactionFee> frozen_transaction_fees;
 };
 
 /// Cash flow direction

@@ -16,9 +16,9 @@ pub use requests::{
 };
 pub use types::{
     AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo, ChargeCategoryCode,
-    CommissionFreeStatus, DeductionStatus, Execution, FundPosition, FundPositionChannel,
-    FundPositionsResponse, MarginRatio, Order, OrderChargeDetail, OrderChargeFee, OrderChargeItem,
-    OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus, OrderTag, OrderType, OutsideRTH,
-    StockPosition, StockPositionChannel, StockPositionsResponse, TimeInForceType, TriggerPriceType,
-    TriggerStatus,
+    CommissionFreeStatus, DeductionStatus, Execution, FrozenTransactionFee, FundPosition,
+    FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderChargeDetail,
+    OrderChargeFee, OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus,
+    OrderTag, OrderType, OutsideRTH, StockPosition, StockPositionChannel, StockPositionsResponse,
+    TimeInForceType, TriggerPriceType, TriggerStatus,
 };

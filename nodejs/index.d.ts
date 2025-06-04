@@ -3005,6 +3005,15 @@ export class CashInfo {
   /** Currency */
   get currency(): string
 }
+/** Frozen transaction fee */
+export class FrozenTransactionFee {
+  toString(): string
+  toJSON(): any
+  /** Currency */
+  get currency(): string
+  /** Frozen transaction fee amount */
+  get frozenTransactionFee(): Decimal
+}
 /** Account balance */
 export class AccountBalance {
   toString(): string
@@ -3031,6 +3040,8 @@ export class AccountBalance {
   get maintenanceMargin(): Decimal
   /** Buy power */
   get buyPower(): Decimal
+  /** Frozen transaction fees */
+  get frozenTransactionFees(): Array<FrozenTransactionFee>
 }
 /** Account balance */
 export class CashFlow {

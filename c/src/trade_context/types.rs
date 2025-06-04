@@ -4,11 +4,11 @@ use longport::{
     Market,
     trade::{
         AccountBalance, BalanceType, CashFlow, CashFlowDirection, CashInfo,
-        EstimateMaxPurchaseQuantityResponse, Execution, FundPosition, FundPositionChannel,
-        FundPositionsResponse, MarginRatio, Order, OrderChargeDetail, OrderChargeFee,
-        OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus, OrderTag,
-        OrderType, PushOrderChanged, StockPosition, StockPositionChannel, StockPositionsResponse,
-        SubmitOrderResponse, TimeInForceType,
+        EstimateMaxPurchaseQuantityResponse, Execution, FrozenTransactionFee, FundPosition,
+        FundPositionChannel, FundPositionsResponse, MarginRatio, Order, OrderChargeDetail,
+        OrderChargeFee, OrderChargeItem, OrderDetail, OrderHistoryDetail, OrderSide, OrderStatus,
+        OrderTag, OrderType, PushOrderChanged, StockPosition, StockPositionChannel,
+        StockPositionsResponse, SubmitOrderResponse, TimeInForceType,
     },
 };
 use time::OffsetDateTime;
@@ -780,6 +780,49 @@ impl ToFFI for CCashInfoOwned {
 
 /// Account balance
 #[repr(C)]
+pub struct CFrozenTransactionFee {
+    /// Total cash
+    pub currency: *const c_char,
+    /// Maximum financing amount
+    pub frozen_transaction_fee: *const CDecimal,
+}
+
+#[derive(Debug)]
+pub(crate) struct CFrozenTransactionFeeOwned {
+    currency: CString,
+    frozen_transaction_fee: CDecimal,
+}
+
+impl From<FrozenTransactionFee> for CFrozenTransactionFeeOwned {
+    fn from(frozen_fee: FrozenTransactionFee) -> Self {
+        let FrozenTransactionFee {
+            currency,
+            frozen_transaction_fee,
+        } = frozen_fee;
+        Self {
+            currency: currency.into(),
+            frozen_transaction_fee: frozen_transaction_fee.into(),
+        }
+    }
+}
+
+impl ToFFI for CFrozenTransactionFeeOwned {
+    type FFIType = CFrozenTransactionFee;
+
+    fn to_ffi_type(&self) -> Self::FFIType {
+        let CFrozenTransactionFeeOwned {
+            currency,
+            frozen_transaction_fee,
+        } = self;
+        CFrozenTransactionFee {
+            currency: currency.to_ffi_type(),
+            frozen_transaction_fee: frozen_transaction_fee.to_ffi_type(),
+        }
+    }
+}
+
+/// Account balance
+#[repr(C)]
 pub struct CAccountBalance {
     /// Total cash
     pub total_cash: *const CDecimal,
@@ -805,6 +848,10 @@ pub struct CAccountBalance {
     pub maintenance_margin: *const CDecimal,
     /// Buy power
     pub buy_power: *const CDecimal,
+    /// Frozen transaction fees
+    pub frozen_transaction_fees: *const CFrozenTransactionFee,
+    /// Number of frozen transaction fees
+    pub num_frozen_transaction_fees: usize,
 }
 
 #[derive(Debug)]
@@ -820,6 +867,7 @@ pub(crate) struct CAccountBalanceOwned {
     init_margin: CDecimal,
     maintenance_margin: CDecimal,
     buy_power: CDecimal,
+    frozen_transaction_fees: CVec<CFrozenTransactionFeeOwned>,
 }
 
 impl From<AccountBalance> for CAccountBalanceOwned {
@@ -836,6 +884,7 @@ impl From<AccountBalance> for CAccountBalanceOwned {
             init_margin,
             maintenance_margin,
             buy_power,
+            frozen_transaction_fees,
         } = info;
         Self {
             total_cash: total_cash.into(),
@@ -849,6 +898,7 @@ impl From<AccountBalance> for CAccountBalanceOwned {
             init_margin: init_margin.into(),
             maintenance_margin: maintenance_margin.into(),
             buy_power: buy_power.into(),
+            frozen_transaction_fees: frozen_transaction_fees.into(),
         }
     }
 }
@@ -869,6 +919,7 @@ impl ToFFI for CAccountBalanceOwned {
             init_margin,
             maintenance_margin,
             buy_power,
+            frozen_transaction_fees,
         } = self;
         CAccountBalance {
             total_cash: total_cash.to_ffi_type(),
@@ -883,6 +934,8 @@ impl ToFFI for CAccountBalanceOwned {
             init_margin: init_margin.to_ffi_type(),
             maintenance_margin: maintenance_margin.to_ffi_type(),
             buy_power: buy_power.to_ffi_type(),
+            frozen_transaction_fees: frozen_transaction_fees.to_ffi_type(),
+            num_frozen_transaction_fees: frozen_transaction_fees.len(),
         }
     }
 }
