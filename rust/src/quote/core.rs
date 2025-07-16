@@ -16,7 +16,6 @@ use longport_wscli::{
     CodecType, Platform, ProtocolVersion, RateLimit, WsClient, WsClientError, WsEvent, WsSession,
 };
 use time::{Date, OffsetDateTime};
-use time_tz::OffsetDateTimeExt;
 use tokio::{
     sync::{mpsc, oneshot},
     time::{Duration, Instant},
@@ -29,7 +28,7 @@ use crate::{
         Candlestick, PushCandlestick, PushEvent, PushEventDetail, PushQuote, PushTrades,
         RealtimeQuote, SecurityBoard, SecurityBrokers, SecurityDepth, Subscription, Trade,
         TradeSession, TradeSessions, cmd_code,
-        store::{Candlesticks, Store, TailCandlestick, get_market},
+        store::{Candlesticks, Store, TailCandlestick},
         sub_flags::SubFlags,
         types::QuotePackageDetail,
         utils::{convert_trade_session, format_date, parse_date},
@@ -643,12 +642,6 @@ impl Core {
         }
 
         tracing::info!(symbol = symbol, board = ?security_data.board, "got the symbol board");
-
-        let Some(market) = parse_market_from_symbol(&symbol)
-            .and_then(|market| get_market(market, security_data.board))
-        else {
-            return Err(Error::UnknownMarket { symbol });
-        };
 
         // pull candlesticks
         tracing::info!(symbol = symbol, period = ?period, "pull history candlesticks");
