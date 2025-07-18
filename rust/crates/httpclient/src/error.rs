@@ -64,6 +64,15 @@ pub enum HttpClientError {
     /// Http error
     #[error(transparent)]
     Http(#[from] HttpError),
+
+    /// Connection limit exceeded
+    #[error("connections limitation is hit, limit = {limit}, online = {online}")]
+    ConnectionLimitExceeded {
+        /// The limit of connections
+        limit: i32,
+        /// The number of online connections
+        online: i32,
+    },
 }
 
 /// Represents an HTTP error

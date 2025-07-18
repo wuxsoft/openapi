@@ -68,32 +68,26 @@ impl HttpClient {
         #[derive(Debug, Deserialize)]
         struct Response {
             otp: String,
+            limit: i32,
+            online: i32,
         }
 
-        Ok(self
+        let resp = self
             .request(Method::GET, "/v1/socket/token")
             .response::<Json<Response>>()
             .send()
             .await?
-            .0
-            .otp)
-    }
+            .0;
+        dbg!(&resp);
+        tracing::info!(limit = resp.limit, online = resp.online, "create otp");
 
-    /// Get the socket OTP v2(One Time Password)
-    ///
-    /// Reference: <https://open.longportapp.com/en/docs/socket-token-api>
-    pub async fn get_otp_v2(&self) -> HttpClientResult<String> {
-        #[derive(Debug, Deserialize)]
-        struct Response {
-            otp: String,
+        if resp.online >= resp.limit {
+            return Err(HttpClientError::ConnectionLimitExceeded {
+                limit: resp.limit,
+                online: resp.online,
+            });
         }
 
-        Ok(self
-            .request(Method::GET, "/v2/socket/token")
-            .response::<Json<Response>>()
-            .send()
-            .await?
-            .0
-            .otp)
+        Ok(resp.otp)
     }
 }
