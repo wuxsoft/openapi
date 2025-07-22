@@ -1,12 +1,11 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, ops::Add};
 
-use rust_decimal::{Decimal, prelude::FromPrimitive};
+use num_traits::Zero;
 use time::{Date, Duration, OffsetDateTime, Time, Weekday, macros::time};
 use time_tz::{OffsetDateTimeExt, PrimitiveDateTimeExt, Tz};
 
 use crate::{
-    Period, Quote, Trade, UpdateFields,
-    candlestick::Candlestick,
+    CandlestickComponents, CandlestickType, Period, QuoteType, TradeType, UpdateFields,
     find_session::{FindSession, FindSessionResult},
 };
 
@@ -43,48 +42,58 @@ impl TradeSession {
     }
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Hash)]
-pub struct TradeSessionType(usize);
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub struct TradeSessionKind(usize);
 
-impl std::fmt::Debug for TradeSessionType {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self.0 {
-            0 => write!(f, "intraday"),
-            1 => write!(f, "pre"),
-            2 => write!(f, "post"),
-            3 => write!(f, "overnight"),
-            _ => unreachable!(),
+pub trait TradeSessionType: Copy {
+    fn kind(&self) -> TradeSessionKind;
+
+    #[inline]
+    fn is_intraday(&self) -> bool {
+        self.kind() == TRADE_SESSION_INTRADAY
+    }
+
+    #[inline]
+    fn as_str(&self) -> &'static str {
+        let kind = self.kind();
+        if kind == TRADE_SESSION_INTRADAY {
+            "intraday"
+        } else if kind == TRADE_SESSION_PRE {
+            "pre"
+        } else if kind == TRADE_SESSION_POST {
+            "post"
+        } else if kind == TRADE_SESSION_OVERNIGHT {
+            "overnight"
+        } else {
+            unreachable!()
         }
     }
 }
 
-impl TradeSessionType {
+impl TradeSessionType for TradeSessionKind {
     #[inline]
-    pub fn is_intraday(&self) -> bool {
-        *self == TRADE_SESSION_INTRADAY
+    fn kind(&self) -> TradeSessionKind {
+        *self
     }
 }
 
-pub const TRADE_SESSION_INTRADAY: TradeSessionType = TradeSessionType(0);
-pub const TRADE_SESSION_PRE: TradeSessionType = TradeSessionType(1);
-pub const TRADE_SESSION_POST: TradeSessionType = TradeSessionType(2);
-pub const TRADE_SESSION_OVERNIGHT: TradeSessionType = TradeSessionType(3);
+pub const TRADE_SESSION_INTRADAY: TradeSessionKind = TradeSessionKind(0);
+pub const TRADE_SESSION_PRE: TradeSessionKind = TradeSessionKind(1);
+pub const TRADE_SESSION_POST: TradeSessionKind = TradeSessionKind(2);
+pub const TRADE_SESSION_OVERNIGHT: TradeSessionKind = TradeSessionKind(3);
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Market {
     pub timezone: &'static Tz,
     pub trade_sessions: &'static [&'static [TradeSession]],
     pub half_trade_sessions: &'static [&'static [TradeSession]],
-    pub lot_size: i64,
+    pub lot_size: i32,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum UpdateAction {
-    UpdateLast(Candlestick),
-    AppendNew {
-        confirmed: Option<Candlestick>,
-        new: Candlestick,
-    },
+pub enum UpdateAction<T> {
+    UpdateLast(T),
+    AppendNew { confirmed: Option<T>, new: T },
     None,
 }
 
@@ -107,19 +116,21 @@ impl Days for &HashSet<Date> {
 }
 
 impl Market {
-    pub fn candlestick_time<H>(
+    pub fn candlestick_time<H, TS>(
         &self,
-        ts: TradeSessionType,
+        ts: TS,
         half_days: H,
         period: Period,
         t: OffsetDateTime,
     ) -> Option<OffsetDateTime>
     where
         H: Days,
+        TS: TradeSessionType,
     {
         use Period::*;
 
         assert!(ts.is_intraday() || (!ts.is_intraday() && period.is_minute()));
+        let ts = ts.kind();
 
         let t = t.to_timezone(self.timezone);
         let time = t.time();
@@ -182,55 +193,75 @@ impl Market {
     }
 
     #[must_use]
-    pub fn merge_trade<H>(
+    pub fn merge_trade<H, TS, C, T, P, V, R>(
         &self,
-        ts: TradeSessionType,
+        ts: TS,
         half_days: H,
         period: Period,
-        input: Option<Candlestick>,
-        trade: Trade,
-    ) -> UpdateAction
+        input: Option<C>,
+        trade: &T,
+        update_fields: UpdateFields,
+    ) -> UpdateAction<C>
     where
         H: Days,
+        TS: TradeSessionType,
+        C: CandlestickType<PriceType = P, VolumeType = V, TurnoverType = R, TradeSessionType = TS>,
+        T: TradeType<PriceType = P, VolumeType = V, TurnoverType = R>,
+        P: PartialOrd + Add<Output = P>,
+        V: Add<Output = V> + Zero,
+        R: Add<Output = R> + Zero,
     {
         debug_assert!(period != Period::Day);
 
-        let Some(time) =
-            self.candlestick_time(ts, half_days, period, trade.time.to_timezone(self.timezone))
-        else {
+        let Some(time) = self.candlestick_time(
+            ts,
+            half_days,
+            period,
+            trade.time().to_timezone(self.timezone),
+        ) else {
             return UpdateAction::None;
         };
 
         match input {
-            Some(prev) if time == prev.time => {
+            Some(prev) if time == prev.time() => {
                 let mut candlestick = prev;
 
-                if trade.update_fields.contains(UpdateFields::PRICE) {
-                    candlestick.high = candlestick.high.max(trade.price);
-                    candlestick.low = candlestick.low.min(trade.price);
-                    candlestick.close = trade.price;
+                if update_fields.contains(UpdateFields::PRICE) {
+                    candlestick.set_high(if trade.price() > candlestick.high() {
+                        trade.price()
+                    } else {
+                        candlestick.high()
+                    });
+
+                    candlestick.set_low(if trade.price() < candlestick.low() {
+                        trade.price()
+                    } else {
+                        candlestick.low()
+                    });
+
+                    candlestick.set_close(trade.price());
                 }
 
-                if trade.update_fields.contains(UpdateFields::VOLUME) {
-                    candlestick.volume += trade.volume;
-                    candlestick.turnover += trade.price
-                        * Decimal::from_i64(trade.volume * self.lot_size).unwrap_or_default();
+                if update_fields.contains(UpdateFields::VOLUME) {
+                    candlestick.set_volume(candlestick.volume() + trade.volume());
+                    candlestick
+                        .set_turnover(candlestick.turnover() + trade.turnover(self.lot_size));
                 }
 
                 UpdateAction::UpdateLast(candlestick)
             }
             None => {
-                if trade.update_fields.contains(UpdateFields::PRICE) {
-                    let new_candlestick = Candlestick {
+                if update_fields.contains(UpdateFields::PRICE) {
+                    let new_candlestick = C::new(CandlestickComponents {
                         time: time.to_timezone(time_tz::timezones::db::UTC),
-                        open: trade.price,
-                        high: trade.price,
-                        low: trade.price,
-                        close: trade.price,
-                        volume: trade.volume,
-                        turnover: trade.price
-                            * Decimal::from_i64(trade.volume * self.lot_size).unwrap_or_default(),
-                    };
+                        open: trade.price(),
+                        high: trade.price(),
+                        low: trade.price(),
+                        close: trade.price(),
+                        volume: trade.volume(),
+                        turnover: trade.turnover(self.lot_size),
+                        trade_session: ts,
+                    });
                     UpdateAction::AppendNew {
                         confirmed: None,
                         new: new_candlestick,
@@ -239,28 +270,28 @@ impl Market {
                     UpdateAction::None
                 }
             }
-            Some(prev) if time > prev.time => {
-                let mut new_candlestick = Candlestick {
+            Some(prev) if time > prev.time() => {
+                let mut new_candlestick = C::new(CandlestickComponents {
                     time: time.to_timezone(time_tz::timezones::db::UTC),
-                    open: prev.close,
-                    high: prev.close,
-                    low: prev.close,
-                    close: prev.close,
-                    volume: 0,
-                    turnover: Decimal::ZERO,
-                };
+                    open: prev.close(),
+                    high: prev.close(),
+                    low: prev.close(),
+                    close: prev.close(),
+                    volume: V::zero(),
+                    turnover: R::zero(),
+                    trade_session: ts,
+                });
 
-                if trade.update_fields.contains(UpdateFields::PRICE) {
-                    new_candlestick.open = trade.price;
-                    new_candlestick.high = trade.price;
-                    new_candlestick.low = trade.price;
-                    new_candlestick.close = trade.price;
+                if update_fields.contains(UpdateFields::PRICE) {
+                    new_candlestick.set_open(trade.price());
+                    new_candlestick.set_high(trade.price());
+                    new_candlestick.set_low(trade.price());
+                    new_candlestick.set_close(trade.price());
                 }
 
-                if trade.update_fields.contains(UpdateFields::VOLUME) {
-                    new_candlestick.volume = trade.volume;
-                    new_candlestick.turnover = trade.price
-                        * Decimal::from_i64(trade.volume * self.lot_size).unwrap_or_default();
+                if update_fields.contains(UpdateFields::VOLUME) {
+                    new_candlestick.set_volume(trade.volume());
+                    new_candlestick.set_turnover(trade.turnover(self.lot_size));
                 }
 
                 UpdateAction::AppendNew {
@@ -273,58 +304,66 @@ impl Market {
     }
 
     #[must_use]
-    pub fn merge_quote<H>(
+    pub fn merge_quote<H, TS, C, Q, P, V, R>(
         &self,
-        ts: TradeSessionType,
+        ts: TS,
         half_days: H,
         period: Period,
-        input: Option<Candlestick>,
-        quote: Quote,
-    ) -> UpdateAction
+        input: Option<C>,
+        quote: &Q,
+    ) -> UpdateAction<C>
     where
         H: Days,
+        TS: TradeSessionType,
+        C: CandlestickType<PriceType = P, VolumeType = V, TurnoverType = R, TradeSessionType = TS>,
+        Q: QuoteType<PriceType = P, VolumeType = V, TurnoverType = R>,
     {
         debug_assert!(period == Period::Day);
 
         let tz = self.timezone;
-        let Some(time) = self.candlestick_time(ts, half_days, period, quote.time.to_timezone(tz))
+        let Some(time) = self.candlestick_time(ts, half_days, period, quote.time().to_timezone(tz))
         else {
             return UpdateAction::None;
         };
 
         match input {
-            Some(prev) if time == prev.time => UpdateAction::UpdateLast(Candlestick {
-                time: time.to_timezone(time_tz::timezones::db::UTC),
-                open: quote.open,
-                high: quote.high,
-                low: quote.low,
-                close: quote.last_done,
-                volume: quote.volume,
-                turnover: quote.turnover,
-            }),
+            Some(prev) if time == prev.time() => {
+                UpdateAction::UpdateLast(C::new(CandlestickComponents {
+                    time: time.to_timezone(time_tz::timezones::db::UTC),
+                    open: quote.open(),
+                    high: quote.high(),
+                    low: quote.low(),
+                    close: quote.last_done(),
+                    volume: quote.volume(),
+                    turnover: quote.turnover(),
+                    trade_session: ts,
+                }))
+            }
             None => UpdateAction::AppendNew {
                 confirmed: None,
-                new: Candlestick {
+                new: C::new(CandlestickComponents {
                     time: time.to_timezone(time_tz::timezones::db::UTC),
-                    open: quote.open,
-                    high: quote.high,
-                    low: quote.low,
-                    close: quote.last_done,
-                    volume: quote.volume,
-                    turnover: quote.turnover,
-                },
+                    open: quote.open(),
+                    high: quote.high(),
+                    low: quote.low(),
+                    close: quote.last_done(),
+                    volume: quote.volume(),
+                    turnover: quote.turnover(),
+                    trade_session: ts,
+                }),
             },
-            Some(prev) if time > prev.time => UpdateAction::AppendNew {
+            Some(prev) if time > prev.time() => UpdateAction::AppendNew {
                 confirmed: Some(prev),
-                new: Candlestick {
+                new: C::new(CandlestickComponents {
                     time: time.to_timezone(time_tz::timezones::db::UTC),
-                    open: quote.open,
-                    high: quote.high,
-                    low: quote.low,
-                    close: quote.last_done,
-                    volume: quote.volume,
-                    turnover: quote.turnover,
-                },
+                    open: quote.open(),
+                    high: quote.high(),
+                    low: quote.low(),
+                    close: quote.last_done(),
+                    volume: quote.volume(),
+                    turnover: quote.turnover(),
+                    trade_session: ts,
+                }),
             },
             _ => UpdateAction::None,
         }
@@ -333,7 +372,7 @@ impl Market {
     pub fn candlestick_trade_session(
         &self,
         candlestick_time: OffsetDateTime,
-    ) -> Option<TradeSessionType> {
+    ) -> Option<TradeSessionKind> {
         let candlestick_time = candlestick_time.to_timezone(self.timezone);
         for (idx, trade_sessions) in self.trade_sessions.iter().enumerate() {
             for TradeSession {
@@ -347,10 +386,10 @@ impl Market {
                 let time = candlestick_time.time();
                 if !*inclusive && timeout.is_zero() {
                     if time >= *start && time < *end {
-                        return Some(TradeSessionType(idx));
+                        return Some(TradeSessionKind(idx));
                     }
                 } else if time >= *start && time <= *end {
-                    return Some(TradeSessionType(idx));
+                    return Some(TradeSessionKind(idx));
                 }
             }
         }

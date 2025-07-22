@@ -1,15 +1,13 @@
 use std::collections::HashMap;
 
-use longport_candlesticks::{
-    Days, TRADE_SESSION_POST, TRADE_SESSION_PRE, TradeSessionType, UpdateAction, UpdateFields,
-};
+use longport_candlesticks::{Days, UpdateAction, UpdateFields};
 use longport_proto::quote::Period;
 
 use crate::{
     Market,
     quote::{
         Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, SecurityBoard,
-        Trade, TradeSessions,
+        Trade, TradeSession, TradeSessions,
         push_types::{PushEventDetail, PushQuote},
     },
 };
@@ -47,13 +45,13 @@ pub(crate) struct TailCandlestick {
 pub(crate) struct Candlesticks {
     pub(crate) trade_sessions: TradeSessions,
     pub(crate) candlesticks: Vec<Candlestick>,
-    pub(crate) tails: HashMap<TradeSessionType, TailCandlestick>,
+    pub(crate) tails: HashMap<TradeSession, TailCandlestick>,
 }
 
 impl Candlesticks {
     #[inline]
-    fn merge_input(&self, ts: TradeSessionType) -> Option<longport_candlesticks::Candlestick> {
-        self.tails.get(&ts).map(|tail| tail.candlestick.into())
+    fn merge_input(&self, ts: TradeSession) -> Option<Candlestick> {
+        self.tails.get(&ts).map(|tail| tail.candlestick)
     }
 
     pub(crate) fn insert_candlestick_by_time(&mut self, candlestick: Candlestick) -> usize {
@@ -75,13 +73,13 @@ impl Candlesticks {
 
     pub(crate) fn merge_trade<H>(
         &mut self,
-        ts: TradeSessionType,
+        ts: TradeSession,
         market_type: Market,
         half_days: H,
         board: SecurityBoard,
         period: Period,
         trade: &Trade,
-    ) -> UpdateAction
+    ) -> UpdateAction<Candlestick>
     where
         H: Days,
     {
@@ -116,7 +114,7 @@ impl Candlesticks {
                 "I" if board == SecurityBoard::USOption || board == SecurityBoard::USOptionS => {
                     UpdateFields::all()
                 }
-                "I" if ts == TRADE_SESSION_PRE || ts == TRADE_SESSION_POST => UpdateFields::all(),
+                "I" if ts == TradeSession::Pre || ts == TradeSession::Post => UpdateFields::all(),
                 "I" => UpdateFields::VOLUME,
                 "K" => UpdateFields::all(),
                 "M" => UpdateFields::empty(),
@@ -136,24 +134,20 @@ impl Candlesticks {
             half_days,
             period,
             self.merge_input(ts),
-            longport_candlesticks::Trade {
-                time: trade.timestamp,
-                price: trade.price,
-                volume: trade.volume,
-                update_fields,
-            },
+            trade,
+            update_fields,
         )
     }
 
     pub(crate) fn merge_quote<H>(
         &mut self,
-        ts: TradeSessionType,
+        ts: TradeSession,
         market_type: Market,
         half_days: H,
         board: SecurityBoard,
         period: Period,
         push_quote: &PushQuote,
-    ) -> UpdateAction
+    ) -> UpdateAction<Candlestick>
     where
         H: Days,
     {
@@ -164,21 +158,7 @@ impl Candlesticks {
         };
         let period = convert_period(period);
 
-        market.merge_quote(
-            ts,
-            half_days,
-            period,
-            self.merge_input(ts),
-            longport_candlesticks::Quote {
-                time: push_quote.timestamp,
-                open: push_quote.open,
-                high: push_quote.high,
-                low: push_quote.low,
-                last_done: push_quote.last_done,
-                volume: push_quote.volume,
-                turnover: push_quote.turnover,
-            },
-        )
+        market.merge_quote(ts, half_days, period, self.merge_input(ts), push_quote)
     }
 
     pub(crate) fn check_and_remove(&mut self) {

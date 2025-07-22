@@ -31,7 +31,7 @@ use crate::{
         store::{Candlesticks, Store, TailCandlestick},
         sub_flags::SubFlags,
         types::QuotePackageDetail,
-        utils::{convert_trade_session, format_date, parse_date},
+        utils::{format_date, parse_date},
     },
 };
 
@@ -666,10 +666,12 @@ impl Core {
 
         for candlestick in resp.candlesticks {
             let candlestick: Candlestick = candlestick.try_into()?;
-            let ts = convert_trade_session(candlestick.trade_session);
             let index = candlesticks.len();
             candlesticks.push(candlestick);
-            tails.insert(ts, TailCandlestick { index, candlestick });
+            tails.insert(
+                candlestick.trade_session,
+                TailCandlestick { index, candlestick },
+            );
         }
 
         tracing::info!(symbol = symbol, period = ?period, count = candlesticks.len(), tails = ?tails, "candlesticks loaded");
@@ -837,9 +839,8 @@ impl Core {
         let half_days = self.trading_days.half_days(market_type);
 
         if let Some(candlesticks) = security_data.candlesticks.get_mut(&Period::Day) {
-            let ts = convert_trade_session(push_quote.trade_session);
             let action = candlesticks.merge_quote(
-                ts,
+                push_quote.trade_session,
                 market_type,
                 half_days,
                 security_data.board,
@@ -848,7 +849,6 @@ impl Core {
             );
             update_and_push_candlestick(
                 candlesticks,
-                ts,
                 push_quote.trade_session,
                 symbol,
                 Period::Day,
@@ -869,15 +869,13 @@ impl Core {
         let half_days = self.trading_days.half_days(market_type);
 
         for trade in &push_trades.trades {
-            let ts = convert_trade_session(trade.trade_session);
-
             for (period, candlesticks) in &mut security_data.candlesticks {
-                if *period >= Period::Day && !ts.is_intraday() {
+                if *period >= Period::Day && !trade.trade_session.is_intraday() {
                     continue;
                 }
 
                 let action = candlesticks.merge_trade(
-                    ts,
+                    trade.trade_session,
                     market_type,
                     half_days,
                     security_data.board,
@@ -886,7 +884,6 @@ impl Core {
                 );
                 update_and_push_candlestick(
                     candlesticks,
-                    ts,
                     trade.trade_session,
                     symbol,
                     *period,
@@ -1066,11 +1063,10 @@ async fn fetch_trading_days(cli: &WsClient) -> Result<TradingDays> {
 #[allow(clippy::too_many_arguments)]
 fn update_and_push_candlestick(
     candlesticks: &mut Candlesticks,
-    ts: TradeSessionType,
-    ts1: TradeSession,
+    ts: TradeSession,
     symbol: &str,
     period: Period,
-    action: UpdateAction,
+    action: UpdateAction<Candlestick>,
     push_candlestick_mode: PushCandlestickMode,
     tx: &mut mpsc::UnboundedSender<PushEvent>,
 ) {
@@ -1079,28 +1075,26 @@ fn update_and_push_candlestick(
     match action {
         UpdateAction::UpdateLast(candlestick) => {
             let tail = candlesticks.tails.get_mut(&ts).unwrap();
-            candlesticks.candlesticks[tail.index] = (candlestick, ts1).into();
-            tail.candlestick = (candlestick, ts1).into();
+            candlesticks.candlesticks[tail.index] = candlestick;
+            tail.candlestick = candlestick;
 
             if push_candlestick_mode == PushCandlestickMode::Realtime {
-                push_candlesticks.push(((candlestick, ts1).into(), false));
+                push_candlesticks.push((candlestick, false));
             }
         }
         UpdateAction::AppendNew { confirmed, new } => {
             let index = if let Some(tail) = candlesticks.tails.get_mut(&ts) {
-                candlesticks
-                    .candlesticks
-                    .insert(tail.index + 1, (new, ts1).into());
+                candlesticks.candlesticks.insert(tail.index + 1, new);
                 tail.index += 1;
-                tail.candlestick = (new, ts1).into();
+                tail.candlestick = new;
                 tail.index
             } else {
-                let index = candlesticks.insert_candlestick_by_time((new, ts1).into());
+                let index = candlesticks.insert_candlestick_by_time(new);
                 candlesticks.tails.insert(
                     ts,
                     TailCandlestick {
                         index,
-                        candlestick: (new, ts1).into(),
+                        candlestick: new,
                     },
                 );
                 index
@@ -1117,13 +1111,13 @@ fn update_and_push_candlestick(
             match push_candlestick_mode {
                 PushCandlestickMode::Realtime => {
                     if let Some(confirmed) = confirmed {
-                        push_candlesticks.push(((confirmed, ts1).into(), true));
+                        push_candlesticks.push((confirmed, true));
                     }
-                    push_candlesticks.push(((new, ts1).into(), false));
+                    push_candlesticks.push((new, false));
                 }
                 PushCandlestickMode::Confirmed => {
                     if let Some(confirmed) = confirmed {
-                        push_candlesticks.push(((confirmed, ts1).into(), true));
+                        push_candlesticks.push((confirmed, true));
                     }
                 }
             }
@@ -1132,7 +1126,7 @@ fn update_and_push_candlestick(
     };
 
     for (candlestick, is_confirmed) in push_candlesticks {
-        if candlesticks.trade_sessions.contains(ts1) {
+        if candlesticks.trade_sessions.contains(ts) {
             tracing::info!(
                 symbol = symbol,
                 period = ?period,

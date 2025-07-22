@@ -1,4 +1,3 @@
-use rust_decimal::Decimal;
 use time::OffsetDateTime;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -52,15 +51,18 @@ impl Period {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub struct Quote {
-    pub time: OffsetDateTime,
-    pub open: Decimal,
-    pub high: Decimal,
-    pub low: Decimal,
-    pub last_done: Decimal,
-    pub volume: i64,
-    pub turnover: Decimal,
+pub trait QuoteType {
+    type PriceType;
+    type VolumeType;
+    type TurnoverType;
+
+    fn time(&self) -> OffsetDateTime;
+    fn open(&self) -> Self::PriceType;
+    fn high(&self) -> Self::PriceType;
+    fn low(&self) -> Self::PriceType;
+    fn last_done(&self) -> Self::PriceType;
+    fn volume(&self) -> Self::VolumeType;
+    fn turnover(&self) -> Self::TurnoverType;
 }
 
 bitflags::bitflags! {
@@ -71,10 +73,13 @@ bitflags::bitflags! {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub struct Trade {
-    pub time: OffsetDateTime,
-    pub price: Decimal,
-    pub volume: i64,
-    pub update_fields: UpdateFields,
+pub trait TradeType {
+    type PriceType;
+    type VolumeType;
+    type TurnoverType;
+
+    fn time(&self) -> OffsetDateTime;
+    fn price(&self) -> Self::PriceType;
+    fn volume(&self) -> Self::VolumeType;
+    fn turnover(&self, lot_size: i32) -> Self::TurnoverType;
 }

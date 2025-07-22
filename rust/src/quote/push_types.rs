@@ -53,6 +53,47 @@ impl Default for PushQuote {
     }
 }
 
+impl longport_candlesticks::QuoteType for PushQuote {
+    type PriceType = Decimal;
+    type VolumeType = i64;
+    type TurnoverType = Decimal;
+
+    #[inline]
+    fn time(&self) -> OffsetDateTime {
+        self.timestamp
+    }
+
+    #[inline]
+    fn open(&self) -> Self::PriceType {
+        self.open
+    }
+
+    #[inline]
+    fn high(&self) -> Self::PriceType {
+        self.high
+    }
+
+    #[inline]
+    fn low(&self) -> Self::PriceType {
+        self.low
+    }
+
+    #[inline]
+    fn last_done(&self) -> Self::PriceType {
+        self.last_done
+    }
+
+    #[inline]
+    fn volume(&self) -> Self::VolumeType {
+        self.volume
+    }
+
+    #[inline]
+    fn turnover(&self) -> Self::TurnoverType {
+        self.turnover
+    }
+}
+
 /// Depth message
 #[derive(Debug)]
 pub struct PushDepth {

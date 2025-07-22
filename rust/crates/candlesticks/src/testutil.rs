@@ -1,8 +1,7 @@
-use rust_decimal::{Decimal, prelude::FromPrimitive};
 use time::{Date, Month, OffsetDateTime, Time};
 use time_tz::PrimitiveDateTimeExt;
 
-use crate::{Candlestick, Market, Period, TradeSessionType};
+use crate::{Market, Period, TradeSessionKind};
 
 pub struct TestCandlestickTime<'a> {
     market: &'a Market,
@@ -16,7 +15,7 @@ impl<'a> TestCandlestickTime<'a> {
     }
 
     #[track_caller]
-    pub fn check_time(&self, ts: TradeSessionType, input: Time, expected: impl Into<Option<Time>>) {
+    pub fn check_time(&self, ts: TradeSessionKind, input: Time, expected: impl Into<Option<Time>>) {
         let date = Date::from_calendar_date(2024, Month::January, 1).unwrap();
         assert_eq!(
             self.market.candlestick_time(
@@ -37,7 +36,7 @@ impl<'a> TestCandlestickTime<'a> {
     #[track_caller]
     pub fn check_datetime(
         &self,
-        ts: TradeSessionType,
+        ts: TradeSessionKind,
         input: OffsetDateTime,
         expected: impl Into<Option<OffsetDateTime>>,
     ) {
@@ -45,29 +44,5 @@ impl<'a> TestCandlestickTime<'a> {
             self.market.candlestick_time(ts, false, self.period, input),
             expected.into()
         );
-    }
-}
-
-pub fn normal_candlestick(time: OffsetDateTime) -> Candlestick {
-    Candlestick {
-        time,
-        open: Decimal::from_i32(3).unwrap(),
-        high: Decimal::from_i32(5).unwrap(),
-        low: Decimal::from_i32(1).unwrap(),
-        close: Decimal::from_i32(4).unwrap(),
-        volume: 100,
-        turnover: Decimal::ONE,
-    }
-}
-
-pub fn new_candlestick(time: OffsetDateTime) -> Candlestick {
-    Candlestick {
-        time,
-        open: Decimal::from_i32(4).unwrap(),
-        high: Decimal::from_i32(4).unwrap(),
-        low: Decimal::from_i32(4).unwrap(),
-        close: Decimal::from_i32(4).unwrap(),
-        volume: 0,
-        turnover: Decimal::ZERO,
     }
 }

@@ -1,3 +1,4 @@
+use longport_candlesticks::CandlestickComponents;
 use longport_proto::quote::{self, Period, TradeStatus};
 use num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
 use rust_decimal::Decimal;
@@ -25,7 +26,20 @@ pub enum TradeSession {
     Overnight,
 }
 
+impl longport_candlesticks::TradeSessionType for TradeSession {
+    #[inline]
+    fn kind(&self) -> longport_candlesticks::TradeSessionKind {
+        match self {
+            TradeSession::Intraday => longport_candlesticks::TRADE_SESSION_INTRADAY,
+            TradeSession::Pre => longport_candlesticks::TRADE_SESSION_PRE,
+            TradeSession::Post => longport_candlesticks::TRADE_SESSION_POST,
+            TradeSession::Overnight => longport_candlesticks::TRADE_SESSION_OVERNIGHT,
+        }
+    }
+}
+
 impl From<longport_proto::quote::TradeSession> for TradeSession {
+    #[inline]
     fn from(value: longport_proto::quote::TradeSession) -> Self {
         match value {
             longport_proto::quote::TradeSession::NormalTrade => Self::Intraday,
@@ -168,6 +182,32 @@ impl TryFrom<quote::Trade> for Trade {
                 .unwrap_or_default()
                 .into(),
         })
+    }
+}
+
+impl longport_candlesticks::TradeType for Trade {
+    type PriceType = Decimal;
+    type VolumeType = i64;
+    type TurnoverType = Decimal;
+
+    #[inline]
+    fn time(&self) -> OffsetDateTime {
+        self.timestamp
+    }
+
+    #[inline]
+    fn price(&self) -> Self::PriceType {
+        self.price
+    }
+
+    #[inline]
+    fn volume(&self) -> Self::VolumeType {
+        self.volume
+    }
+
+    #[inline]
+    fn turnover(&self, lot_size: i32) -> Self::TurnoverType {
+        self.price * Decimal::from(self.volume * lot_size as i64)
     }
 }
 
@@ -774,36 +814,101 @@ impl TryFrom<quote::Candlestick> for Candlestick {
     }
 }
 
-impl From<(longport_candlesticks::Candlestick, TradeSession)> for Candlestick {
+impl longport_candlesticks::CandlestickType for Candlestick {
+    type PriceType = Decimal;
+    type VolumeType = i64;
+    type TurnoverType = Decimal;
+    type TradeSessionType = TradeSession;
+
     #[inline]
-    fn from(
-        (candlestick, trade_session): (longport_candlesticks::Candlestick, TradeSession),
+    fn new(
+        components: CandlestickComponents<
+            Self::PriceType,
+            Self::VolumeType,
+            Self::TurnoverType,
+            Self::TradeSessionType,
+        >,
     ) -> Self {
         Self {
-            close: candlestick.close,
-            open: candlestick.open,
-            low: candlestick.low,
-            high: candlestick.high,
-            volume: candlestick.volume,
-            turnover: candlestick.turnover,
-            timestamp: candlestick.time,
-            trade_session,
+            timestamp: components.time,
+            open: components.open,
+            high: components.high,
+            low: components.low,
+            close: components.close,
+            volume: components.volume,
+            turnover: components.turnover,
+            trade_session: components.trade_session,
         }
     }
-}
 
-impl From<Candlestick> for longport_candlesticks::Candlestick {
     #[inline]
-    fn from(candlestick: Candlestick) -> Self {
-        Self {
-            time: candlestick.timestamp,
-            open: candlestick.open,
-            high: candlestick.high,
-            low: candlestick.low,
-            close: candlestick.close,
-            volume: candlestick.volume,
-            turnover: candlestick.turnover,
-        }
+    fn time(&self) -> OffsetDateTime {
+        self.timestamp
+    }
+
+    #[inline]
+    fn set_time(&mut self, time: OffsetDateTime) {
+        self.timestamp = time;
+    }
+
+    #[inline]
+    fn open(&self) -> Self::PriceType {
+        self.open
+    }
+
+    #[inline]
+    fn set_open(&mut self, open: Self::PriceType) {
+        self.open = open;
+    }
+
+    #[inline]
+    fn high(&self) -> Self::PriceType {
+        self.high
+    }
+
+    #[inline]
+    fn set_high(&mut self, high: Self::PriceType) {
+        self.high = high;
+    }
+
+    #[inline]
+    fn low(&self) -> Self::PriceType {
+        self.low
+    }
+
+    #[inline]
+    fn set_low(&mut self, low: Self::PriceType) {
+        self.low = low;
+    }
+
+    #[inline]
+    fn close(&self) -> Self::PriceType {
+        self.close
+    }
+
+    #[inline]
+    fn set_close(&mut self, close: Self::PriceType) {
+        self.close = close;
+    }
+
+    #[inline]
+    fn volume(&self) -> Self::VolumeType {
+        self.volume
+    }
+
+    #[inline]
+    fn set_volume(&mut self, volume: Self::VolumeType) {
+        self.volume = volume;
+    }
+
+    #[inline]
+    fn turnover(&self) -> Self::TurnoverType {
+        self.turnover
+    }
+
+    #[inline]
+    fn set_turnover(&mut self, turnover: Self::TurnoverType) {
+        self.turnover = turnover;
     }
 }
 
