@@ -10,7 +10,7 @@ jobs:
   check-format:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -32,7 +32,7 @@ jobs:
         os: [ubuntu-22.04, windows-latest, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -59,7 +59,7 @@ jobs:
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -112,7 +112,7 @@ jobs:
             universal2: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions/setup-python@v5
@@ -159,7 +159,7 @@ jobs:
         target: [x64, x86]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions/setup-python@v5
@@ -198,7 +198,7 @@ jobs:
         target: [x86_64, i686]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions/setup-python@v5
@@ -232,7 +232,7 @@ jobs:
         target: [aarch64]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - name: Build wheels
@@ -331,12 +331,12 @@ jobs:
 
     runs-on: ${{ matrix.settings.host }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: ${{ !matrix.settings.docker }}
         with:
           node-version: 20
@@ -394,12 +394,12 @@ jobs:
         java-version: ["8"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Install JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
@@ -430,7 +430,7 @@ jobs:
         os: [ubuntu-22.04, windows-latest, macos-13]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -473,7 +473,7 @@ jobs:
             platform: SIMULATOR64
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -519,7 +519,7 @@ jobs:
             ar: llvm-ar
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 

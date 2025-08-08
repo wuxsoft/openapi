@@ -27,7 +27,7 @@ jobs:
             universal2: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions/setup-python@v5
@@ -72,7 +72,7 @@ jobs:
         target: [x64, x86]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions/setup-python@v5
@@ -109,7 +109,7 @@ jobs:
         target: [x86_64, i686]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions/setup-python@v5
@@ -141,7 +141,7 @@ jobs:
         target: [aarch64]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - name: Build wheels
@@ -252,12 +252,12 @@ jobs:
 
     runs-on: ${{ matrix.settings.host }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: ${{ !matrix.settings.docker }}
         with:
           node-version: 20
@@ -324,7 +324,7 @@ jobs:
             target: aarch64-apple-darwin
     runs-on: ${{ matrix.settings.host }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -344,7 +344,7 @@ jobs:
 
       - name: Install latest cross binary
         if: ${{ matrix.settings.cross }}
-        uses: st3iny/install-cross-binary@v2
+        uses: st3iny/install-cross-binary@v3
 
       - name: Build with Cross
         if: ${{ matrix.settings.cross }}
@@ -361,7 +361,7 @@ jobs:
   copy-cpp-headers:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -401,7 +401,7 @@ jobs:
             dylib_ext: dylib
     runs-on: ${{ matrix.settings.host }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -482,7 +482,7 @@ jobs:
             dylib_ext: dylib
     runs-on: ${{ matrix.settings.host }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -568,7 +568,7 @@ jobs:
             cargo-args: -r
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -646,7 +646,7 @@ jobs:
             cargo-args: -r
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -745,7 +745,7 @@ jobs:
             path: rust
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions-rs/toolchain@v1
@@ -779,17 +779,17 @@ jobs:
       - build
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Download includes
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: ./sdk/libs
           pattern: libs-*
           merge-multiple: true
 
       - name: Download includes
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: ./sdk/include
           pattern: include-*
@@ -825,7 +825,7 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: dist
           pattern: wheels-*
@@ -841,18 +841,18 @@ jobs:
     needs:
       - build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Update versions
         run: node ./.github/misc/update_jssdk_version.mjs $(sed -nE 's/^\s*version = "(.*?)"/\1/p' nodejs/Cargo.toml)
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           check-latest: true
       - name: Install napi-rs/cli
         run: npm install -g @napi-rs/cli
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: ./nodejs/artifacts
           pattern: bindings-*
@@ -876,18 +876,18 @@ jobs:
     runs-on: ubuntu-22.04
     needs: build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Install JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: "8"
           distribution: "temurin"
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: ./java/jnis
           pattern: jnis-*

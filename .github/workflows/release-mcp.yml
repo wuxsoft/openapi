@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.settings.host }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -51,7 +51,7 @@ jobs:
 
       - name: Install latest cross binary
         if: ${{ matrix.settings.cross }}
-        uses: st3iny/install-cross-binary@v2
+        uses: st3iny/install-cross-binary@v3
 
       - name: Build with Cross
         if: ${{ matrix.settings.cross }}
