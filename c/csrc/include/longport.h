@@ -4079,6 +4079,7 @@ void lb_quote_context_trades(const struct lb_quote_context_t *ctx,
  */
 void lb_quote_context_intraday(const struct lb_quote_context_t *ctx,
                                const char *symbol,
+                               enum lb_trade_sessions_t trade_sessions,
                                lb_async_callback_t callback,
                                void *userdata);
 

@@ -528,13 +528,15 @@ public class QuoteContext implements AutoCloseable {
      * }
      * </pre>
      * 
-     * @param symbol Security symbol
+     * @param symbol        Security symbol
+     * @param tradeSessions Trade sessions
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<IntradayLine[]> getIntraday(String symbol) throws OpenApiException {
+    public CompletableFuture<IntradayLine[]> getIntraday(String symbol, TradeSessions tradeSessions)
+            throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextIntraday(this.raw, symbol, callback);
+            SdkNative.quoteContextIntraday(this.raw, symbol, tradeSessions, callback);
         });
     }
 

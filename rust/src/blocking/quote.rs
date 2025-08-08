@@ -406,13 +406,13 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, blocking::QuoteContextSync};
+    /// use longport::{Config, blocking::QuoteContextSync, quote::TradeSessions};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// let resp = ctx.intraday("700.HK")?;
+    /// let resp = ctx.intraday("700.HK", TradeSessions::Intraday)?;
     /// println!("{:?}", resp);
     /// # Ok(())
     /// # }
@@ -420,9 +420,10 @@ impl QuoteContextSync {
     pub fn intraday(
         &self,
         symbol: impl Into<String> + Send + 'static,
+        trade_sessions: TradeSessions,
     ) -> Result<Vec<IntradayLine>> {
         self.rt
-            .call(move |ctx| async move { ctx.intraday(symbol).await })
+            .call(move |ctx| async move { ctx.intraday(symbol, trade_sessions).await })
     }
 
     /// Get security candlesticks

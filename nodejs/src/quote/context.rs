@@ -516,11 +516,11 @@ impl QuoteContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, QuoteContext } = require("longport")
+    /// const { Config, QuoteContext, TradeSessions } = require("longport")
     ///
     /// let config = Config.fromEnv()
     /// QuoteContext.new(config)
-    ///   .then((ctx) => ctx.intraday("700.HK"))
+    ///   .then((ctx) => ctx.intraday("700.HK", TradeSessions.Intraday))
     ///   .then((resp) => {
     ///     for (let obj of resp) {
     ///       console.log(obj.toString());
@@ -528,9 +528,13 @@ impl QuoteContext {
     ///   })
     /// ```
     #[napi]
-    pub async fn intraday(&self, symbol: String) -> Result<Vec<IntradayLine>> {
+    pub async fn intraday(
+        &self,
+        symbol: String,
+        trade_sessions: TradeSessions,
+    ) -> Result<Vec<IntradayLine>> {
         self.ctx
-            .intraday(symbol)
+            .intraday(symbol, trade_sessions.into())
             .await
             .map_err(ErrorNewType)?
             .into_iter()

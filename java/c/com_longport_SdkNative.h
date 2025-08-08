@@ -266,10 +266,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextTrades
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextIntraday
- * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ * Signature: (JLjava/lang/String;Lcom/longport/quote/TradeSessions;Lcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextIntraday
-  (JNIEnv *, jclass, jlong, jstring, jobject);
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
 
 /*
  * Class:     com_longport_SdkNative

@@ -85,7 +85,8 @@ public class SdkNative {
 
         public static native void quoteContextTrades(long context, String symbol, int count, AsyncCallback callback);
 
-        public static native void quoteContextIntraday(long context, String symbol, AsyncCallback callback);
+        public static native void quoteContextIntraday(long context, String symbol, TradeSessions tradeSessions,
+                        AsyncCallback callback);
 
         public static native void quoteContextCandlesticks(long context, String symbol, Period period, int count,
                         AdjustType adjustType, TradeSessions tradeSessions, AsyncCallback callback);

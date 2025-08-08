@@ -658,13 +658,17 @@ pub unsafe extern "C" fn lb_quote_context_trades(
 pub unsafe extern "C" fn lb_quote_context_intraday(
     ctx: *const CQuoteContext,
     symbol: *const c_char,
+    trade_sessions: CTradeSessions,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
     let symbol = cstr_to_rust(symbol);
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CIntradayLineOwned> = ctx_inner.intraday(symbol).await?.into();
+        let rows: CVec<CIntradayLineOwned> = ctx_inner
+            .intraday(symbol, trade_sessions.into())
+            .await?
+            .into();
         Ok(rows)
     });
 }

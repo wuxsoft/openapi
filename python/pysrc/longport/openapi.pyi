@@ -2986,12 +2986,13 @@ class QuoteContext:
                 print(resp)
         """
 
-    def intraday(self, symbol: str) -> List[IntradayLine]:
+    def intraday(self, symbol: str, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[IntradayLine]:
         """
         Get security intraday lines
 
         Args:
             symbol: Security code
+            trade_sessions: Trade sessions
 
         Returns:
             Intraday lines
@@ -2999,12 +3000,12 @@ class QuoteContext:
         Examples:
             ::
 
-                from longport.openapi import QuoteContext, Config
+                from longport.openapi import QuoteContext, Config, TradeSessions
 
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                resp = ctx.intraday("700.HK")
+                resp = ctx.intraday("700.HK", TradeSessions.Intraday)
                 print(resp)
         """
 

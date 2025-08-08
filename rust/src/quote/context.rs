@@ -694,23 +694,31 @@ impl QuoteContext {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, quote::QuoteContext};
+    /// use longport::{
+    ///     Config,
+    ///     quote::{QuoteContext, TradeSessions},
+    /// };
     ///
     /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// let resp = ctx.intraday("700.HK").await?;
+    /// let resp = ctx.intraday("700.HK", TradeSessions::Intraday).await?;
     /// println!("{:?}", resp);
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn intraday(&self, symbol: impl Into<String>) -> Result<Vec<IntradayLine>> {
+    pub async fn intraday(
+        &self,
+        symbol: impl Into<String>,
+        trade_sessions: TradeSessions,
+    ) -> Result<Vec<IntradayLine>> {
         let resp: quote::SecurityIntradayResponse = self
             .request(
                 cmd_code::GET_SECURITY_INTRADAY,
                 quote::SecurityIntradayRequest {
                     symbol: symbol.into(),
+                    trade_session: trade_sessions as i32,
                 },
             )
             .await?;

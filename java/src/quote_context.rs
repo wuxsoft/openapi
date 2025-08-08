@@ -564,13 +564,17 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextIntraday(
     _class: JClass,
     context: i64,
     symbol: JString,
+    trade_sessions: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let trade_sessions: TradeSessions = FromJValue::from_jvalue(env, trade_sessions.into())?;
         async_util::execute(env, callback, async move {
-            Ok(ObjectArray(context.ctx.intraday(symbol).await?))
+            Ok(ObjectArray(
+                context.ctx.intraday(symbol, trade_sessions).await?,
+            ))
         })?;
         Ok(())
     })

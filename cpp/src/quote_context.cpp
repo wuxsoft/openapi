@@ -619,11 +619,13 @@ QuoteContext::trades(
 void
 QuoteContext::intraday(
   const std::string& symbol,
+  TradeSessions trade_sessions,
   AsyncCallback<QuoteContext, std::vector<IntradayLine>> callback) const
 {
   lb_quote_context_intraday(
     ctx_,
     symbol.c_str(),
+    convert(trade_sessions),
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<QuoteContext, std::vector<IntradayLine>>(

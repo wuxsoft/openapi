@@ -320,6 +320,8 @@ pub struct Trade {
 pub struct SecurityIntradayRequest {
     #[prost(string, tag = "1")]
     pub symbol: ::prost::alloc::string::String,
+    #[prost(int32, tag = "2")]
+    pub trade_session: i32,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]

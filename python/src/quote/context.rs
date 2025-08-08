@@ -256,9 +256,14 @@ impl QuoteContext {
     }
 
     /// Get security intraday
-    fn intraday(&self, symbol: String) -> PyResult<Vec<IntradayLine>> {
+    #[pyo3(signature = (symbol, trade_sessions = TradeSessions::Intraday))]
+    fn intraday(
+        &self,
+        symbol: String,
+        trade_sessions: TradeSessions,
+    ) -> PyResult<Vec<IntradayLine>> {
         self.ctx
-            .intraday(symbol)
+            .intraday(symbol, trade_sessions.into())
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)

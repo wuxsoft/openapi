@@ -132,6 +132,7 @@ public:
   /// Get security intraday lines
   void intraday(
     const std::string& symbol,
+    TradeSessions trade_sessions,
     AsyncCallback<QuoteContext, std::vector<IntradayLine>> callback) const;
 
   /// Get security candlesticks
