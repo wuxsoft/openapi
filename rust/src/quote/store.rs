@@ -126,7 +126,7 @@ impl Candlesticks {
                 "1" => UpdateFields::all(),
                 _ => UpdateFields::empty(),
             },
-            Market::CN | Market::SG => UpdateFields::all(),
+            Market::CN | Market::SG | Market::Crypto => UpdateFields::all(),
         };
 
         market.merge_trade(
@@ -283,7 +283,7 @@ pub(crate) fn get_market(
         Market::HK => &HK,
         Market::SG => &SG,
         Market::CN => &CN,
-        Market::Unknown => return None,
+        Market::Unknown | Market::Crypto => return None,
     })
 }
 

@@ -436,6 +436,10 @@ typedef enum lb_market_t {
    * SG market
    */
   MarketSG,
+  /**
+   * Crypto market
+   */
+  MarketCrypto,
 } lb_market_t;
 
 /**
@@ -4306,7 +4310,7 @@ void lb_quote_context_realtime_candlesticks(const struct lb_quote_context_t *ctx
  */
 void lb_quote_context_security_list(const struct lb_quote_context_t *ctx,
                                     enum lb_market_t market,
-                                    enum lb_security_list_category_t category,
+                                    const enum lb_security_list_category_t *category,
                                     lb_async_callback_t callback,
                                     void *userdata);
 

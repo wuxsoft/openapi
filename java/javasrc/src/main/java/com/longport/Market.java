@@ -24,4 +24,8 @@ public enum Market {
      * SG market
      */
     SG,
+    /**
+     * Crypro market
+     */
+    Crypto,
 }

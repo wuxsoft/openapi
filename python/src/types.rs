@@ -15,6 +15,8 @@ pub(crate) enum Market {
     CN,
     /// SG market
     SG,
+    /// Crypto market
+    Crypto,
 }
 
 #[pyclass(eq, eq_int)]

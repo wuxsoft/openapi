@@ -207,6 +207,11 @@ class Market:
         SG market
         """
 
+    class Crypto(Market):
+        """
+        Crypto market
+        """
+
 
 class PushQuote:
     """
@@ -3350,7 +3355,7 @@ class QuoteContext:
                 ctx.update_watchlist_group(10086, name = "Watchlist2", securities = ["700.HK", "AAPL.US"], SecuritiesUpdateMode.Replace)
         """
 
-    def security_list(self, market: Type[Market], category: Type[SecurityListCategory]) -> List[Security]:
+    def security_list(self, market: Type[Market], category: Optional[Type[SecurityListCategory]] = None) -> List[Security]:
         """
         Get security list
 

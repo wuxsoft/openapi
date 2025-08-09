@@ -1188,14 +1188,19 @@ pub unsafe extern "C" fn lb_quote_context_realtime_candlesticks(
 pub unsafe extern "C" fn lb_quote_context_security_list(
     ctx: *const CQuoteContext,
     market: CMarket,
-    category: CSecurityListCategory,
+    category: *const CSecurityListCategory,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
+    let category = if !category.is_null() {
+        Some((*category).into())
+    } else {
+        None
+    };
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<CSecurityOwned> = ctx_inner
-            .security_list(market.into(), category.into())
+            .security_list(market.into(), category)
             .await?
             .into();
         Ok(rows)

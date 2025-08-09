@@ -246,6 +246,11 @@ public:
     SecurityListCategory category,
     AsyncCallback<QuoteContext, std::vector<Security>> callback) const;
 
+  /// Get security list without category
+  void security_list(
+    Market market,
+    AsyncCallback<QuoteContext, std::vector<Security>> callback) const;
+
   /// Get current market temperature
   void market_temperature(
     Market market,

@@ -145,6 +145,8 @@ convert(lb_market_t market)
       return Market::CN;
     case MarketSG:
       return Market::SG;
+    case MarketCrypto:
+      return Market::Crypto;
     default:
       throw std::invalid_argument("unreachable");
   }

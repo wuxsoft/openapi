@@ -1111,7 +1111,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSecurityLi
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let market: Market = FromJValue::from_jvalue(env, market.into())?;
-        let category: SecurityListCategory = FromJValue::from_jvalue(env, category.into())?;
+        let category: Option<SecurityListCategory> = FromJValue::from_jvalue(env, category.into())?;
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
                 context.ctx.security_list(market, category).await?,

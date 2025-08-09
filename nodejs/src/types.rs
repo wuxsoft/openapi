@@ -14,6 +14,8 @@ pub enum Market {
     CN,
     /// SG market
     SG,
+    /// Crypto market
+    Crypto,
 }
 
 #[napi_derive::napi]

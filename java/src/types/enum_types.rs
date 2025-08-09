@@ -27,7 +27,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longport/Market",
     longport::Market,
-    [Unknown, US, HK, CN, SG]
+    [Unknown, US, HK, CN, SG, Crypto]
 );
 
 impl_java_enum!(

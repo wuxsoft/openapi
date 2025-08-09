@@ -1004,10 +1004,10 @@ impl QuoteContext {
     pub async fn security_list(
         &self,
         market: Market,
-        category: SecurityListCategory,
+        category: Option<SecurityListCategory>,
     ) -> Result<Vec<Security>> {
         self.ctx
-            .security_list(market.into(), category.into())
+            .security_list(market.into(), category.map(Into::into))
             .await
             .map_err(ErrorNewType)?
             .into_iter()

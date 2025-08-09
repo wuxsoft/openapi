@@ -848,8 +848,9 @@ impl QuoteContextSync {
     pub fn security_list(
         &self,
         market: Market,
-        category: SecurityListCategory,
+        category: impl Into<Option<SecurityListCategory>>,
     ) -> Result<Vec<Security>> {
+        let category = category.into();
         self.rt
             .call(move |ctx| async move { ctx.security_list(market, category).await })
     }

@@ -13,6 +13,8 @@ pub enum Market {
     CN,
     /// SG market
     SG,
+    /// Crypto market
+    Crypto,
 }
 
 impl_default_for_enum_string!(Market);

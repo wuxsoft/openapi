@@ -1052,6 +1052,39 @@ public class QuoteContext implements AutoCloseable {
     }
 
     /**
+     * Security list without category
+     * 
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.quote.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         try (Config config = Config.fromEnv();
+     *                 QuoteContext ctx = QuoteContext.create(config).get()) {
+     *             Security[] resp = ctx.securityList(Market.Crypto).get();
+     *             for (Security obj : resp) {
+     *                 System.out.println(obj);
+     *             }
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @param market Market
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<Security[]> getSecurityList(Market market)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextSecurityList(this.raw, market, null, callback);
+        });
+    }
+
+    /**
      * Get current market temperature
      * 
      * <pre>

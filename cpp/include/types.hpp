@@ -59,6 +59,8 @@ enum class Market
   CN,
   /// SG market
   SG,
+  /// Crypto market
+  Crypto,
 };
 
 namespace quote {

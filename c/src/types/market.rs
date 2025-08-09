@@ -21,4 +21,7 @@ pub enum CMarket {
     /// SG market
     #[c(remote = "SG")]
     MarketSG,
+    /// Crypto market
+    #[c(remote = "Crypto")]
+    MarketCrypto,
 }

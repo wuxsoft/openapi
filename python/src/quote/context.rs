@@ -536,13 +536,14 @@ impl QuoteContext {
     }
 
     /// Get security list
+    #[pyo3(signature = (market, category = None))]
     pub fn security_list(
         &self,
         market: Market,
-        category: SecurityListCategory,
+        category: Option<SecurityListCategory>,
     ) -> PyResult<Vec<Security>> {
         self.ctx
-            .security_list(market.into(), category.into())
+            .security_list(market.into(), category.map(Into::into))
             .map_err(ErrorNewType)?
             .into_iter()
             .map(TryInto::try_into)

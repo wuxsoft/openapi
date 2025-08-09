@@ -1455,12 +1455,13 @@ impl QuoteContext {
     pub async fn security_list(
         &self,
         market: Market,
-        category: SecurityListCategory,
+        category: impl Into<Option<SecurityListCategory>>,
     ) -> Result<Vec<Security>> {
         #[derive(Debug, Serialize)]
         struct Request {
             market: Market,
-            category: SecurityListCategory,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            category: Option<SecurityListCategory>,
         }
 
         #[derive(Debug, Deserialize)]
@@ -1472,7 +1473,10 @@ impl QuoteContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/quote/get_security_list")
-            .query_params(Request { market, category })
+            .query_params(Request {
+                market,
+                category: category.into(),
+            })
             .response::<Json<Resposne>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
