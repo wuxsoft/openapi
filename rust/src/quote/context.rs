@@ -1465,7 +1465,7 @@ impl QuoteContext {
         }
 
         #[derive(Debug, Deserialize)]
-        struct Resposne {
+        struct Response {
             list: Vec<Security>,
         }
 
@@ -1477,7 +1477,7 @@ impl QuoteContext {
                 market,
                 category: category.into(),
             })
-            .response::<Json<Resposne>>()
+            .response::<Json<Response>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
