@@ -1,22 +1,40 @@
-use longport_oauth::OAuthToken;
+use longport_oauth::OAuth;
 
 use crate::HttpClientError;
+
+/// Authentication configuration
+#[derive(Debug, Clone)]
+pub enum AuthConfig {
+    /// Legacy API Key mode: HMAC-SHA256 signed requests
+    ApiKey {
+        /// App key
+        app_key: String,
+        /// App secret (used for HMAC-SHA256 signing)
+        app_secret: String,
+        /// Static access token
+        access_token: String,
+    },
+    /// OAuth 2.0 mode: Bearer token, auto-refreshed via the [`OAuth`] client
+    OAuth(OAuth),
+}
 
 /// Configuration options for Http client
 #[derive(Debug, Clone)]
 pub struct HttpClientConfig {
     /// HTTP API url
     pub(crate) http_url: Option<String>,
-    /// App key
-    pub(crate) app_key: String,
-    /// App secret
-    pub(crate) app_secret: String,
-    /// Access token
-    pub(crate) access_token: String,
+    /// Authentication configuration
+    pub(crate) auth: AuthConfig,
 }
 
 impl HttpClientConfig {
-    /// Create a new `HttpClientConfig`
+    /// Create a new `HttpClientConfig` using API Key authentication
+    ///
+    /// # Arguments
+    ///
+    /// * `app_key` - Application key
+    /// * `app_secret` - Application secret (used for request signing)
+    /// * `access_token` - Access token
     pub fn new(
         app_key: impl Into<String>,
         app_secret: impl Into<String>,
@@ -24,40 +42,32 @@ impl HttpClientConfig {
     ) -> Self {
         Self {
             http_url: None,
-            app_key: app_key.into(),
-            app_secret: app_secret.into(),
-            access_token: access_token.into(),
+            auth: AuthConfig::ApiKey {
+                app_key: app_key.into(),
+                app_secret: app_secret.into(),
+                access_token: access_token.into(),
+            },
         }
     }
 
-    /// Create a new `HttpClientConfig` for OAuth 2.0
+    /// Create a new `HttpClientConfig` for OAuth 2.0 authentication
     ///
-    /// OAuth 2.0 mode uses Bearer token authentication and does not require
-    /// app_secret.
+    /// The [`OAuth`] client handles token lifecycle automatically, including
+    /// expiry checks and token refresh.
     ///
     /// # Arguments
     ///
-    /// * `token` - OAuth 2.0 token obtained from
-    ///   [`longport_oauth::OAuth::authorize`]
-    pub fn from_oauth(token: &OAuthToken) -> Self {
+    /// * `oauth` - An [`OAuth`] client obtained from
+    ///   [`longport_oauth::OAuthBuilder`]
+    pub fn from_oauth(oauth: OAuth) -> Self {
         Self {
             http_url: None,
-            app_key: token.client_id.clone(),
-            app_secret: String::new(), // Not used in OAuth 2.0 mode
-            access_token: format!("Bearer {}", token.access_token),
+            auth: AuthConfig::OAuth(oauth),
         }
     }
 
-    /// Check if this config is using OAuth 2.0 mode
-    ///
-    /// OAuth 2.0 mode is detected when:
-    /// 1. access_token starts with "Bearer "
-    /// 2. app_secret is empty
-    pub fn is_oauth2(&self) -> bool {
-        self.access_token.starts_with("Bearer ") || self.app_secret.is_empty()
-    }
-
-    /// Create a new `HttpClientConfig` from the given environment variables
+    /// Create a new `HttpClientConfig` from environment variables (API Key
+    /// mode)
     ///
     /// # Variables
     ///
@@ -110,78 +120,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_httpclient_config_from_oauth() {
-        let token = longport_oauth::OAuthToken {
-            client_id: "test-client-id".to_string(),
-            access_token: "test-access-token".to_string(),
-            refresh_token: None,
-            expires_at: u64::MAX,
-        };
-        let config = HttpClientConfig::from_oauth(&token);
-
-        assert_eq!(config.app_key, "test-client-id");
-        assert_eq!(config.access_token, "Bearer test-access-token");
-        assert_eq!(config.app_secret, "");
-        assert!(config.is_oauth2());
-    }
-
-    #[test]
-    fn test_httpclient_config_from_oauth_adds_bearer_prefix() {
-        let token = longport_oauth::OAuthToken {
-            client_id: "test-client-id".to_string(),
-            access_token: "my-token".to_string(),
-            refresh_token: None,
-            expires_at: u64::MAX,
-        };
-        let config = HttpClientConfig::from_oauth(&token);
-
-        assert_eq!(config.access_token, "Bearer my-token");
-        assert!(config.is_oauth2());
-    }
-
-    #[test]
-    fn test_httpclient_config_is_oauth2_with_bearer_token() {
-        let config = HttpClientConfig {
-            http_url: None,
-            app_key: "client-id".to_string(),
-            app_secret: String::new(),
-            access_token: "Bearer token123".to_string(),
-        };
-
-        assert!(config.is_oauth2());
-    }
-
-    #[test]
-    fn test_httpclient_config_is_oauth2_with_empty_secret() {
-        let config = HttpClientConfig {
-            http_url: None,
-            app_key: "app-key".to_string(),
-            app_secret: String::new(),
-            access_token: "regular-token".to_string(),
-        };
-
-        assert!(config.is_oauth2());
-    }
-
-    #[test]
-    fn test_httpclient_config_is_not_oauth2_legacy_mode() {
-        let config = HttpClientConfig {
-            http_url: None,
-            app_key: "app-key".to_string(),
-            app_secret: "app-secret".to_string(),
-            access_token: "access-token".to_string(),
-        };
-
-        assert!(!config.is_oauth2());
-    }
-
-    #[test]
     fn test_httpclient_config_new() {
         let config = HttpClientConfig::new("app-key", "app-secret", "access-token");
 
-        assert_eq!(config.app_key, "app-key");
-        assert_eq!(config.app_secret, "app-secret");
-        assert_eq!(config.access_token, "access-token");
+        match &config.auth {
+            AuthConfig::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            } => {
+                assert_eq!(app_key, "app-key");
+                assert_eq!(app_secret, "app-secret");
+                assert_eq!(access_token, "access-token");
+            }
+            _ => panic!("Expected ApiKey auth config"),
+        }
         assert_eq!(config.http_url, None);
+    }
+
+    #[test]
+    fn test_httpclient_config_http_url() {
+        let config = HttpClientConfig::new("app-key", "app-secret", "access-token")
+            .http_url("https://custom.example.com");
+
+        assert_eq!(
+            config.http_url,
+            Some("https://custom.example.com".to_string())
+        );
     }
 }

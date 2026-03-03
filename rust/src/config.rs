@@ -9,7 +9,7 @@ use std::{
 use http::Method;
 pub(crate) use http::{HeaderValue, Request, header};
 use longport_httpcli::{HttpClient, HttpClientConfig, Json, is_cn};
-use longport_oauth::OAuthToken;
+use longport_oauth::OAuth;
 use num_enum::IntoPrimitive;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -78,10 +78,51 @@ pub enum PushCandlestickMode {
     Confirmed,
 }
 
+/// Internal authentication mode (not part of the public API)
+pub(crate) enum AuthMode {
+    /// Legacy API Key mode (HMAC-SHA256 signed requests)
+    ApiKey {
+        app_key: String,
+        app_secret: String,
+        access_token: String,
+    },
+    /// OAuth 2.0 mode
+    OAuth(OAuth),
+}
+
+impl Clone for AuthMode {
+    fn clone(&self) -> Self {
+        match self {
+            AuthMode::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            } => AuthMode::ApiKey {
+                app_key: app_key.clone(),
+                app_secret: app_secret.clone(),
+                access_token: access_token.clone(),
+            },
+            AuthMode::OAuth(oauth) => AuthMode::OAuth(oauth.clone()),
+        }
+    }
+}
+
+impl fmt::Debug for AuthMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AuthMode::ApiKey { app_key, .. } => {
+                f.debug_struct("ApiKey").field("app_key", app_key).finish()
+            }
+            AuthMode::OAuth(_) => f.debug_struct("OAuth").finish(),
+        }
+    }
+}
+
 /// Configuration options for LongPort sdk
 #[derive(Debug, Clone)]
 pub struct Config {
-    pub(crate) http_cli_config: HttpClientConfig,
+    pub(crate) auth: AuthMode,
+    pub(crate) http_url: Option<String>,
     pub(crate) quote_ws_url: Option<String>,
     pub(crate) trade_ws_url: Option<String>,
     pub(crate) enable_overnight: Option<bool>,
@@ -92,14 +133,26 @@ pub struct Config {
 }
 
 impl Config {
-    /// Create a new `Config`
-    pub fn new(
+    /// Create a new `Config` using API Key authentication (legacy mode).
+    ///
+    /// # Deprecation note
+    ///
+    /// For new integrations prefer [`Config::from_oauth`] together with
+    /// [`longport::oauth::OAuthBuilder`].
+    #[deprecated = "Legacy API Key mode. \
+        Use `Config::from_oauth` with `OAuthBuilder` for new integrations."]
+    pub fn from_apikey(
         app_key: impl Into<String>,
         app_secret: impl Into<String>,
         access_token: impl Into<String>,
     ) -> Self {
         Self {
-            http_cli_config: HttpClientConfig::new(app_key, app_secret, access_token),
+            auth: AuthMode::ApiKey {
+                app_key: app_key.into(),
+                app_secret: app_secret.into(),
+                access_token: access_token.into(),
+            },
+            http_url: None,
             quote_ws_url: None,
             trade_ws_url: None,
             language: Language::EN,
@@ -110,33 +163,49 @@ impl Config {
         }
     }
 
-    /// Create a new `Config` for OAuth 2.0 authentication
+    /// Create a new `Config` (API Key / legacy mode).
+    ///
+    /// Prefer [`Config::from_apikey`] for clarity, or
+    /// [`Config::from_oauth`] for OAuth 2.0.
+    #[deprecated = "Use `Config::from_apikey` or `Config::from_oauth` instead."]
+    pub fn new(
+        app_key: impl Into<String>,
+        app_secret: impl Into<String>,
+        access_token: impl Into<String>,
+    ) -> Self {
+        #[allow(deprecated)]
+        Self::from_apikey(app_key, app_secret, access_token)
+    }
+
+    /// Create a new `Config` for OAuth 2.0 authentication.
     ///
     /// # Arguments
     ///
-    /// * `token` - [`OAuthToken`] obtained from
-    ///   [`longport::oauth::OAuth::authorize`]
+    /// * `oauth` - An [`OAuth`] client obtained from
+    ///   [`longport::oauth::OAuthBuilder`].
     ///
     /// # Example
     ///
     /// ```rust,no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, oauth::OAuth};
+    /// use longport::{Config, oauth::OAuthBuilder};
     ///
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let oauth = OAuth::new("your-client-id");
-    ///     let token = oauth.authorize(|url| println!("Visit: {url}")).await?;
-    ///     let config = Arc::new(Config::from_oauth(&token));
+    ///     let oauth = OAuthBuilder::new("your-client-id")
+    ///         .build(|url| println!("Visit: {url}"))
+    ///         .await?;
+    ///     let config = Arc::new(Config::from_oauth(oauth));
     ///
     ///     let (ctx, receiver) = longport::quote::QuoteContext::try_new(config).await?;
     ///     Ok(())
     /// }
     /// ```
-    pub fn from_oauth(token: &OAuthToken) -> Self {
+    pub fn from_oauth(oauth: OAuth) -> Self {
         Self {
-            http_cli_config: HttpClientConfig::from_oauth(token),
+            auth: AuthMode::OAuth(oauth),
+            http_url: None,
             quote_ws_url: None,
             trade_ws_url: None,
             language: Language::EN,
@@ -147,9 +216,10 @@ impl Config {
         }
     }
 
-    /// Create a new `Config` from the given environment variables
+    /// Create a new `Config` from environment variables (API Key / legacy
+    /// mode).
     ///
-    /// It first gets the environment variables from the `.env` file in the
+    /// It first loads the environment variables from the `.env` file in the
     /// current directory.
     ///
     /// # Variables
@@ -175,13 +245,29 @@ impl Config {
     ///
     /// # Note
     ///
-    /// For OAuth 2.0 authentication, use [`from_oauth`](Config::from_oauth)
-    /// instead. OAuth tokens should not be stored in environment variables
-    /// for security reasons.
-    pub fn from_env() -> Result<Self> {
+    /// For OAuth 2.0 authentication use [`from_oauth`](Config::from_oauth)
+    /// together with [`OAuthBuilder`](longport_oauth::OAuthBuilder).
+    #[deprecated = "Legacy API Key mode. \
+        Use `Config::from_oauth` with `OAuthBuilder` for new integrations."]
+    pub fn from_apikey_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 
-        let http_cli_config = HttpClientConfig::from_env()?;
+        let app_key = std::env::var("LONGPORT_APP_KEY").map_err(|_| {
+            longport_httpcli::HttpClientError::MissingEnvVar {
+                name: "LONGPORT_APP_KEY",
+            }
+        })?;
+        let app_secret = std::env::var("LONGPORT_APP_SECRET").map_err(|_| {
+            longport_httpcli::HttpClientError::MissingEnvVar {
+                name: "LONGPORT_APP_SECRET",
+            }
+        })?;
+        let access_token = std::env::var("LONGPORT_ACCESS_TOKEN").map_err(|_| {
+            longport_httpcli::HttpClientError::MissingEnvVar {
+                name: "LONGPORT_ACCESS_TOKEN",
+            }
+        })?;
+        let http_url = std::env::var("LONGPORT_HTTP_URL").ok();
         let language = std::env::var("LONGPORT_LANGUAGE")
             .ok()
             .and_then(|value| value.parse::<Language>().ok())
@@ -204,7 +290,12 @@ impl Config {
         let log_path = std::env::var("LONGPORT_LOG_PATH").ok().map(PathBuf::from);
 
         Ok(Config {
-            http_cli_config,
+            auth: AuthMode::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            },
+            http_url,
             quote_ws_url,
             trade_ws_url,
             language,
@@ -215,6 +306,15 @@ impl Config {
         })
     }
 
+    /// Create a new `Config` from environment variables.
+    ///
+    /// Prefer [`Config::from_apikey_env`] for clarity.
+    #[deprecated = "Use `Config::from_apikey_env` or `Config::from_oauth` instead."]
+    pub fn from_env() -> Result<Self> {
+        #[allow(deprecated)]
+        Self::from_apikey_env()
+    }
+
     /// Specifies the url of the OpenAPI server.
     ///
     /// Default: `https://openapi.longportapp.com`
@@ -222,7 +322,7 @@ impl Config {
     /// NOTE: Usually you don't need to change it.
     #[must_use]
     pub fn http_url(mut self, url: impl Into<String>) -> Self {
-        self.http_cli_config = self.http_cli_config.http_url(url);
+        self.http_url = Some(url.into());
         self
     }
 
@@ -299,8 +399,19 @@ impl Config {
 
     #[inline]
     pub(crate) fn create_http_client(&self) -> HttpClient {
-        HttpClient::new(self.http_cli_config.clone())
-            .header(header::ACCEPT_LANGUAGE, self.language.as_str())
+        let mut config = match &self.auth {
+            AuthMode::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            } => HttpClientConfig::new(app_key, app_secret, access_token),
+            AuthMode::OAuth(oauth) => HttpClientConfig::from_oauth(oauth.clone()),
+        };
+        if let Some(url) = &self.http_url {
+            config = config.http_url(url.clone());
+        }
+
+        HttpClient::new(config).header(header::ACCEPT_LANGUAGE, self.language.as_str())
     }
 
     fn create_ws_request(&self, url: &str) -> tokio_tungstenite::tungstenite::Result<Request<()>> {
@@ -440,26 +551,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_config_from_oauth() {
-        let token = OAuthToken {
-            client_id: "test-client-id".to_string(),
-            access_token: "test-access-token".to_string(),
-            refresh_token: None,
-            expires_at: u64::MAX,
-        };
-        let config = Config::from_oauth(&token);
+    fn test_config_from_apikey() {
+        #[allow(deprecated)]
+        let config = Config::from_apikey("app-key", "app-secret", "token");
         assert_eq!(config.language, Language::EN);
+        match &config.auth {
+            AuthMode::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            } => {
+                assert_eq!(app_key, "app-key");
+                assert_eq!(app_secret, "app-secret");
+                assert_eq!(access_token, "token");
+            }
+            _ => panic!("Expected ApiKey auth mode"),
+        }
     }
 
     #[test]
     fn test_config_default_values() {
-        let token = OAuthToken {
-            client_id: "client-id".to_string(),
-            access_token: "token".to_string(),
-            refresh_token: None,
-            expires_at: u64::MAX,
-        };
-        let config = Config::from_oauth(&token);
+        #[allow(deprecated)]
+        let config = Config::from_apikey("key", "secret", "token");
 
         assert_eq!(config.language, Language::EN);
         assert_eq!(config.quote_ws_url, None);

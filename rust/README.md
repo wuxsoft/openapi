@@ -54,11 +54,13 @@ LongPort OpenAPI supports two authentication methods:
 
 #### 1. OAuth 2.0 (Recommended)
 
-OAuth 2.0 is the modern authentication method that uses Bearer tokens without requiring HMAC signatures.
+OAuth 2.0 uses Bearer tokens without requiring HMAC signatures.  The token is
+persisted automatically at `~/.longbridge-openapi/tokens/<client_id>` and
+refreshed transparently on every request.
 
-**Step 1: Register OAuth Client**
+**Step 1: Register an OAuth Client**
 
-First, register an OAuth client to get your `client_id`:
+Register an OAuth client to obtain your `client_id`:
 
 ```bash
 curl -X POST https://openapi.longbridgeapp.com/oauth2/register \
@@ -71,6 +73,7 @@ curl -X POST https://openapi.longbridgeapp.com/oauth2/register \
 ```
 
 Response:
+
 ```json
 {
   "client_id": "your-client-id-here",
@@ -80,59 +83,23 @@ Response:
 }
 ```
 
-Save the `client_id` for use in your application.
-
-**Step 2: Authorize, Refresh, and Get Token**
+**Step 2: Build an `OAuth` handle and create `Config`**
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{Config, oauth::{OAuth, OAuthToken}};
+use longport::{Config, oauth::OAuthBuilder};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let token = match OAuthToken::load() {
-        Ok(token) if token.is_expired() => {
-            // Token has expired — re-authorize
-            let oauth = OAuth::new("your-client-id");
-            let token = oauth.authorize(|url| {
-                println!("Open this URL to authorize: {url}");
-            }).await?;
-            token.save()?;
-            token
-        }
-        Ok(token) if token.expires_soon() => {
-            // Token will expire soon — refresh it
-            let oauth = OAuth::new("your-client-id");
-            match oauth.refresh(&token).await {
-                Ok(new_token) => {
-                    new_token.save()?;
-                    new_token
-                }
-                Err(_) => {
-                    // Refresh failed — fall back to re-authorization
-                    let oauth = OAuth::new("your-client-id");
-                    let token = oauth.authorize(|url| {
-                        println!("Open this URL to authorize: {url}");
-                    }).await?;
-                    token.save()?;
-                    token
-                }
-            }
-        }
-        Ok(token) => token,
-        Err(_) => {
-            // No saved token — start authorization flow
-            let oauth = OAuth::new("your-client-id");
-            let token = oauth.authorize(|url| {
-                println!("Open this URL to authorize: {url}");
-            }).await?;
-            token.save()?;
-            token
-        }
-    };
+    // Loads an existing token from ~/.longbridge-openapi/tokens/<client_id>.
+    // If none exists or it is expired, opens the browser authorization flow.
+    // Token refresh is handled automatically on every subsequent request.
+    let oauth = OAuthBuilder::new("your-client-id")
+        // .callback_port(8080)  // optional, default 60355
+        .build(|url| println!("Open this URL to authorize: {url}"))
+        .await?;
 
-    // Create config with OAuth token
-    let config = Arc::new(Config::from_oauth(&token));
+    let config = Arc::new(Config::from_oauth(oauth));
 
     // Use config to create contexts...
     Ok(())
@@ -140,18 +107,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```
 
 **Benefits:**
-- More secure (no shared secret)
-- Simpler integration (no signature calculation)
-- Token-based authentication
-- Better suited for modern applications
-
-**Note:** OAuth tokens should be stored securely in your application (e.g., encrypted file, secure keychain), **not in environment variables** for security reasons.
+- No shared secret required
+- No per-request signature calculation
+- Token lifecycle (load, refresh, persist) managed automatically
 
 #### 2. Legacy API Key (Environment Variables)
 
-For backward compatibility, you can still use the traditional API key method:
+For backward compatibility you can use the traditional API key method.
 
-_Setting environment variables (MacOS/Linux)_
+_Setting environment variables (macOS/Linux)_
 
 ```bash
 export LONGPORT_APP_KEY="App Key get from user center"
@@ -173,42 +137,17 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 
 ```rust,no_run
 use std::sync::Arc;
-use longport::{Config, QuoteContext, oauth::{OAuth, OAuthToken}};
-
-async fn get_token() -> Result<OAuthToken, Box<dyn std::error::Error>> {
-    match OAuthToken::load() {
-        Ok(token) if token.is_expired() => {
-            let oauth = OAuth::new("your-client-id");
-            let token = oauth.authorize(|url| println!("Open this URL to authorize: {url}")).await?;
-            token.save()?;
-            Ok(token)
-        }
-        Ok(token) if token.expires_soon() => {
-            let oauth = OAuth::new("your-client-id");
-            let token = oauth.refresh(&token).await.or_else(|_| async {
-                let oauth = OAuth::new("your-client-id");
-                oauth.authorize(|url| println!("Open this URL to authorize: {url}")).await
-            }).await?;
-            token.save()?;
-            Ok(token)
-        }
-        Ok(token) => Ok(token),
-        Err(_) => {
-            let oauth = OAuth::new("your-client-id");
-            let token = oauth.authorize(|url| println!("Open this URL to authorize: {url}")).await?;
-            token.save()?;
-            Ok(token)
-        }
-    }
-}
+use longport::{Config, QuoteContext, oauth::OAuthBuilder};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let token = get_token().await?;
-    let config = Arc::new(Config::from_oauth(&token));
+    let oauth = OAuthBuilder::new("your-client-id")
+        .build(|url| println!("Open this URL to authorize: {url}"))
+        .await?;
+    let config = Arc::new(Config::from_oauth(oauth));
 
     // Create a context for quote APIs
-    let (ctx, _) = QuoteContext::try_new(config.clone()).await?;
+    let (ctx, _) = QuoteContext::try_new(config).await?;
 
     // Get basic information of securities
     let resp = ctx
@@ -246,9 +185,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Quote API _(Subscribe quotes)_
 
-```rust, no_run
+```rust,no_run
 use std::sync::Arc;
-
 use longport::{quote::SubFlags, Config, QuoteContext};
 
 #[tokio::main]
@@ -273,9 +211,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Trade API _(Submit order)_
 
-```rust, no_run
+```rust,no_run
 use std::sync::Arc;
-
 use longport::{
     decimal,
     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},

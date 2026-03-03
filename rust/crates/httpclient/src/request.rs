@@ -13,7 +13,7 @@ use reqwest::{
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
 use crate::{
-    HttpClient, HttpClientError, HttpClientResult, is_cn,
+    AuthConfig, HttpClient, HttpClientError, HttpClientResult, is_cn,
     signature::{SignatureParams, signature},
     timestamp::Timestamp,
 };
@@ -235,9 +235,34 @@ where
             .and_then(|value| value.to_str().ok())
             .and_then(|value| value.parse().ok())
             .unwrap_or_else(Timestamp::now);
+
+        // Resolve app_key, access_token, and optional app_secret from auth config
+        let (app_key, access_token, app_secret) = match &config.auth {
+            AuthConfig::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            } => (
+                app_key.clone(),
+                access_token.clone(),
+                Some(app_secret.clone()),
+            ),
+            AuthConfig::OAuth(oauth) => {
+                let token = oauth
+                    .access_token()
+                    .await
+                    .map_err(|e| HttpClientError::OAuth(e.to_string()))?;
+                (
+                    oauth.client_id().to_string(),
+                    format!("Bearer {token}"),
+                    None,
+                )
+            }
+        };
+
         let app_key_value =
-            HeaderValue::from_str(&config.app_key).map_err(|_| HttpClientError::InvalidApiKey)?;
-        let access_token_value = HeaderValue::from_str(&config.access_token)
+            HeaderValue::from_str(&app_key).map_err(|_| HttpClientError::InvalidApiKey)?;
+        let access_token_value = HeaderValue::from_str(&access_token)
             .map_err(|_| HttpClientError::InvalidAccessToken)?;
 
         let url = self.http_url().await;
@@ -267,21 +292,21 @@ where
             request.url_mut().set_query(Some(&query_string));
         }
 
-        // Generate signature (None for OAuth 2.0, Some for legacy mode)
-        let sign = signature(SignatureParams {
-            request: &request,
-            app_key: &config.app_key,
-            access_token: Some(&config.access_token),
-            app_secret: &config.app_secret,
-            timestamp,
-        });
-
-        // Only set X-Api-Signature header in legacy mode
-        if let Some(signature_value) = sign {
-            request.headers_mut().insert(
-                "X-Api-Signature",
-                HeaderValue::from_maybe_shared(signature_value).expect("valid signature"),
-            );
+        // Generate HMAC-SHA256 signature only for ApiKey mode
+        if let Some(secret) = app_secret {
+            let sign = signature(SignatureParams {
+                request: &request,
+                app_key: &app_key,
+                access_token: Some(&access_token),
+                app_secret: &secret,
+                timestamp,
+            });
+            if let Some(signature_value) = sign {
+                request.headers_mut().insert(
+                    "X-Api-Signature",
+                    HeaderValue::from_maybe_shared(signature_value).expect("valid signature"),
+                );
+            }
         }
 
         if let Some(body) = &self.body {

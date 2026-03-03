@@ -73,6 +73,10 @@ pub enum HttpClientError {
         /// The number of online connections
         online: i32,
     },
+
+    /// OAuth error
+    #[error("oauth error: {0}")]
+    OAuth(String),
 }
 
 /// Represents an HTTP error

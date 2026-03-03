@@ -15,7 +15,7 @@ mod signature;
 mod timestamp;
 
 pub use client::HttpClient;
-pub use config::HttpClientConfig;
+pub use config::{AuthConfig, HttpClientConfig};
 pub use error::{HttpClientError, HttpClientResult, HttpError};
 pub use geo::is_cn;
 pub use qs::QsError;
