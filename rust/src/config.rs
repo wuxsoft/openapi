@@ -7,14 +7,14 @@ use std::{
 };
 
 use http::Method;
-pub(crate) use http::{HeaderValue, Request, header};
-use longport_httpcli::{HttpClient, HttpClientConfig, Json, is_cn};
+pub(crate) use http::{header, HeaderValue, Request};
+use longport_httpcli::{is_cn, HttpClient, HttpClientConfig, Json};
 use longport_oauth::OAuth;
 use num_enum::IntoPrimitive;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
-use tracing::{Level, Subscriber, subscriber::NoSubscriber};
+use tracing::{subscriber::NoSubscriber, Level, Subscriber};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 
@@ -133,14 +133,10 @@ pub struct Config {
 }
 
 impl Config {
-    /// Create a new `Config` using API Key authentication (legacy mode).
+    /// Create a new `Config` using API Key authentication.
     ///
-    /// # Deprecation note
-    ///
-    /// For new integrations prefer [`Config::from_oauth`] together with
-    /// [`longport::oauth::OAuthBuilder`].
-    #[deprecated = "Legacy API Key mode. \
-        Use `Config::from_oauth` with `OAuthBuilder` for new integrations."]
+    /// For OAuth 2.0, use [`Config::from_oauth`] together with
+    /// [`longport::oauth::OAuthBuilder`] instead.
     pub fn from_apikey(
         app_key: impl Into<String>,
         app_secret: impl Into<String>,
@@ -161,20 +157,6 @@ impl Config {
             enable_print_quote_packages: true,
             log_path: None,
         }
-    }
-
-    /// Create a new `Config` (API Key / legacy mode).
-    ///
-    /// Prefer [`Config::from_apikey`] for clarity, or
-    /// [`Config::from_oauth`] for OAuth 2.0.
-    #[deprecated = "Use `Config::from_apikey` or `Config::from_oauth` instead."]
-    pub fn new(
-        app_key: impl Into<String>,
-        app_secret: impl Into<String>,
-        access_token: impl Into<String>,
-    ) -> Self {
-        #[allow(deprecated)]
-        Self::from_apikey(app_key, app_secret, access_token)
     }
 
     /// Create a new `Config` for OAuth 2.0 authentication.
@@ -216,8 +198,8 @@ impl Config {
         }
     }
 
-    /// Create a new `Config` from environment variables (API Key / legacy
-    /// mode).
+    /// Create a new `Config` from environment variables (API Key
+    /// authentication).
     ///
     /// It first loads the environment variables from the `.env` file in the
     /// current directory.
@@ -243,12 +225,8 @@ impl Config {
     /// - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no
     ///   logs`)
     ///
-    /// # Note
-    ///
     /// For OAuth 2.0 authentication use [`from_oauth`](Config::from_oauth)
     /// together with [`OAuthBuilder`](longport_oauth::OAuthBuilder).
-    #[deprecated = "Legacy API Key mode. \
-        Use `Config::from_oauth` with `OAuthBuilder` for new integrations."]
     pub fn from_apikey_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 
@@ -304,15 +282,6 @@ impl Config {
             enable_print_quote_packages,
             log_path,
         })
-    }
-
-    /// Create a new `Config` from environment variables.
-    ///
-    /// Prefer [`Config::from_apikey_env`] for clarity.
-    #[deprecated = "Use `Config::from_apikey_env` or `Config::from_oauth` instead."]
-    pub fn from_env() -> Result<Self> {
-        #[allow(deprecated)]
-        Self::from_apikey_env()
     }
 
     /// Specifies the url of the OpenAPI server.
@@ -552,7 +521,6 @@ mod tests {
 
     #[test]
     fn test_config_from_apikey() {
-        #[allow(deprecated)]
         let config = Config::from_apikey("app-key", "app-secret", "token");
         assert_eq!(config.language, Language::EN);
         match &config.auth {
@@ -571,7 +539,6 @@ mod tests {
 
     #[test]
     fn test_config_default_values() {
-        #[allow(deprecated)]
         let config = Config::from_apikey("key", "secret", "token");
 
         assert_eq!(config.language, Language::EN);
