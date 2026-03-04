@@ -9,6 +9,10 @@ cargo clippy --all --all-features
 cargo +nightly fmt --all
 ```
 
+> **Note:** `cargo +nightly fmt` may reflow doc comments (e.g. `/// @param …`
+> lines). Do **not** revert those changes — they are intentional formatting
+> output and should be committed as-is.
+
 ## After modifying the Node.js SDK (`nodejs/`)
 
 Build the native `.node` binary from the `nodejs/` directory:
