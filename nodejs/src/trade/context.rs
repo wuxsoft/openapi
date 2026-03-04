@@ -86,7 +86,7 @@ impl TradeContext {
     ///
     /// ```javascript
     /// const {
-    ///  Config,
+    ///  OAuth, Config,
     ///  TradeContext,
     ///  Decimal,
     ///  OrderSide,
@@ -95,8 +95,8 @@ impl TradeContext {
     ///  TopicType,
     /// } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) => {
     ///     ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
     ///     ctx.subscribe([TopicType.Private]);
@@ -135,10 +135,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge');
+    /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) =>
     ///     ctx.historyExecutions({
     ///       symbol: "700.HK",
@@ -171,10 +171,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge');
+    /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) => ctx.todayExecutions({ symbol: "700.HK" }))
     ///   .then((resp) => {
     ///     for (let obj of resp) {
@@ -202,15 +202,15 @@ impl TradeContext {
     ///
     /// ```javascript
     /// const {
-    ///   Config,
+    ///   OAuth, Config,
     ///   TradeContext,
     ///   OrderStatus,
     ///   OrderSide,
     ///   Market,
     /// } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) =>
     ///     ctx.historyOrders({
     ///       symbol: "700.HK",
@@ -247,15 +247,15 @@ impl TradeContext {
     ///
     /// ```javascript
     /// const {
-    ///   Config,
+    ///   OAuth, Config,
     ///   TradeContext,
     ///   OrderStatus,
     ///   OrderSide,
     ///   Market,
     /// } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) =>
     ///     ctx.todayOrders({
     ///       symbol: "700.HK",
@@ -286,10 +286,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, Decimal } = require('longbridge');
+    /// const { OAuth, Config, TradeContext, Decimal } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) =>
     ///     ctx.replaceOrder({
     ///       orderId: "709043056541253632",
@@ -323,7 +323,7 @@ impl TradeContext {
     ///
     /// ```javascript
     /// const {
-    ///   Config,
+    ///   OAuth, Config,
     ///   TradeContext,
     ///   OrderType,
     ///   OrderSide,
@@ -331,8 +331,8 @@ impl TradeContext {
     ///   TimeInForceType,
     /// } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) =>
     ///     ctx.submitOrder({
     ///       symbol: "700.HK",
@@ -364,10 +364,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge');
+    /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config).then((ctx) => ctx.cancelOrder("709043056541253632"));
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth))).then((ctx) => ctx.cancelOrder("709043056541253632"));
     /// ```
     #[napi]
     pub async fn cancel_order(&self, order_id: String) -> Result<()> {
@@ -383,10 +383,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge');
+    /// const { OAuth, Config, TradeContext } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) => ctx.accountBalance())
     ///   .then((resp) => {
     ///     for (let obj of resp) {
@@ -410,10 +410,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, GetCashFlowOptions } = require('longbridge');
+    /// const { OAuth, Config, TradeContext, GetCashFlowOptions } = require('longbridge');
     ///
-    /// let config = Config.fromApiKeyEnv();
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) =>
     ///     ctx.cashFlow({
     ///       startAt: new Date(2022, 5, 9),
@@ -442,10 +442,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge')
+    /// const { OAuth, Config, TradeContext } = require('longbridge')
     ///
-    /// let config = Config.fromApiKeyEnv()
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) => ctx.fundPositions())
     ///   .then((resp) => console.log(resp))
     /// ```
@@ -466,10 +466,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge')
+    /// const { OAuth, Config, TradeContext } = require('longbridge')
     ///
-    /// let config = Config.fromApiKeyEnv()
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) => ctx.stockPositions())
     ///   .then((resp) => console.log(resp))
     /// ```
@@ -490,10 +490,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge')
+    /// const { OAuth, Config, TradeContext } = require('longbridge')
     ///
-    /// let config = Config.fromApiKeyEnv()
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) => ctx.marginRatio("700.HK"))
     ///   .then((resp) => console.log(resp))
     /// ```
@@ -511,10 +511,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext } = require('longbridge')
+    /// const { OAuth, Config, TradeContext } = require('longbridge')
     ///
-    /// let config = Config.fromApiKeyEnv()
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) => ctx.orderDetail("701276261045858304"))
     ///   .then((resp) => console.log(resp))
     /// ```
@@ -533,10 +533,10 @@ impl TradeContext {
     /// #### Example
     ///
     /// ```javascript
-    /// const { Config, TradeContext, OrderType, OrderSide } = require('longbridge')
+    /// const { OAuth, Config, TradeContext, OrderType, OrderSide } = require('longbridge')
     ///
-    /// let config = Config.fromApiKeyEnv()
-    /// TradeContext.new(config)
+    /// OAuth.build('your-client-id', (_, url) => console.log('Visit:', url))
+    ///   .then((oauth) => TradeContext.new(Config.fromOAuth(oauth)))
     ///   .then((ctx) => ctx.estimateMaxPurchaseQuantity({
     ///     symbol: "700.HK",
     ///     orderType: OrderType.LO,

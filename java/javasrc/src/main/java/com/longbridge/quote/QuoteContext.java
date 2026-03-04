@@ -120,7 +120,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.setOnQuote((symbol, event) -> {
      *                 System.out.printf("%s\t%s\n", symbol, event);
      *             });
@@ -153,7 +155,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.setOnQuote((symbol, quote) -> {
      *                 System.out.printf("%s\t%s\n", symbol, quote);
      *             });
@@ -187,7 +191,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.setOnCandlestick((symbol, event) -> {
      *                 System.out.printf("%s\t%s\n", symbol, event);
      *             });
@@ -237,7 +243,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Quote, true);
      *             Subscription[] subscriptions = ctx.getSubscrptions().get();
      *             for (Subscription obj : subscriptions) {
@@ -268,7 +276,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             SecurityStaticInfo[] resp = ctx
      *                     .getStaticInfo(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" })
      *                     .get();
@@ -301,7 +311,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             SecurityQuote[] resp = ctx.getQuote(new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" })
      *                     .get();
      *             for (SecurityQuote obj : resp) {
@@ -333,7 +345,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             OptionQuote[] resp = ctx.getOptionQuote(new String[] { "AAPL230317P160000.US" }).get();
      *             for (OptionQuote obj : resp) {
      *                 System.out.println(obj);
@@ -364,7 +378,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             WarrantQuote[] resp = ctx.getWarrantQuote(new String[] { "21125.HK" }).get();
      *             for (WarrantQuote obj : resp) {
      *                 System.out.println(obj);
@@ -395,7 +411,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             SecurityDepth resp = ctx.getDepth("700.HK").get();
      *             System.out.println(resp);
      *         }
@@ -424,7 +442,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             SecurityBrokers resp = ctx.getBrokers("700.HK").get();
      *             System.out.println(resp);
      *         }
@@ -453,7 +473,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ParticipantInfo[] resp = ctx.getParticipants().get();
      *             for (ParticipantInfo obj : resp) {
      *                 System.out.println(obj);
@@ -483,7 +505,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             Trade[] resp = ctx.getTrades("700.HK", 10).get();
      *             for (Trade obj : resp) {
      *                 System.out.println(obj);
@@ -515,7 +539,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             IntradayLine[] resp = ctx.getIntraday("700.HK").get();
      *             for (IntradayLine obj : resp) {
      *                 System.out.println(obj);
@@ -548,7 +574,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             Candlestick[] resp = ctx
      *                     .getCandlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday)
      *                     .get();
@@ -587,7 +615,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             LocalDate[] resp = ctx.getOptionChainExpiryDateList("AAPL.US").get();
      *             for (LocalDate obj : resp) {
      *                 System.out.println(obj);
@@ -619,7 +649,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             StrikePriceInfo[] resp = ctx.getOptionChainInfoByDate("AAPL.US", LocalDate.of(2023, 1, 20)).get();
      *             for (StrikePriceInfo obj : resp) {
      *                 System.out.println(obj);
@@ -652,7 +684,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             IssuerInfo[] resp = ctx.getWarrantIssuers().get();
      *             for (IssuerInfo obj : resp) {
      *                 System.out.println(obj);
@@ -683,7 +717,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             QueryWarrantOptions opts = new QueryWarrantOptions("700.HK", WarrantSortBy.LastDone,
      *                     SortOrderType.Ascending);
      *             IssuerInfo[] resp = ctx.queryWarrantList(opts).get();
@@ -717,7 +753,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             MarketTradingSession[] resp = ctx.getTradingSession().get();
      *             for (MarketTradingSession obj : resp) {
      *                 System.out.println(obj);
@@ -752,7 +790,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             MarketTradingDays resp = ctx
      *                     .getTradingDays(Market.HK, LocalDate.of(2022, 1, 20), LocalDate.of(2022, 2, 20)).get();
      *             System.out.println(resp);
@@ -785,7 +825,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             CapitalFlowLine[] resp = ctx.getCapitalFlow("700.HK").get();
      *             for (CapitalFlowLine obj : resp) {
      *                 System.out.println(obj);
@@ -816,7 +858,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             CapitalDistributionResponse resp = ctx.getCapitalDistribution("700.HK").get();
      *             System.out.println(resp);
      *         }
@@ -904,7 +948,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             WatchlistGroup[] resp = ctx.getWatchlist().get();
      *             System.out.println(resp);
      *         }
@@ -934,7 +980,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             CreateWatchlistGroup req = new CreateWatchlistGroup("Watchlist1")
      *                     .setSecurities(new String[] { "700.HK", "AAPL.US" });
      *             Long groupId = ctx.createWatchlistGroup(req).get();
@@ -965,7 +1013,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             DeleteWatchlistGroup req = new DeleteWatchlistGroup(10086);
      *             ctx.deleteWatchlistGroup(req).get();
      *         }
@@ -994,7 +1044,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             CreateWatchlistGroup req = new UpdateWatchlistGroup(10086)
      *                     .setName("watchlist2")
      *                     .setSecurities(new String[] { "700.HK", "AAPL.US" });
@@ -1025,7 +1077,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv();
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+     *                 .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth);
      *                 QuoteContext ctx = QuoteContext.create(config).get()) {
      *             Security[] resp = ctx.securityList(Market.US, SecurityListCategory.Overnight).get();
      *             for (Security obj : resp) {
@@ -1059,7 +1113,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv();
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+     *                 .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth);
      *                 QuoteContext ctx = QuoteContext.create(config).get()) {
      *             Security[] resp = ctx.securityList(Market.Crypto).get();
      *             for (Security obj : resp) {
@@ -1092,7 +1148,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             MarketTemperature resp = ctx.getMarketTemperature(Market.HK).get();
      *             System.out.println(resp);
      *         }
@@ -1122,7 +1180,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             HistoryMarketTemperatureResponse resp = ctx
      *                     .getHistoryMarketTemperature(Market.HK, LocalDate.of(2025, 1, 20), LocalDate.of(2025, 2, 20))
      *                     .get();
@@ -1161,7 +1221,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Quote, true).get();
      *             Thread.sleep(5000);
      *             RealtimeQuote[] resp = ctx.getRealtimeQuote(new String[] { "700.HK", "AAPL.US" }).get();
@@ -1198,7 +1260,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Depth, true).get();
      *             Thread.sleep(5000);
      *             SecurityDepth resp = ctx.getRealtimeDepth("700.HK").get();
@@ -1233,7 +1297,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Brokers, true).get();
      *             Thread.sleep(5000);
      *             SecurityBrokers resp = ctx.getRealtimeBrokers("700.HK").get();
@@ -1268,7 +1334,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.subscribe(new String[] { "700.HK", "AAPL.US" }, SubFlags.Trade, false).get();
      *             Thread.sleep(5000);
      *             Trade[] resp = ctx.getRealtimeTrades("700.HK", 10).get();
@@ -1306,7 +1374,9 @@ public class QuoteContext implements AutoCloseable {
      * 
      * class Main {
      *     public static void main(String[] args) throws Exception {
-     *         try (Config config = Config.fromEnv(); QuoteContext ctx = QuoteContext.create(config).get()) {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+                .build(url -> System.out.println("Visit: " + url)).get();
+        try (Config config = Config.fromOAuth(oauth); QuoteContext ctx = QuoteContext.create(config).get()) {
      *             ctx.subscribeCandlesticks("AAPL.US", Period.Min_1).get();
      *             Thread.sleep(5000);
      *             Candlestick[] resp = ctx.getRealtimeCandlesticks("AAPL.US", Period.Min_1, 10).get();
