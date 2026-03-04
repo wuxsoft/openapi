@@ -63,10 +63,24 @@ refreshed transparently on every request.
 
 Register an OAuth client to obtain your `client_id`:
 
+_bash / macOS / Linux_
+
 ```bash
 curl -X POST https://openapi.longbridgeapp.com/oauth2/register \
   -H "Content-Type: application/json" \
   -d '{
+    "client_name": "My Application",
+    "redirect_uris": ["http://localhost:60355/callback"],
+    "grant_types": ["authorization_code", "refresh_token"]
+  }'
+```
+
+_PowerShell (Windows)_
+
+```powershell
+Invoke-RestMethod -Method Post -Uri https://openapi.longbridgeapp.com/oauth2/register `
+  -ContentType "application/json" `
+  -Body '{
     "client_name": "My Application",
     "redirect_uris": ["http://localhost:60355/callback"],
     "grant_types": ["authorization_code", "refresh_token"]
@@ -79,7 +93,7 @@ Response:
 {
   "client_id": "your-client-id-here",
   "client_secret": null,
-  "name": "My Application",
+  "client_name": "My Application",
   "redirect_uris": ["http://localhost:60355/callback"]
 }
 ```
