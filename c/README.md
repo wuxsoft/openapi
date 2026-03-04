@@ -60,8 +60,11 @@ Save the `client_id` for use in your application.
 
 **Step 2: Build OAuth client and create a Config**
 
-`lb_oauth_new` loads a cached token if one exists, or starts the browser
-authorization flow automatically.  The resulting `lb_oauth_t*` handle is passed
+`lb_oauth_new` loads a cached token from
+`~/.longbridge-openapi/tokens/<client_id>` (`%USERPROFILE%\.longbridge-openapi\tokens\<client_id>` on Windows)
+if one exists and is still valid, or starts the browser authorization flow
+automatically.  The token is persisted to the same path after a successful
+authorization or refresh.  The resulting `lb_oauth_t*` handle is passed
 directly to `lb_config_from_oauth`.
 
 ```c

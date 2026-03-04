@@ -55,7 +55,8 @@ LongPort OpenAPI supports two authentication methods:
 #### 1. OAuth 2.0 (Recommended)
 
 OAuth 2.0 uses Bearer tokens without requiring HMAC signatures.  The token is
-persisted automatically at `~/.longbridge-openapi/tokens/<client_id>` and
+persisted automatically at `~/.longbridge-openapi/tokens/<client_id>`
+(`%USERPROFILE%\.longbridge-openapi\tokens\<client_id>` on Windows) and
 refreshed transparently on every request.
 
 **Step 1: Register an OAuth Client**
@@ -168,7 +169,7 @@ use longport::{Config, QuoteContext};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load configuration from environment variables
-    let config = Arc::new(Config::from_env()?);
+    let config = Arc::new(Config::from_apikey_env()?);
 
     // Create a context for quote APIs
     let (ctx, _) = QuoteContext::try_new(config.clone()).await?;
@@ -192,7 +193,7 @@ use longport::{quote::SubFlags, Config, QuoteContext};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load configuration from environment variables
-    let config = Arc::new(Config::from_env()?);
+    let config = Arc::new(Config::from_apikey_env()?);
 
     // Create a context for quote APIs
     let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
@@ -222,7 +223,7 @@ use longport::{
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load configuration from environment variables
-    let config = Arc::new(Config::from_env()?);
+    let config = Arc::new(Config::from_apikey_env()?);
 
     // Create a context for trade APIs
     let (ctx, _) = TradeContext::try_new(config).await?;

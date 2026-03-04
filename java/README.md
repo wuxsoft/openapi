@@ -69,9 +69,12 @@ Save the `client_id` for use in your application.
 
 **Step 2: Build OAuth client and create a Config**
 
-`OAuthBuilder.build` loads a cached token if one exists, or starts the browser
-authorization flow automatically.  The resulting `OAuth` handle is passed
-directly to `Config.fromOAuth`.
+`OAuthBuilder.build` loads a cached token from
+`~/.longbridge-openapi/tokens/<client_id>` (`%USERPROFILE%\.longbridge-openapi\tokens\<client_id>` on Windows)
+if one exists and is still valid, or starts the browser authorization flow
+automatically.  The token is persisted to the same path after a successful
+authorization or refresh.  The resulting `OAuth` handle is passed directly to
+`Config.fromOAuth`.
 
 ```java
 import com.longport.*;
