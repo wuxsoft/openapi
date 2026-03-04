@@ -63,11 +63,15 @@ class HttpClient:
         """
         Create a new ``HttpClient`` using API Key authentication.
 
+        ``LONGPORT_HTTP_URL`` is read from the environment automatically.
+        Passing ``http_url`` overrides that value.
+
         Args:
             app_key: App Key
             app_secret: App Secret
             access_token: Access Token
-            http_url: HTTP API url (default:
+            http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL``
+                from env if omitted; falls back to
                 ``https://openapi.longportapp.com``)
         """
 
@@ -94,10 +98,14 @@ class HttpClient:
         """
         Create a new ``HttpClient`` from an OAuth handle.
 
+        ``LONGPORT_HTTP_URL`` is read from the environment automatically.
+        Passing ``http_url`` overrides that value.
+
         Args:
             oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
                 :meth:`OAuthBuilder.build_async`
-            http_url: HTTP API url (default:
+            http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL``
+                from env if omitted; falls back to
                 ``https://openapi.longportapp.com``)
         """
 
@@ -284,19 +292,30 @@ class Config:
         """
         Create a new ``Config`` using API Key authentication.
 
+        Optional environment variables are read automatically
+        (``LONGPORT_HTTP_URL``, ``LONGPORT_LANGUAGE``,
+        ``LONGPORT_QUOTE_WS_URL``, ``LONGPORT_TRADE_WS_URL``,
+        ``LONGPORT_ENABLE_OVERNIGHT``, ``LONGPORT_PUSH_CANDLESTICK_MODE``,
+        ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``).
+        Any explicit parameter overrides the corresponding env variable.
+
         Args:
             app_key: App Key
             app_secret: App Secret
             access_token: Access Token
-            http_url: HTTP API url override (optional)
-            quote_ws_url: Quote WS url override (optional)
-            trade_ws_url: Trade WS url override (optional)
-            language: Language identifier (optional)
-            enable_overnight: Enable overnight quote (optional)
-            push_candlestick_mode: Push candlestick mode (optional)
+            http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL``
+                from env if omitted)
+            quote_ws_url: Quote WS url override (reads
+                ``LONGPORT_QUOTE_WS_URL`` from env if omitted)
+            trade_ws_url: Trade WS url override (reads
+                ``LONGPORT_TRADE_WS_URL`` from env if omitted)
+            language: Language identifier override (reads
+                ``LONGPORT_LANGUAGE`` from env if omitted)
+            enable_overnight: Enable overnight quote (default: ``False``)
+            push_candlestick_mode: Push candlestick mode
             enable_print_quote_packages: Print opened quote packages on
-                connect (optional)
-            log_path: Path for log files (optional)
+                connect (default: ``True``)
+            log_path: Path for log files (default: no logs)
         """
 
     @classmethod
@@ -346,13 +365,24 @@ class Config:
         OAuth 2.0 is the recommended authentication method — no app_secret or
         HMAC signatures required.
 
+        Optional environment variables are read automatically
+        (``LONGPORT_HTTP_URL``, ``LONGPORT_LANGUAGE``,
+        ``LONGPORT_QUOTE_WS_URL``, ``LONGPORT_TRADE_WS_URL``,
+        ``LONGPORT_ENABLE_OVERNIGHT``, ``LONGPORT_PUSH_CANDLESTICK_MODE``,
+        ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``).
+        Any explicit parameter overrides the corresponding env variable.
+
         Args:
             oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
                 :meth:`AsyncOAuthBuilder.build`
-            http_url: HTTP API url override (optional)
-            quote_ws_url: Quote WS url override (optional)
-            trade_ws_url: Trade WS url override (optional)
-            language: Language identifier (optional)
+            http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL``
+                from env if omitted)
+            quote_ws_url: Quote WS url override (reads
+                ``LONGPORT_QUOTE_WS_URL`` from env if omitted)
+            trade_ws_url: Trade WS url override (reads
+                ``LONGPORT_TRADE_WS_URL`` from env if omitted)
+            language: Language identifier override (reads
+                ``LONGPORT_LANGUAGE`` from env if omitted)
             enable_overnight: Enable overnight quote (optional)
             push_candlestick_mode: Push candlestick mode (optional)
             enable_print_quote_packages: Print opened quote packages on

@@ -13,10 +13,15 @@ pub struct HttpClient(LbHttpClient);
 impl HttpClient {
     /// Create a new `HttpClient` using API Key authentication
     ///
+    /// `LONGPORT_HTTP_URL` is read from the environment automatically.
+    /// Passing `httpUrl` overrides that value.
+    ///
     /// @param appKey      App key
     /// @param appSecret   App secret
     /// @param accessToken Access token
-    /// @param httpUrl     HTTP endpoint url (default: `https://openapi.longportapp.com`)
+    /// @param httpUrl     HTTP endpoint url override (reads `LONGPORT_HTTP_URL`
+    ///                    from env if omitted; falls back to
+    ///                    `https://openapi.longportapp.com`)
     #[napi(factory, js_name = "fromApikey")]
     pub fn from_apikey(
         app_key: String,
@@ -51,8 +56,13 @@ impl HttpClient {
 
     /// Create a new `HttpClient` from an OAuth handle
     ///
+    /// `LONGPORT_HTTP_URL` is read from the environment automatically.
+    /// Passing `httpUrl` overrides that value.
+    ///
     /// @param oauth    OAuth handle obtained from `OAuthBuilder.build(...)`
-    /// @param httpUrl  HTTP endpoint url (default: `https://openapi.longportapp.com`)
+    /// @param httpUrl  HTTP endpoint url override (reads `LONGPORT_HTTP_URL`
+    ///                 from env if omitted; falls back to
+    ///                 `https://openapi.longportapp.com`)
     #[napi(factory, js_name = "fromOAuth")]
     pub fn from_oauth(oauth: &OAuth, http_url: Option<String>) -> Self {
         let mut config = HttpClientConfig::from_oauth(oauth.0.clone());

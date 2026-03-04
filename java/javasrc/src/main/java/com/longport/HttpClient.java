@@ -16,6 +16,8 @@ public class HttpClient implements AutoCloseable {
 
     /**
      * Create a new {@code HttpClient} using API Key authentication.
+     * <p>
+     * {@code LONGPORT_HTTP_URL} is read from the environment automatically.
      *
      * @param appKey      App key
      * @param appSecret   App secret
@@ -29,11 +31,14 @@ public class HttpClient implements AutoCloseable {
     /**
      * Create a new {@code HttpClient} using API Key authentication with a custom
      * HTTP endpoint URL.
+     * <p>
+     * The {@code httpUrl} parameter overrides {@code LONGPORT_HTTP_URL} from the
+     * environment.
      *
      * @param appKey      App key
      * @param appSecret   App secret
      * @param accessToken Access token
-     * @param httpUrl     HTTP endpoint URL
+     * @param httpUrl     HTTP endpoint URL override
      * @return HttpClient object
      */
     public static HttpClient fromApikey(String appKey, String appSecret, String accessToken, String httpUrl) {
@@ -45,22 +50,6 @@ public class HttpClient implements AutoCloseable {
         SdkNative.freeHttpClient(this.raw);
     }
 
-    /**
-     * Create a new `HttpClient` from the given environment variables
-     * <p>
-     * It first gets the environment variables from the .env file in the current
-     * directory.
-     * 
-     * # Variables
-     * 
-     * - `LONGPORT_HTTP_URL` - HTTP endpoint url
-     * - `LONGPORT_APP_KEY` - App key
-     * - `LONGPORT_APP_SECRET` - App secret
-     * - `LONGPORT_ACCESS_TOKEN` - Access token
-     * 
-     * @return Config object
-     * @throws OpenApiException If an error occurs
-     */
     /**
      * Create a new {@code HttpClient} from environment variables (API Key
      * authentication).
@@ -77,6 +66,8 @@ public class HttpClient implements AutoCloseable {
 
     /**
      * Create a new {@code HttpClient} from an OAuth handle.
+     * <p>
+     * {@code LONGPORT_HTTP_URL} is read from the environment automatically.
      *
      * @param oauth OAuth handle returned by {@link OAuthBuilder#build}
      * @return HttpClient object
@@ -88,9 +79,12 @@ public class HttpClient implements AutoCloseable {
     /**
      * Create a new {@code HttpClient} from an OAuth handle with a custom HTTP
      * endpoint URL.
+     * <p>
+     * The {@code httpUrl} parameter overrides {@code LONGPORT_HTTP_URL} from the
+     * environment.
      *
      * @param oauth   OAuth handle returned by {@link OAuthBuilder#build}
-     * @param httpUrl HTTP endpoint URL
+     * @param httpUrl HTTP endpoint URL override
      * @return HttpClient object
      */
     public static HttpClient fromOAuth(OAuth oauth, String httpUrl) {

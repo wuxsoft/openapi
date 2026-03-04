@@ -15,6 +15,14 @@ public class Config implements AutoCloseable {
 
     /**
      * Create a new {@code Config} from API key credentials.
+     * <p>
+     * Optional environment variables are read automatically:
+     * {@code LONGPORT_HTTP_URL}, {@code LONGPORT_LANGUAGE},
+     * {@code LONGPORT_QUOTE_WS_URL}, {@code LONGPORT_TRADE_WS_URL},
+     * {@code LONGPORT_ENABLE_OVERNIGHT}, {@code LONGPORT_PUSH_CANDLESTICK_MODE},
+     * {@code LONGPORT_PRINT_QUOTE_PACKAGES}, {@code LONGPORT_LOG_PATH}.
+     * Use the chainable setter methods (e.g. {@link #httpUrl}) to override any of
+     * these values.
      *
      * @param appKey      App key
      * @param appSecret   App secret
@@ -67,6 +75,14 @@ public class Config implements AutoCloseable {
      * <p>
      * OAuth 2.0 is the recommended authentication method. Obtain an {@link OAuth}
      * instance via {@link OAuthBuilder#build}.
+     * <p>
+     * Optional environment variables are read automatically:
+     * {@code LONGPORT_HTTP_URL}, {@code LONGPORT_LANGUAGE},
+     * {@code LONGPORT_QUOTE_WS_URL}, {@code LONGPORT_TRADE_WS_URL},
+     * {@code LONGPORT_ENABLE_OVERNIGHT}, {@code LONGPORT_PUSH_CANDLESTICK_MODE},
+     * {@code LONGPORT_PRINT_QUOTE_PACKAGES}, {@code LONGPORT_LOG_PATH}.
+     * Use the chainable setter methods (e.g. {@link #httpUrl}) to override any of
+     * these values.
      *
      * @param oauth OAuth handle returned by {@link OAuthBuilder#build}
      * @return Config object

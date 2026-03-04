@@ -129,8 +129,59 @@ pub struct Config {
     pub(crate) log_path: Option<PathBuf>,
 }
 
+/// Non-credential environment variables shared by `from_apikey` and
+/// `from_oauth`.  Callers must have already invoked `dotenv::dotenv()`.
+struct ConfigExtras {
+    http_url: Option<String>,
+    quote_ws_url: Option<String>,
+    trade_ws_url: Option<String>,
+    language: Language,
+    enable_overnight: Option<bool>,
+    push_candlestick_mode: Option<PushCandlestickMode>,
+    enable_print_quote_packages: bool,
+    log_path: Option<PathBuf>,
+}
+
+impl ConfigExtras {
+    fn from_env() -> Self {
+        let language = std::env::var("LONGPORT_LANGUAGE")
+            .ok()
+            .and_then(|v| v.parse::<Language>().ok())
+            .unwrap_or(Language::EN);
+        let enable_overnight = std::env::var("LONGPORT_ENABLE_OVERNIGHT")
+            .map(|v| v == "true")
+            .ok();
+        let push_candlestick_mode = std::env::var("LONGPORT_PUSH_CANDLESTICK_MODE")
+            .map(|v| match v.as_str() {
+                "confirmed" => PushCandlestickMode::Confirmed,
+                _ => PushCandlestickMode::Realtime,
+            })
+            .ok();
+        let enable_print_quote_packages = std::env::var("LONGPORT_PRINT_QUOTE_PACKAGES")
+            .as_deref()
+            .unwrap_or("true")
+            == "true";
+        Self {
+            http_url: std::env::var("LONGPORT_HTTP_URL").ok(),
+            quote_ws_url: std::env::var("LONGPORT_QUOTE_WS_URL").ok(),
+            trade_ws_url: std::env::var("LONGPORT_TRADE_WS_URL").ok(),
+            language,
+            enable_overnight,
+            push_candlestick_mode,
+            enable_print_quote_packages,
+            log_path: std::env::var("LONGPORT_LOG_PATH").ok().map(PathBuf::from),
+        }
+    }
+}
+
 impl Config {
     /// Create a new `Config` using API Key authentication.
+    ///
+    /// All optional environment variables (`LONGPORT_HTTP_URL`,
+    /// `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`,
+    /// `LONGPORT_ENABLE_OVERNIGHT`, `LONGPORT_PUSH_CANDLESTICK_MODE`,
+    /// `LONGPORT_PRINT_QUOTE_PACKAGES`, `LONGPORT_LOG_PATH`) are read from the
+    /// environment (or `.env` file) and applied automatically if set.
     ///
     /// For OAuth 2.0, use [`Config::from_oauth`] together with
     /// [`longport::oauth::OAuthBuilder`] instead.
@@ -139,24 +190,32 @@ impl Config {
         app_secret: impl Into<String>,
         access_token: impl Into<String>,
     ) -> Self {
+        let _ = dotenv::dotenv();
+        let extras = ConfigExtras::from_env();
         Self {
             auth: AuthMode::ApiKey {
                 app_key: app_key.into(),
                 app_secret: app_secret.into(),
                 access_token: access_token.into(),
             },
-            http_url: None,
-            quote_ws_url: None,
-            trade_ws_url: None,
-            language: Language::EN,
-            enable_overnight: None,
-            push_candlestick_mode: None,
-            enable_print_quote_packages: true,
-            log_path: None,
+            http_url: extras.http_url,
+            quote_ws_url: extras.quote_ws_url,
+            trade_ws_url: extras.trade_ws_url,
+            language: extras.language,
+            enable_overnight: extras.enable_overnight,
+            push_candlestick_mode: extras.push_candlestick_mode,
+            enable_print_quote_packages: extras.enable_print_quote_packages,
+            log_path: extras.log_path,
         }
     }
 
     /// Create a new `Config` for OAuth 2.0 authentication.
+    ///
+    /// All optional environment variables (`LONGPORT_HTTP_URL`,
+    /// `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`,
+    /// `LONGPORT_ENABLE_OVERNIGHT`, `LONGPORT_PUSH_CANDLESTICK_MODE`,
+    /// `LONGPORT_PRINT_QUOTE_PACKAGES`, `LONGPORT_LOG_PATH`) are read from the
+    /// environment (or `.env` file) and applied automatically if set.
     ///
     /// # Arguments
     ///
@@ -182,16 +241,18 @@ impl Config {
     /// }
     /// ```
     pub fn from_oauth(oauth: OAuth) -> Self {
+        let _ = dotenv::dotenv();
+        let extras = ConfigExtras::from_env();
         Self {
             auth: AuthMode::OAuth(oauth),
-            http_url: None,
-            quote_ws_url: None,
-            trade_ws_url: None,
-            language: Language::EN,
-            enable_overnight: None,
-            push_candlestick_mode: None,
-            enable_print_quote_packages: true,
-            log_path: None,
+            http_url: extras.http_url,
+            quote_ws_url: extras.quote_ws_url,
+            trade_ws_url: extras.trade_ws_url,
+            language: extras.language,
+            enable_overnight: extras.enable_overnight,
+            push_candlestick_mode: extras.push_candlestick_mode,
+            enable_print_quote_packages: extras.enable_print_quote_packages,
+            log_path: extras.log_path,
         }
     }
 
@@ -242,27 +303,7 @@ impl Config {
                 name: "LONGPORT_ACCESS_TOKEN",
             }
         })?;
-        let http_url = std::env::var("LONGPORT_HTTP_URL").ok();
-        let language = std::env::var("LONGPORT_LANGUAGE")
-            .ok()
-            .and_then(|value| value.parse::<Language>().ok())
-            .unwrap_or(Language::EN);
-        let quote_ws_url = std::env::var("LONGPORT_QUOTE_WS_URL").ok();
-        let trade_ws_url = std::env::var("LONGPORT_TRADE_WS_URL").ok();
-        let enable_overnight = std::env::var("LONGPORT_ENABLE_OVERNIGHT")
-            .map(|value| value == "true")
-            .ok();
-        let push_candlestick_mode = std::env::var("LONGPORT_PUSH_CANDLESTICK_MODE")
-            .map(|value| match value.as_str() {
-                "confirmed" => PushCandlestickMode::Confirmed,
-                _ => PushCandlestickMode::Realtime,
-            })
-            .ok();
-        let enable_print_quote_packages = std::env::var("LONGPORT_PRINT_QUOTE_PACKAGES")
-            .as_deref()
-            .unwrap_or("true")
-            == "true";
-        let log_path = std::env::var("LONGPORT_LOG_PATH").ok().map(PathBuf::from);
+        let extras = ConfigExtras::from_env();
 
         Ok(Config {
             auth: AuthMode::ApiKey {
@@ -270,14 +311,14 @@ impl Config {
                 app_secret,
                 access_token,
             },
-            http_url,
-            quote_ws_url,
-            trade_ws_url,
-            language,
-            enable_overnight,
-            push_candlestick_mode,
-            enable_print_quote_packages,
-            log_path,
+            http_url: extras.http_url,
+            quote_ws_url: extras.quote_ws_url,
+            trade_ws_url: extras.trade_ws_url,
+            language: extras.language,
+            enable_overnight: extras.enable_overnight,
+            push_candlestick_mode: extras.push_candlestick_mode,
+            enable_print_quote_packages: extras.enable_print_quote_packages,
+            log_path: extras.log_path,
         })
     }
 

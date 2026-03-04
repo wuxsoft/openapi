@@ -29,6 +29,13 @@ public:
 
   /// Create a new `Config` for API Key authentication
   ///
+  /// Optional environment variables are read automatically:
+  /// `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
+  /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
+  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+  /// `LONGPORT_LOG_PATH`.  Use the chainable `set_*` methods to override any
+  /// of these values.
+  ///
   /// @param app_key       App key
   /// @param app_secret    App secret
   /// @param access_token  Access token
@@ -46,6 +53,13 @@ public:
   static Config from_apikey_env(Status& status);
 
   /// Create a new `Config` for OAuth 2.0 authentication
+  ///
+  /// Optional environment variables are read automatically:
+  /// `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
+  /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
+  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+  /// `LONGPORT_LOG_PATH`.  Use the chainable `set_*` methods to override any
+  /// of these values.
   ///
   /// @param oauth OAuth 2.0 client obtained from `OAuthBuilder::build`
   static Config from_oauth(const OAuth& oauth);

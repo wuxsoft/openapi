@@ -3877,6 +3877,13 @@ extern "C" {
 /**
  * Create a new `Config` using API Key authentication
  *
+ * Optional environment variables are read automatically:
+ * `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
+ * `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
+ * `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+ * `LONGPORT_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
+ * to override any of these values after construction.
+ *
  * @param app_key       App key
  * @param app_secret    App secret
  * @param access_token  Access token
@@ -3900,6 +3907,13 @@ struct lb_config_t *lb_config_from_apikey_env(struct lb_error_t **error);
 
 /**
  * Create a new `Config` for OAuth 2.0 authentication
+ *
+ * Optional environment variables are read automatically:
+ * `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
+ * `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
+ * `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+ * `LONGPORT_LOG_PATH`.  Use the corresponding `lb_config_set_*` functions
+ * to override any of these values after construction.
  *
  * Does **not** take ownership of `oauth`. The caller must free `oauth` with
  * `lb_oauth_free` after this call returns.

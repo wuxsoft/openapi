@@ -29,11 +29,16 @@ pub(crate) struct HttpClient(Arc<LbHttpClient>);
 impl HttpClient {
     /// Create a new ``HttpClient`` using API Key authentication.
     ///
+    /// ``LONGPORT_HTTP_URL`` is read from the environment automatically.
+    /// Passing ``http_url`` overrides that value.
+    ///
     /// Args:
     ///     app_key: App Key
     ///     app_secret: App Secret
     ///     access_token: Access Token
-    ///     http_url: HTTP API url (default: ``https://openapi.longportapp.com``)
+    ///     http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL`` from
+    ///         env if omitted; falls back to
+    ///         ``https://openapi.longportapp.com``)
     #[staticmethod]
     #[pyo3(signature = (app_key, app_secret, access_token, http_url = None))]
     fn from_apikey(
@@ -64,10 +69,15 @@ impl HttpClient {
 
     /// Create a new ``HttpClient`` from an OAuth handle.
     ///
+    /// ``LONGPORT_HTTP_URL`` is read from the environment automatically.
+    /// Passing ``http_url`` overrides that value.
+    ///
     /// Args:
     ///     oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
     ///         :meth:`OAuthBuilder.build_async`
-    ///     http_url: HTTP API url (default: ``https://openapi.longportapp.com``)
+    ///     http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL`` from
+    ///         env if omitted; falls back to
+    ///         ``https://openapi.longportapp.com``)
     #[classmethod]
     #[pyo3(signature = (oauth, http_url = None))]
     fn from_oauth(_cls: Bound<PyType>, oauth: &OAuth, http_url: Option<String>) -> Self {

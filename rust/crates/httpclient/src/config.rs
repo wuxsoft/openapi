@@ -28,7 +28,10 @@ pub struct HttpClientConfig {
 }
 
 impl HttpClientConfig {
-    /// Create a new `HttpClientConfig` using API Key authentication
+    /// Create a new `HttpClientConfig` using API Key authentication.
+    ///
+    /// `LONGPORT_HTTP_URL` is read from the environment (or `.env` file) and
+    /// applied automatically if set.
     ///
     /// # Arguments
     ///
@@ -40,8 +43,9 @@ impl HttpClientConfig {
         app_secret: impl Into<String>,
         access_token: impl Into<String>,
     ) -> Self {
+        let _ = dotenv::dotenv();
         Self {
-            http_url: None,
+            http_url: std::env::var("LONGPORT_HTTP_URL").ok(),
             auth: AuthConfig::ApiKey {
                 app_key: app_key.into(),
                 app_secret: app_secret.into(),
@@ -50,7 +54,10 @@ impl HttpClientConfig {
         }
     }
 
-    /// Create a new `HttpClientConfig` for OAuth 2.0 authentication
+    /// Create a new `HttpClientConfig` for OAuth 2.0 authentication.
+    ///
+    /// `LONGPORT_HTTP_URL` is read from the environment (or `.env` file) and
+    /// applied automatically if set.
     ///
     /// The [`OAuth`] client handles token lifecycle automatically, including
     /// expiry checks and token refresh.
@@ -60,27 +67,27 @@ impl HttpClientConfig {
     /// * `oauth` - An [`OAuth`] client obtained from
     ///   [`longport_oauth::OAuthBuilder`]
     pub fn from_oauth(oauth: OAuth) -> Self {
+        let _ = dotenv::dotenv();
         Self {
-            http_url: None,
+            http_url: std::env::var("LONGPORT_HTTP_URL").ok(),
             auth: AuthConfig::OAuth(oauth),
         }
     }
 
     /// Create a new `HttpClientConfig` from environment variables (API Key
-    /// mode)
+    /// mode).
     ///
     /// # Variables
     ///
-    /// - `LONGPORT_APP_KEY` - App key
-    /// - `LONGPORT_APP_SECRET` - App secret
-    /// - `LONGPORT_ACCESS_TOKEN` - Access token
-    /// - `LONGPORT_HTTP_URL` - (Optional) HTTP endpoint URL
+    /// - `LONGPORT_APP_KEY` - App key (required)
+    /// - `LONGPORT_APP_SECRET` - App secret (required)
+    /// - `LONGPORT_ACCESS_TOKEN` - Access token (required)
+    /// - `LONGPORT_HTTP_URL` - HTTP endpoint URL (optional)
     ///
     /// # Note
     ///
     /// For OAuth 2.0 authentication, use
-    /// [`from_oauth`](HttpClientConfig::from_oauth) instead. OAuth tokens
-    /// should not be stored in environment variables for security reasons.
+    /// [`from_oauth`](HttpClientConfig::from_oauth) instead.
     pub fn from_apikey_env() -> Result<Self, HttpClientError> {
         let _ = dotenv::dotenv();
 
@@ -97,9 +104,14 @@ impl HttpClientConfig {
                 name: "LONGPORT_ACCESS_TOKEN",
             })?;
 
-        let mut config = Self::from_apikey(app_key, app_secret, access_token);
-        config.http_url = std::env::var("LONGPORT_HTTP_URL").ok();
-        Ok(config)
+        Ok(Self {
+            http_url: std::env::var("LONGPORT_HTTP_URL").ok(),
+            auth: AuthConfig::ApiKey {
+                app_key,
+                app_secret,
+                access_token,
+            },
+        })
     }
 
     /// Specifies the url of the OpenAPI server.

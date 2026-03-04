@@ -13,14 +13,26 @@ pub(crate) struct Config(pub(crate) longport::Config);
 impl Config {
     /// Create a new ``Config`` using API Key authentication.
     ///
+    /// Optional environment variables are read automatically
+    /// (``LONGPORT_HTTP_URL``, ``LONGPORT_LANGUAGE``,
+    /// ``LONGPORT_QUOTE_WS_URL``, ``LONGPORT_TRADE_WS_URL``,
+    /// ``LONGPORT_ENABLE_OVERNIGHT``, ``LONGPORT_PUSH_CANDLESTICK_MODE``,
+    /// ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``).
+    /// Any explicit parameter passed to this method overrides the
+    /// corresponding environment variable.
+    ///
     /// Args:
     ///     app_key: App Key
     ///     app_secret: App Secret
     ///     access_token: Access Token
-    ///     http_url: HTTP API url (default: ``https://openapi.longportapp.com``)
-    ///     quote_ws_url: Websocket url for quote API
-    ///     trade_ws_url: Websocket url for trade API
-    ///     language: Language identifier (default: ``Language.EN``)
+    ///     http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL`` from
+    ///         env if omitted)
+    ///     quote_ws_url: Websocket url for quote API override (reads
+    ///         ``LONGPORT_QUOTE_WS_URL`` from env if omitted)
+    ///     trade_ws_url: Websocket url for trade API override (reads
+    ///         ``LONGPORT_TRADE_WS_URL`` from env if omitted)
+    ///     language: Language identifier override (reads ``LONGPORT_LANGUAGE``
+    ///         from env if omitted; default: ``Language.EN``)
     ///     enable_overnight: Enable overnight quote (default: ``False``)
     ///     push_candlestick_mode: Push candlestick mode
     ///     enable_print_quote_packages: Print opened quote packages on connect
@@ -116,13 +128,25 @@ impl Config {
     /// OAuth 2.0 is the recommended authentication method — no app_secret or
     /// HMAC signatures required.
     ///
+    /// Optional environment variables are read automatically
+    /// (``LONGPORT_HTTP_URL``, ``LONGPORT_LANGUAGE``,
+    /// ``LONGPORT_QUOTE_WS_URL``, ``LONGPORT_TRADE_WS_URL``,
+    /// ``LONGPORT_ENABLE_OVERNIGHT``, ``LONGPORT_PUSH_CANDLESTICK_MODE``,
+    /// ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``).
+    /// Any explicit parameter passed to this method overrides the
+    /// corresponding environment variable.
+    ///
     /// Args:
     ///     oauth: :class:`OAuth` handle from :meth:`OAuthBuilder.build` or
     ///         :meth:`AsyncOAuthBuilder.build`
-    ///     http_url: HTTP API url override (optional)
-    ///     quote_ws_url: Quote WS url override (optional)
-    ///     trade_ws_url: Trade WS url override (optional)
-    ///     language: Language identifier (optional)
+    ///     http_url: HTTP API url override (reads ``LONGPORT_HTTP_URL`` from
+    ///         env if omitted)
+    ///     quote_ws_url: Quote WS url override (reads
+    ///         ``LONGPORT_QUOTE_WS_URL`` from env if omitted)
+    ///     trade_ws_url: Trade WS url override (reads
+    ///         ``LONGPORT_TRADE_WS_URL`` from env if omitted)
+    ///     language: Language identifier override (reads ``LONGPORT_LANGUAGE``
+    ///         from env if omitted)
     ///     enable_overnight: Enable overnight quote (optional)
     ///     push_candlestick_mode: Push candlestick mode (optional)
     ///     enable_print_quote_packages: Print opened quote packages on connect

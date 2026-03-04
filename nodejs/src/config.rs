@@ -69,10 +69,17 @@ pub struct Config(pub(crate) longport::Config);
 impl Config {
     /// Create a new `Config` using API Key authentication
     ///
+    /// Optional environment variables are read automatically
+    /// (`LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
+    /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
+    /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+    /// `LONGPORT_LOG_PATH`).  Fields set in `extra` override the
+    /// corresponding environment variables.
+    ///
     /// @param appKey       Application key
     /// @param appSecret    Application secret
     /// @param accessToken  Access token
-    /// @param extra        Optional extra parameters
+    /// @param extra        Optional extra parameters (override env variables)
     ///
     /// @example
     /// ```javascript
@@ -129,8 +136,15 @@ impl Config {
     /// OAuth 2.0 is the recommended authentication method that uses Bearer
     /// tokens and does not require app_secret or HMAC signatures.
     ///
+    /// Optional environment variables are read automatically
+    /// (`LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
+    /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
+    /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+    /// `LONGPORT_LOG_PATH`).  Fields set in `extra` override the
+    /// corresponding environment variables.
+    ///
     /// @param oauth  OAuth handle obtained from `OAuthBuilder.build(...)`
-    /// @param extra  Optional extra parameters
+    /// @param extra  Optional extra parameters (override env variables)
     ///
     /// @example
     /// ```javascript
