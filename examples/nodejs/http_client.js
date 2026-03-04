@@ -1,7 +1,7 @@
 const { HttpClient, OAuth } = require('longbridge');
 
 async function main() {
-  const oauth = await OAuth.build("your-client-id", (url) => {
+  const oauth = await OAuth.build("your-client-id", (_, url) => {
     console.log("Open this URL to authorize: " + url);
   });
   let cli = HttpClient.fromOAuth(oauth);

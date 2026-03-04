@@ -89,7 +89,7 @@ const { OAuth, Config } = require('longbridge');
 async function main() {
   const oauth = await OAuth.build(
     "your-client-id",
-    (url) => console.log("Open this URL to authorize: " + url)
+    (_, url) => console.log("Open this URL to authorize: " + url)
   );
   const config = Config.fromOAuth(oauth);
   // Use config to create contexts...
@@ -131,7 +131,7 @@ const { OAuth, Config, QuoteContext } = require('longbridge');
 async function main() {
   const oauth = await OAuth.build(
     "your-client-id",
-    (url) => console.log("Open this URL to authorize: " + url)
+    (_, url) => console.log("Open this URL to authorize: " + url)
   );
   const config = Config.fromOAuth(oauth);
   const ctx = await QuoteContext.new(config);
@@ -152,7 +152,7 @@ const { OAuth, Config, QuoteContext, SubType } = require('longbridge');
 async function main() {
   const oauth = await OAuth.build(
     "your-client-id",
-    (url) => console.log("Open this URL to authorize: " + url)
+    (_, url) => console.log("Open this URL to authorize: " + url)
   );
   const config = Config.fromOAuth(oauth);
   const ctx = await QuoteContext.new(config);
@@ -182,7 +182,7 @@ const {
 async function main() {
   const oauth = await OAuth.build(
     "your-client-id",
-    (url) => console.log("Open this URL to authorize: " + url)
+    (_, url) => console.log("Open this URL to authorize: " + url)
   );
   const config = Config.fromOAuth(oauth);
   const ctx = await TradeContext.new(config);

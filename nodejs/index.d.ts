@@ -208,7 +208,7 @@ export declare class Config {
    * ```javascript
    * const { OAuth, Config } = require('longbridge');
    *
-   * const oauth = await OAuth.build('your-client-id', (url) => {
+   * const oauth = await OAuth.build('your-client-id', (_, url) => {
    *   console.log('Open:', url);
    * });
    * const config = Config.fromOAuth(oauth);
@@ -618,7 +618,7 @@ export declare class NaiveDatetime {
  * ```javascript
  * const { OAuth, Config } = require('longbridge');
  *
- * const oauth = await OAuth.build('your-client-id', (url) => {
+ * const oauth = await OAuth.build('your-client-id', (_, url) => {
  *   console.log('Open:', url);
  * });
  * const config = Config.fromOAuth(oauth);
