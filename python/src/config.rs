@@ -99,8 +99,8 @@ impl Config {
     ///     - ``LONGPORT_TRADE_WS_URL`` - Trade websocket endpoint url
     ///     - ``LONGPORT_ENABLE_OVERNIGHT`` - ``true`` or ``false`` (Default:
     ///       ``false``)
-    ///     - ``LONGPORT_PUSH_CANDLESTICK_MODE`` - ``realtime`` or
-    ///       ``confirmed`` (Default: ``realtime``)
+    ///     - ``LONGPORT_PUSH_CANDLESTICK_MODE`` - ``realtime`` or ``confirmed``
+    ///       (Default: ``realtime``)
     ///     - ``LONGPORT_PRINT_QUOTE_PACKAGES`` - ``true`` or ``false``
     ///       (Default: ``true``)
     ///     - ``LONGPORT_LOG_PATH`` - Log file directory (Default: no logs)

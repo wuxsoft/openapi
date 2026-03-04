@@ -6,13 +6,10 @@ use std::{
     sync::Arc,
 };
 
-use http::Method;
 pub(crate) use http::{HeaderValue, Request, header};
-use longport_httpcli::{HttpClient, HttpClientConfig, Json, is_cn};
+use longport_httpcli::{HttpClient, HttpClientConfig, is_cn};
 use longport_oauth::OAuth;
 use num_enum::IntoPrimitive;
-use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tracing::{Level, Subscriber, subscriber::NoSubscriber};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
