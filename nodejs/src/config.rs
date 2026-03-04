@@ -1,22 +1,15 @@
-use chrono::{DateTime, Utc};
 use napi::Result;
 
 use crate::{
     error::ErrorNewType,
-    oauth::OAuthToken,
+    oauth::OAuth,
     types::{Language, PushCandlestickMode},
-    utils::from_datetime,
 };
 
-/// Configuration parameters
+/// Optional extra parameters shared by `Config.fromApikey` and
+/// `Config.fromOAuth`.  All fields are optional.
 #[napi_derive::napi(object)]
-pub struct ConfigParams {
-    /// App Key
-    pub app_key: String,
-    /// App Secret
-    pub app_secret: String,
-    /// Access Token
-    pub access_token: String,
+pub struct ExtraConfigParams {
     /// HTTP API url (default: "https://openapi.longportapp.com")
     pub http_url: Option<String>,
     /// Websocket url for quote API (default:
@@ -32,10 +25,40 @@ pub struct ConfigParams {
     /// Push candlesticks mode (default: PushCandlestickMode.Realtime)
     pub push_candlestick_mode: Option<PushCandlestickMode>,
     /// Enable printing the opened quote packages when connected to the server
-    /// (default: true)
-    pub enable_print_quote_packages: bool,
+    /// (default: true).  Set to `false` to suppress the output.
+    pub enable_print_quote_packages: Option<bool>,
     /// Set the path of the log files (Default: `no logs`)
     pub log_path: Option<String>,
+}
+
+fn apply_extra(mut config: longport::Config, extra: Option<ExtraConfigParams>) -> longport::Config {
+    if let Some(extra) = extra {
+        if let Some(http_url) = extra.http_url {
+            config.set_http_url(http_url);
+        }
+        if let Some(quote_ws_url) = extra.quote_ws_url {
+            config.set_quote_ws_url(quote_ws_url);
+        }
+        if let Some(trade_ws_url) = extra.trade_ws_url {
+            config.set_trade_ws_url(trade_ws_url);
+        }
+        if let Some(language) = extra.language {
+            config.set_language(language.into());
+        }
+        if let Some(true) = extra.enable_overnight {
+            config.set_enable_overnight();
+        }
+        if let Some(mode) = extra.push_candlestick_mode {
+            config.set_push_candlestick_mode(mode.into());
+        }
+        if let Some(false) = extra.enable_print_quote_packages {
+            config.set_dont_print_quote_packages();
+        }
+        if let Some(log_path) = extra.log_path {
+            config.set_log_path(log_path);
+        }
+    }
+    config
 }
 
 /// Configuration for LongPort sdk
@@ -44,48 +67,35 @@ pub struct Config(pub(crate) longport::Config);
 
 #[napi_derive::napi]
 impl Config {
-    /// Create a new `Config`
-    #[napi(constructor)]
-    pub fn new(params: ConfigParams) -> Self {
-        let mut config =
-            longport::Config::new(params.app_key, params.app_secret, params.access_token);
-
-        if let Some(http_url) = params.http_url {
-            config = config.http_url(http_url);
-        }
-
-        if let Some(quote_ws_url) = params.quote_ws_url {
-            config = config.quote_ws_url(quote_ws_url);
-        }
-
-        if let Some(trade_ws_url) = params.trade_ws_url {
-            config = config.trade_ws_url(trade_ws_url);
-        }
-
-        if let Some(language) = params.language {
-            config = config.language(language.into());
-        }
-
-        if let Some(true) = params.enable_overnight {
-            config = config.enable_overnight();
-        }
-
-        if let Some(mode) = params.push_candlestick_mode {
-            config = config.push_candlestick_mode(mode.into());
-        }
-
-        if !params.enable_print_quote_packages {
-            config = config.dont_print_quote_packages();
-        }
-
-        if let Some(log_path) = params.log_path {
-            config = config.log_path(log_path);
-        }
-
-        Self(config)
+    /// Create a new `Config` using API Key authentication
+    ///
+    /// @param appKey       Application key
+    /// @param appSecret    Application secret
+    /// @param accessToken  Access token
+    /// @param extra        Optional extra parameters
+    ///
+    /// @example
+    /// ```javascript
+    /// const { Config } = require('longport');
+    ///
+    /// const config = Config.fromApikey(
+    ///   process.env.LONGPORT_APP_KEY,
+    ///   process.env.LONGPORT_APP_SECRET,
+    ///   process.env.LONGPORT_ACCESS_TOKEN,
+    /// );
+    /// ```
+    #[napi(factory, js_name = "fromApikey")]
+    pub fn from_apikey(
+        app_key: String,
+        app_secret: String,
+        access_token: String,
+        extra: Option<ExtraConfigParams>,
+    ) -> Self {
+        let config = longport::Config::from_apikey(app_key, app_secret, access_token);
+        Self(apply_extra(config, extra))
     }
 
-    /// Create a new `Config` from the given environment variables
+    /// Create a new `Config` from the environment (API Key authentication)
     ///
     /// It first gets the environment variables from the `.env` file in the
     /// current directory.
@@ -106,9 +116,12 @@ impl Config {
     ///   `realtime`)
     /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
     ///   `true` or `false` (Default: `true`)
-    #[napi(factory)]
-    pub fn from_env() -> Result<Self> {
-        Ok(Self(longport::Config::from_env().map_err(ErrorNewType)?))
+    /// - `LONGPORT_LOG_PATH` - Log file directory (Default: no logs)
+    #[napi(factory, js_name = "fromApikeyEnv")]
+    pub fn from_apikey_env() -> Result<Self> {
+        Ok(Self(
+            longport::Config::from_apikey_env().map_err(ErrorNewType)?,
+        ))
     }
 
     /// Create a new `Config` for OAuth 2.0 authentication
@@ -116,29 +129,21 @@ impl Config {
     /// OAuth 2.0 is the recommended authentication method that uses Bearer
     /// tokens and does not require app_secret or HMAC signatures.
     ///
-    /// # Example
+    /// @param oauth  OAuth handle obtained from `OAuthBuilder.build(...)`
+    /// @param extra  Optional extra parameters
     ///
+    /// @example
     /// ```javascript
-    /// const { Config, OAuth } = require('longport');
+    /// const { OAuthBuilder, Config } = require('longport');
     ///
-    /// // Obtain a token via OAuth flow, then:
-    /// // const config = Config.fromOAuth(token);
+    /// const oauth = await OAuthBuilder.build('your-client-id', (url) => {
+    ///   console.log('Open:', url);
+    /// });
+    /// const config = Config.fromOAuth(oauth);
     /// ```
     #[napi(factory, js_name = "fromOAuth")]
-    pub fn from_oauth(token: &OAuthToken) -> Self {
-        Self(longport::Config::from_oauth(&token.0))
-    }
-
-    /// Gets a new `access_token`
-    ///
-    /// `expired_at` - The expiration time of the access token, defaults to `90`
-    /// days.
-    #[napi]
-    pub async fn refresh_access_token(&self, expired_at: Option<DateTime<Utc>>) -> Result<String> {
-        Ok(self
-            .0
-            .refresh_access_token(expired_at.map(from_datetime))
-            .await
-            .map_err(ErrorNewType)?)
+    pub fn from_oauth(oauth: &OAuth, extra: Option<ExtraConfigParams>) -> Self {
+        let config = longport::Config::from_oauth(oauth.0.clone());
+        Self(apply_extra(config, extra))
     }
 }

@@ -136,10 +136,28 @@ export declare class CashInfo {
 
 /** Configuration for LongPort sdk */
 export declare class Config {
-  /** Create a new `Config` */
-  constructor(params: ConfigParams)
   /**
-   * Create a new `Config` from the given environment variables
+   * Create a new `Config` using API Key authentication
+   *
+   * @param appKey       Application key
+   * @param appSecret    Application secret
+   * @param accessToken  Access token
+   * @param extra        Optional extra parameters
+   *
+   * @example
+   * ```javascript
+   * const { Config } = require('longport');
+   *
+   * const config = Config.fromApikey(
+   *   process.env.LONGPORT_APP_KEY,
+   *   process.env.LONGPORT_APP_SECRET,
+   *   process.env.LONGPORT_ACCESS_TOKEN,
+   * );
+   * ```
+   */
+  static fromApikey(appKey: string, appSecret: string, accessToken: string, extra?: ExtraConfigParams | undefined | null): Config
+  /**
+   * Create a new `Config` from the environment (API Key authentication)
    *
    * It first gets the environment variables from the `.env` file in the
    * current directory.
@@ -160,31 +178,29 @@ export declare class Config {
    *   `realtime`)
    * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
    *   `true` or `false` (Default: `true`)
+   * - `LONGPORT_LOG_PATH` - Log file directory (Default: no logs)
    */
-  static fromEnv(): Config
+  static fromApikeyEnv(): Config
   /**
    * Create a new `Config` for OAuth 2.0 authentication
    *
    * OAuth 2.0 is the recommended authentication method that uses Bearer
    * tokens and does not require app_secret or HMAC signatures.
    *
-   * # Example
+   * @param oauth  OAuth handle obtained from `OAuthBuilder.build(...)`
+   * @param extra  Optional extra parameters
    *
+   * @example
    * ```javascript
-   * const { Config, OAuth } = require('longport');
+   * const { OAuthBuilder, Config } = require('longport');
    *
-   * // Obtain a token via OAuth flow, then:
-   * // const config = Config.fromOAuth(token);
+   * const oauth = await OAuthBuilder.build('your-client-id', (url) => {
+   *   console.log('Open:', url);
+   * });
+   * const config = Config.fromOAuth(oauth);
    * ```
    */
-  static fromOAuth(token: OAuthToken): Config
-  /**
-   * Gets a new `access_token`
-   *
-   * `expired_at` - The expiration time of the access token, defaults to `90`
-   * days.
-   */
-  refreshAccessToken(expiredAt?: Date | undefined | null): Promise<string>
+  static fromOAuth(oauth: OAuth, extra?: ExtraConfigParams | undefined | null): Config
 }
 
 export declare class Decimal {
@@ -453,8 +469,12 @@ export declare class HttpClient {
    * - `LONGPORT_ACCESS_TOKEN` - Access token
    */
   static fromEnv(): HttpClient
-  /** Create a new `HttpClient` from an OAuthToken */
-  static fromOAuth(token: OAuthToken): HttpClient
+  /**
+   * Create a new `HttpClient` from an OAuth handle
+   *
+   * @param oauth  OAuth handle obtained from `OAuthBuilder.build(...)`
+   */
+  static fromOAuth(oauth: OAuth): HttpClient
   /** Performs a HTTP request */
   request(method: string, path: string, headers?: Record<string, string> | undefined | null, body?: any | undefined | null): Promise<any>
 }
@@ -556,52 +576,48 @@ export declare class NaiveDatetime {
   toJSON(): any
 }
 
-/** OAuth 2.0 client for LongPort OpenAPI */
+/**
+ * OAuth 2.0 client handle for LongPort OpenAPI
+ *
+ * Obtain an instance via `OAuthBuilder.build(...)`.
+ * Pass it to `Config.fromOAuth(...)` or `HttpClient.fromOAuth(...)`.
+ */
 export declare class OAuth {
-  /**
-   * Create a new OAuth 2.0 client
-   *
-   * @param clientId  OAuth 2.0 client ID from the LongPort developer portal
-   *
-   * @example
-   * ```javascript
-   * const { OAuth } = require('longport');
-   *
-   * const oauth = new OAuth('your-client-id');
-   * const token = await oauth.authorize((url) => {
-   *   console.log('Open:', url);
-   * });
-   * console.log(token.accessToken);
-   * ```
-   */
-  constructor(clientId: string)
-  /**
-   * Start the OAuth 2.0 authorization flow
-   *
-   * Starts a local HTTP server, calls `onOpenUrl` with the authorization
-   * URL, then waits for the redirect and exchanges the code for a token.
-   *
-   * @param onOpenUrl  Called with the authorization URL; open it in a
-   * browser                   or print it however you like
-   * @returns OAuthToken that can be passed to `Config.fromOAuth` or
-   * `HttpClient.fromOAuth`
-   */
-  authorize(onOpenUrl: ((err: Error | null, arg: string) => void)): Promise<OAuthToken>
-  /**
-   * Refresh an access token using an existing OAuthToken
-   *
-   * @param token  Existing OAuthToken whose refresh token is used
-   * @returns New OAuthToken with a fresh access token
-   */
-  refresh(token: OAuthToken): Promise<OAuthToken>
+
 }
 
-/** OAuth 2.0 access token */
-export declare class OAuthToken {
-  /** Returns `true` if the token has expired */
-  isExpired(): boolean
-  /** Returns `true` if the token will expire within 1 hour */
-  expiresSoon(): boolean
+/**
+ * Builder that performs the OAuth 2.0 authorization flow
+ *
+ * @example
+ * ```javascript
+ * const { OAuthBuilder, Config } = require('longport');
+ *
+ * const oauth = await OAuthBuilder.build('your-client-id', (url) => {
+ *   console.log('Open:', url);
+ * });
+ * const config = Config.fromOAuth(oauth);
+ * ```
+ */
+export declare class OAuthBuilder {
+  /**
+   * Build an OAuth 2.0 client.
+   *
+   * If a valid token is already cached on disk
+   * (`~/.longbridge-openapi/tokens/<clientId>`) it is reused; otherwise
+   * the browser authorization flow is started and `onOpenUrl` is called
+   * with the authorization URL.
+   *
+   * @param clientId      OAuth 2.0 client ID from the LongPort developer portal
+   * @param onOpenUrl     Called with the authorization URL; open it in a
+   *                      browser or print it however you like
+   * @param callbackPort  TCP port for the local callback server
+   *                      (default: 60355). Must match one of the redirect
+   *                      URIs registered for the client.
+   * @returns OAuth handle that can be passed to `Config.fromOAuth` or
+   *          `HttpClient.fromOAuth`
+   */
+  static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
 }
 
 /** Quote of option */
@@ -1090,7 +1106,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => {
    *     ctx.setOnQuote((_, event) => console.log(event.toString()));
@@ -1107,7 +1123,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => {
    *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true)
@@ -1128,7 +1144,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => {
    *     return ctx
@@ -1147,7 +1163,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
    *   .then((resp) => {
@@ -1166,7 +1182,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]))
    *   .then((resp) => {
@@ -1185,7 +1201,7 @@ export declare class QuoteContext {
    * ```javascript
    * import { Config, QuoteContext } from 'longport'
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.optionQuote(["AAPL230317P160000.US"]))
    *   .then((resp) => {
@@ -1204,7 +1220,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.warrantQuote(["21125.HK"]))
    *   .then((resp) => {
@@ -1223,7 +1239,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.depth("700.HK"))
    *   .then((resp) => console.log(resp.toString()))
@@ -1238,7 +1254,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.brokers("700.HK"))
    *   .then((resp) => console.log(resp.toString()))
@@ -1253,7 +1269,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.participants())
    *   .then((resp) => {
@@ -1272,7 +1288,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.trades("700.HK", 10))
    *   .then((resp) => {
@@ -1291,7 +1307,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, TradeSessions } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.intraday("700.HK", TradeSessions.Intraday))
    *   .then((resp) => {
@@ -1310,7 +1326,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Period, AdjustType, TradeSessions } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday))
    *   .then((resp) => {
@@ -1333,7 +1349,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.optionChainExpiryDateList("AAPL.US"))
    *   .then((resp) => {
@@ -1352,7 +1368,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, NaiveDate } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20)))
    *   .then((resp) => {
@@ -1371,7 +1387,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, NaiveDate } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.warrantIssuers())
    *   .then((resp) => {
@@ -1388,7 +1404,7 @@ export declare class QuoteContext {
    * #### Example
    * ```javascript
    * const { Config, QuoteContext, WarrantSortBy, SortOrderType } = require("longport")
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *  .then((ctx) => ctx.warrantList("700.HK", WarrantSortBy.LastDone, SortOrderType.Asc))
    * .then((resp) => {
@@ -1407,7 +1423,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, NaiveDate } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.tradingSession())
    *   .then((resp) => {
@@ -1426,7 +1442,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Market, NaiveDate } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20)))
    *   .then((resp) => console.log(resp.toString()))
@@ -1441,7 +1457,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.capitalFlow("700.HK"))
    *   .then((resp) => {
@@ -1460,7 +1476,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.capitalDistribution("700.HK"))
    *   .then((resp) => console.log(resp.toString()))
@@ -1477,7 +1493,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.watchList())
    *   .then((resp) => console.log(resp.toString()))
@@ -1492,7 +1508,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => {
    *     ctx.createWatchlistGroup({
@@ -1510,7 +1526,7 @@ export declare class QuoteContext {
    *
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config)
    *   .then(ctx => ctx.deleteWatchlistGroup({ id: 10086 });
    * ```
@@ -1523,7 +1539,7 @@ export declare class QuoteContext {
    *
    * ```javascript
    * const { Config, QuoteContext } = require("longport")
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config)
    *   .then(ctx => ctx.updateWatchlistGroup({
    *     id: 10086,
@@ -1541,7 +1557,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Market, SecurityListCategory } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.securityList(Market.US, SecurityListCategory.Overnight))
    *   .then((resp) => console.log(resp.toString()));
@@ -1556,7 +1572,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Market } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.marketTemperature(Market.HK))
    *   .then((resp) => console.log(resp.toString()));
@@ -1571,7 +1587,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Market, NaiveDate } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config)
    *   .then((ctx) => ctx.historyMarketTemperature(Market.HK, new NaiveDate(2023, 1, 20), new NaiveDate(2023, 2, 20)))
    *   .then((resp) => console.log(resp.toString()));
@@ -1586,7 +1602,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config).then((ctx) => {
    *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true).then(() => {
    *     setTimeout(() => {
@@ -1609,7 +1625,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config).then((ctx) => {
    *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth], true);
    *   setTimeout(
@@ -1629,7 +1645,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, NaiveDate, SubType } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config).then((ctx) => {
    *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers], true).then(() => {
    *     setTimeout(
@@ -1652,7 +1668,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, SubType } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config).then((ctx) => {
    *   ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade], false).then(() => {
    *     setTimeout(() => {
@@ -1675,7 +1691,7 @@ export declare class QuoteContext {
    * ```javascript
    * const { Config, QuoteContext, Period } = require("longport")
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * QuoteContext.new(config).then((ctx) => {
    *   ctx.subscribeCandlesticks("700.HK", Period.Min_1).then(() => {
    *     setTimeout(() => {
@@ -2048,7 +2064,7 @@ export declare class TradeContext {
    *  TopicType,
    * } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) => {
    *     ctx.setOnOrderChanged((_, event) => console.log(event.toString()));
@@ -2076,7 +2092,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.historyExecutions({
@@ -2101,7 +2117,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) => ctx.todayExecutions({ symbol: "700.HK" }))
    *   .then((resp) => {
@@ -2126,7 +2142,7 @@ export declare class TradeContext {
    *   Market,
    * } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.historyOrders({
@@ -2160,7 +2176,7 @@ export declare class TradeContext {
    *   Market,
    * } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.todayOrders({
@@ -2186,7 +2202,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext, Decimal } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.replaceOrder({
@@ -2218,7 +2234,7 @@ export declare class TradeContext {
    *   TimeInForceType,
    * } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.submitOrder({
@@ -2242,7 +2258,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config).then((ctx) => ctx.cancelOrder("709043056541253632"));
    * ```
    */
@@ -2255,7 +2271,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) => ctx.accountBalance())
    *   .then((resp) => {
@@ -2274,7 +2290,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext, GetCashFlowOptions } = require("longport");
    *
-   * let config = Config.fromEnv();
+   * let config = Config.fromApikeyEnv();
    * TradeContext.new(config)
    *   .then((ctx) =>
    *     ctx.cashFlow({
@@ -2298,7 +2314,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.fundPositions())
    *   .then((resp) => console.log(resp))
@@ -2313,7 +2329,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.stockPositions())
    *   .then((resp) => console.log(resp))
@@ -2328,7 +2344,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.marginRatio("700.HK"))
    *   .then((resp) => console.log(resp))
@@ -2343,7 +2359,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.orderDetail("701276261045858304"))
    *   .then((resp) => console.log(resp))
@@ -2359,7 +2375,7 @@ export declare class TradeContext {
    * ```javascript
    * const { Config, TradeContext, OrderType, OrderSide } = require("longport")
    *
-   * let config = Config.fromEnv()
+   * let config = Config.fromApikeyEnv()
    * TradeContext.new(config)
    *   .then((ctx) => ctx.estimateMaxPurchaseQuantity({
    *     symbol: "700.HK",
@@ -2653,41 +2669,6 @@ export declare const enum CommissionFreeStatus {
   Ready = 4
 }
 
-/** Configuration parameters */
-export interface ConfigParams {
-  /** App Key */
-  appKey: string
-  /** App Secret */
-  appSecret: string
-  /** Access Token */
-  accessToken: string
-  /** HTTP API url (default: "https://openapi.longportapp.com") */
-  httpUrl?: string
-  /**
-   * Websocket url for quote API (default:
-   * "wss://openapi-quote.longportapp.com/v2")
-   */
-  quoteWsUrl?: string
-  /**
-   * Websocket url for trade API (default:
-   * "wss://openapi-trade.longportapp.com/v2")
-   */
-  tradeWsUrl?: string
-  /** Language identifier (default: Language.EN) */
-  language?: Language
-  /** Enable overnight (default: false) */
-  enableOvernight?: boolean
-  /** Push candlesticks mode (default: PushCandlestickMode.Realtime) */
-  pushCandlestickMode?: PushCandlestickMode
-  /**
-   * Enable printing the opened quote packages when connected to the server
-   * (default: true)
-   */
-  enablePrintQuotePackages: boolean
-  /** Set the path of the log files (Default: `no logs`) */
-  logPath?: string
-}
-
 /** An request to create a watchlist group */
 export interface CreateWatchlistGroup {
   /** Group name */
@@ -2735,6 +2716,38 @@ export interface EstimateMaxPurchaseQuantityOptions {
   currency?: string
   orderId?: string
   fractionalShares: boolean
+}
+
+/**
+ * Optional extra parameters shared by `Config.fromApikey` and
+ * `Config.fromOAuth`.  All fields are optional.
+ */
+export interface ExtraConfigParams {
+  /** HTTP API url (default: "https://openapi.longportapp.com") */
+  httpUrl?: string
+  /**
+   * Websocket url for quote API (default:
+   * "wss://openapi-quote.longportapp.com/v2")
+   */
+  quoteWsUrl?: string
+  /**
+   * Websocket url for trade API (default:
+   * "wss://openapi-trade.longportapp.com/v2")
+   */
+  tradeWsUrl?: string
+  /** Language identifier (default: Language.EN) */
+  language?: Language
+  /** Enable overnight (default: false) */
+  enableOvernight?: boolean
+  /** Push candlesticks mode (default: PushCandlestickMode.Realtime) */
+  pushCandlestickMode?: PushCandlestickMode
+  /**
+   * Enable printing the opened quote packages when connected to the server
+   * (default: true).  Set to `false` to suppress the output.
+   */
+  enablePrintQuotePackages?: boolean
+  /** Set the path of the log files (Default: `no logs`) */
+  logPath?: string
 }
 
 /** Filter warrant expiry date type */
