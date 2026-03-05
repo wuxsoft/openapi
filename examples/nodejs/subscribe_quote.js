@@ -1,4 +1,4 @@
-const { Config, QuoteContext, SubType, OAuth } = require('E:\\work\\openapi-sdk\\nodejs');
+const { Config, QuoteContext, SubType, OAuth } = require('longbridge');
 
 let globalCtx;
 
