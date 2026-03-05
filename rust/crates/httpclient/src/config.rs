@@ -3,11 +3,11 @@ use longbridge_oauth::OAuth;
 use crate::HttpClientError;
 
 /// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
-/// to the legacy `LONGBRIDGE_<suffix>` name.  Returns `None` if neither is set.
+/// to `LONGPORT_<suffix>`.  Returns `None` if neither is set.
 fn env_var(suffix: &str) -> Option<String> {
     std::env::var(format!("LONGBRIDGE_{suffix}"))
         .ok()
-        .or_else(|| std::env::var(format!("LONGBRIDGE_{suffix}")).ok())
+        .or_else(|| std::env::var(format!("LONGPORT_{suffix}")).ok())
 }
 
 /// Like [`env_var`] but returns an error (using the new `LONGBRIDGE_` name)

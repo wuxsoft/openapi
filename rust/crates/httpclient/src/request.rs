@@ -7,19 +7,20 @@ use std::{
 };
 
 use reqwest::{
-    Method, StatusCode,
     header::{HeaderMap, HeaderName, HeaderValue},
+    Method, StatusCode,
 };
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 use crate::{
-    AuthConfig, HttpClient, HttpClientError, HttpClientResult, is_cn,
-    signature::{SignatureParams, signature},
+    is_cn,
+    signature::{signature, SignatureParams},
     timestamp::Timestamp,
+    AuthConfig, HttpClient, HttpClientError, HttpClientResult,
 };
 
-const HTTP_URL: &str = "https://openapi.longbridge.com";
-const HTTP_URL_CN: &str = "https://openapi.longbridge.cn";
+const HTTP_URL: &str = "https://openapi.longportapp.com";
+const HTTP_URL_CN: &str = "https://openapi.longportapp.cn";
 
 const USER_AGENT: &str = "openapi-sdk";
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
@@ -220,7 +221,11 @@ where
             return url;
         }
 
-        if is_cn().await { HTTP_URL_CN } else { HTTP_URL }
+        if is_cn().await {
+            HTTP_URL_CN
+        } else {
+            HTTP_URL
+        }
     }
 
     async fn do_send(&self) -> HttpClientResult<R> {

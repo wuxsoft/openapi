@@ -6,12 +6,12 @@ use std::{
     sync::Arc,
 };
 
-pub(crate) use http::{HeaderValue, Request, header};
-use longbridge_httpcli::{HttpClient, HttpClientConfig, is_cn};
+pub(crate) use http::{header, HeaderValue, Request};
+use longbridge_httpcli::{is_cn, HttpClient, HttpClientConfig};
 use longbridge_oauth::OAuth;
 use num_enum::IntoPrimitive;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
-use tracing::{Level, Subscriber, subscriber::NoSubscriber};
+use tracing::{subscriber::NoSubscriber, Level, Subscriber};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::{filter::Targets, layer::SubscriberExt};
 
@@ -130,11 +130,21 @@ pub struct Config {
 }
 
 /// Reads an env var by trying `LONGBRIDGE_<suffix>` first, then falling back
-/// to the legacy `LONGBRIDGE_<suffix>` name.  Returns `None` if neither is set.
+/// to `LONGPORT_<suffix>`.  Returns `None` if neither is set.
 fn env_var(suffix: &str) -> Option<String> {
     std::env::var(format!("LONGBRIDGE_{suffix}"))
         .ok()
-        .or_else(|| std::env::var(format!("LONGBRIDGE_{suffix}")).ok())
+        .or_else(|| std::env::var(format!("LONGPORT_{suffix}")).ok())
+}
+
+/// Like [`env_var`] but returns an error if the variable is not set.
+fn env_var_required(suffix: &str) -> Result<String> {
+    env_var(suffix).ok_or_else(|| {
+        longbridge_httpcli::HttpClientError::MissingEnvVar {
+            name: format!("LONGBRIDGE_{suffix}"),
+        }
+        .into()
+    })
 }
 
 /// Non-credential environment variables shared by `from_apikey` and
@@ -291,21 +301,9 @@ impl Config {
     pub fn from_apikey_env() -> Result<Self> {
         let _ = dotenv::dotenv();
 
-        let app_key = env_var("APP_KEY").ok_or_else(|| {
-            longbridge_httpcli::HttpClientError::MissingEnvVar {
-                name: "LONGBRIDGE_APP_KEY".to_string(),
-            }
-        })?;
-        let app_secret = env_var("APP_SECRET").ok_or_else(|| {
-            longbridge_httpcli::HttpClientError::MissingEnvVar {
-                name: "LONGBRIDGE_APP_SECRET".to_string(),
-            }
-        })?;
-        let access_token = env_var("ACCESS_TOKEN").ok_or_else(|| {
-            longbridge_httpcli::HttpClientError::MissingEnvVar {
-                name: "LONGBRIDGE_ACCESS_TOKEN".to_string(),
-            }
-        })?;
+        let app_key = env_var_required("APP_KEY")?;
+        let app_secret = env_var_required("APP_SECRET")?;
+        let access_token = env_var_required("ACCESS_TOKEN")?;
         let extras = ConfigExtras::from_env();
 
         Ok(Config {
