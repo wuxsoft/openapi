@@ -156,8 +156,8 @@ impl Core {
 
         let (event_tx, event_rx) = mpsc::unbounded_channel();
 
-        tracing::info!("connecting to quote server");
         let (url, res) = config.create_quote_ws_request().await;
+        tracing::info!(url = url, "connecting to quote server");
         let request = res.map_err(WsClientError::from)?;
 
         let mut ws_cli = WsClient::open(
@@ -308,8 +308,8 @@ impl Core {
                 // reconnect
                 tokio::time::sleep(RECONNECT_DELAY).await;
 
-                tracing::info!("connecting to quote server");
                 let (url, res) = self.config.create_quote_ws_request().await;
+                tracing::info!(url = url, "connecting to quote server");
                 let request = res.expect("BUG: failed to create quote ws request");
 
                 match WsClient::open(

@@ -15,8 +15,8 @@ use tokio::{
 };
 
 use crate::{
+    trade::{cmd_code, PushEvent, PushOrderChanged, TopicType},
     Config, Result,
-    trade::{PushEvent, PushOrderChanged, TopicType, cmd_code},
 };
 
 const RECONNECT_DELAY: Duration = Duration::from_secs(2);
@@ -60,8 +60,8 @@ impl Core {
 
         let (event_tx, event_rx) = mpsc::unbounded_channel();
 
-        tracing::info!("connecting to trade server");
         let (url, res) = config.create_trade_ws_request().await;
+        tracing::info!(url = url, "connecting to trade server");
         let request = res.map_err(WsClientError::from)?;
         let ws_cli = WsClient::open(
             request,
@@ -103,8 +103,8 @@ impl Core {
                 // reconnect
                 tokio::time::sleep(RECONNECT_DELAY).await;
 
-                tracing::info!("connecting to trade server");
                 let (url, res) = self.config.create_trade_ws_request().await;
+                tracing::info!(url = url, "connecting to trade server");
                 let request = res.expect("BUG: failed to create trade ws request");
 
                 match WsClient::open(
