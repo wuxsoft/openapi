@@ -112,13 +112,11 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
                 ::std::format!("{:?}", self)
             }
 
-            fn __dict__(&self) -> pyo3::PyResult<pyo3::Py<pyo3::types::PyDict>> {
-                pyo3::Python::with_gil(|py| -> pyo3::PyResult<pyo3::Py<pyo3::types::PyDict>> {
-                    use pyo3::prelude::*;
-                    let d = pyo3::types::PyDict::new(py);
-                    #(#set_dictitem)*
-                    Ok(d.into())
-                })
+            fn __dict__(&self, py: pyo3::Python<'_>) -> pyo3::PyResult<pyo3::Py<pyo3::types::PyDict>> {
+                use pyo3::prelude::*;
+                let d = pyo3::types::PyDict::new(py);
+                #(#set_dictitem)*
+                Ok(d.into())
             }
 
             #(#getters)*
