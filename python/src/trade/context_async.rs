@@ -41,7 +41,8 @@ pub(crate) struct AsyncTradeContext {
 impl AsyncTradeContext {
     /// Create an async trade context. Returns an awaitable; must be awaited
     /// inside asyncio. Pass `loop_=asyncio.get_running_loop()` when using async
-    /// callbacks (e.g. `async def` for `set_on_order_changed`) so they are scheduled.
+    /// callbacks (e.g. `async def` for `set_on_order_changed`) so they are
+    /// scheduled.
     #[classmethod]
     #[pyo3(signature = (config, loop_=None))]
     fn create(

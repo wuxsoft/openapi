@@ -23,7 +23,9 @@ pub(crate) fn schedule_coro_if_needed(
         .call1((result,))?
         .extract::<bool>()?;
     if is_coro {
-        asyncio.getattr("run_coroutine_threadsafe")?.call1((result, loop_ref))?;
+        asyncio
+            .getattr("run_coroutine_threadsafe")?
+            .call1((result, loop_ref))?;
     }
     Ok(())
 }
