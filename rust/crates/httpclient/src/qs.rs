@@ -456,12 +456,12 @@ impl<W: Write> SerializeTuple for QsTuplePairSerializer<'_, '_, W> {
     where
         T: Serialize + ?Sized,
     {
-        if self.key.is_none() {
-            self.key = Some(value.serialize(QsKeySerializer)?);
-        } else {
+        if let Some(key) = &self.key {
             for value in value.serialize(QsValueSerializer)? {
-                self.writer.add_pair(self.key.as_ref().unwrap(), &value)?;
+                self.writer.add_pair(key, &value)?;
             }
+        } else {
+            self.key = Some(value.serialize(QsKeySerializer)?);
         }
         Ok(())
     }

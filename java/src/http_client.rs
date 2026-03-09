@@ -121,11 +121,11 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_httpClientRequest(
                     .body(Json(req_data))
                     .send()
                     .await
-                    .map_err(|err| JniError::OpenApi(longbridge::Error::HttpClient(err)))?,
+                    .map_err(|err| JniError::from(longbridge::Error::HttpClient(err)))?,
                 None => req
                     .send()
                     .await
-                    .map_err(|err| JniError::OpenApi(longbridge::Error::HttpClient(err)))?,
+                    .map_err(|err| JniError::from(longbridge::Error::HttpClient(err)))?,
             };
 
             Ok(resp)

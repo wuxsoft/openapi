@@ -16,9 +16,15 @@ pub(crate) enum JniError {
     #[error(transparent)]
     Jni(#[from] jni::errors::Error),
     #[error(transparent)]
-    OpenApi(#[from] longbridge::Error),
+    OpenApi(#[from] Box<longbridge::Error>),
     #[error("{0}")]
     Other(String),
+}
+
+impl From<longbridge::Error> for JniError {
+    fn from(e: longbridge::Error) -> Self {
+        JniError::OpenApi(Box::new(e))
+    }
 }
 
 impl From<longbridge::oauth::OAuthError> for JniError {
@@ -78,7 +84,7 @@ impl JniError {
     pub(crate) fn into_error_object<'a>(self, env: &mut JNIEnv<'a>) -> JObject<'a> {
         match self {
             JniError::Jni(err) => Self::into_runtime_error_object(env, err),
-            JniError::OpenApi(err) => Self::into_openapi_error_object(env, err),
+            JniError::OpenApi(err) => Self::into_openapi_error_object(env, *err),
             JniError::Other(err) => Self::into_runtime_error_object(env, err),
         }
         .expect("to error object")
@@ -87,7 +93,7 @@ impl JniError {
     fn throw(self, env: &mut JNIEnv) {
         let res = match self {
             JniError::Jni(err) => Self::throw_runtime_error(env, err),
-            JniError::OpenApi(err) => Self::throw_openapi_error(env, err),
+            JniError::OpenApi(err) => Self::throw_openapi_error(env, *err),
             JniError::Other(err) => Self::throw_runtime_error(env, err),
         };
         if let Err(err) = res {
