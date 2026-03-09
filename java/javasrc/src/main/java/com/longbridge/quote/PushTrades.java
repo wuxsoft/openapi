@@ -2,9 +2,17 @@ package com.longbridge.quote;
 
 import java.util.Arrays;
 
+/**
+ * Real-time trades push event.
+ */
 public class PushTrades {
     private Trade[] trades;
 
+    /**
+     * Returns the trades included in this push event.
+     *
+     * @return the trades
+     */
     public Trade[] getTrades() {
         return trades;
     }

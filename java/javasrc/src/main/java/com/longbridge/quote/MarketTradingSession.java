@@ -4,14 +4,27 @@ import java.util.Arrays;
 
 import com.longbridge.Market;
 
+/**
+ * Trading sessions for a single market on a given day.
+ */
 public class MarketTradingSession {
     private Market market;
     private TradingSessionInfo[] tradeSessions;
 
+    /**
+     * Returns the market.
+     *
+     * @return the market
+     */
     public Market getMarket() {
         return market;
     }
 
+    /**
+     * Returns the trading session time ranges for this market.
+     *
+     * @return the trading session time ranges
+     */
     public TradingSessionInfo[] getTradeSessions() {
         return tradeSessions;
     }

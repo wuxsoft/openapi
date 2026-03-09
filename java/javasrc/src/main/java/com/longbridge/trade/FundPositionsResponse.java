@@ -2,9 +2,17 @@ package com.longbridge.trade;
 
 import java.util.Arrays;
 
+/**
+ * Response containing all fund positions
+ */
 public class FundPositionsResponse {
     private FundPositionChannel[] channels;
 
+    /**
+     * Returns the fund position channels.
+     *
+     * @return fund position channels
+     */
     public FundPositionChannel[] getChannels() {
         return channels;
     }

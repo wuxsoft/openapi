@@ -4,6 +4,14 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import com.google.gson.Gson;
 
+/**
+ * Longbridge OpenAPI HTTP client.
+ * <p>
+ * Provides authenticated HTTP access to the Longbridge REST API. Instances are
+ * created via the static factory methods {@link #fromApikey} or
+ * {@link #fromApikeyEnv}. The client must be closed after use (it implements
+ * {@link AutoCloseable}).
+ */
 public class HttpClient implements AutoCloseable {
     private long raw;
 

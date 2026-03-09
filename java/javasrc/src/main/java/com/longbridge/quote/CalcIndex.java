@@ -1,84 +1,87 @@
 package com.longbridge.quote;
 
+/**
+ * Calculation index
+ */
 public enum CalcIndex {
-    /// Latest price
+    /** Latest price */
     LastDone,
-    /// Change value
+    /** Change value */
     ChangeValue,
-    /// Change rate
+    /** Change rate */
     ChangeRate,
-    /// Volume
+    /** Volume */
     Volume,
-    /// Turnover
+    /** Turnover */
     Turnover,
-    /// Year-to-date change ratio
+    /** Year-to-date change ratio */
     YtdChangeRate,
-    /// Turnover rate
+    /** Turnover rate */
     TurnoverRate,
-    /// Total market value
+    /** Total market value */
     TotalMarketValue,
-    /// Capital flow
+    /** Capital flow */
     CapitalFlow,
-    /// Amplitude
+    /** Amplitude */
     Amplitude,
-    /// Volume ratio
+    /** Volume ratio */
     VolumeRatio,
-    /// PE (TTM)
+    /** PE (TTM) */
     PeTtmRatio,
-    /// PB
+    /** PB */
     PbRatio,
-    /// Dividend ratio (TTM)
+    /** Dividend ratio (TTM) */
     DividendRatioTtm,
-    /// Five days change ratio
+    /** Five days change ratio */
     FiveDayChangeRate,
-    /// Ten days change ratio
+    /** Ten days change ratio */
     TenDayChangeRate,
-    /// Half year change ratio
+    /** Half year change ratio */
     HalfYearChangeRate,
-    /// Five minutes change ratio
+    /** Five minutes change ratio */
     FiveMinutesChangeRate,
-    /// Expiry date
+    /** Expiry date */
     ExpiryDate,
-    /// Strike price
+    /** Strike price */
     StrikePrice,
-    /// Upper bound price
+    /** Upper bound price */
     UpperStrikePrice,
-    /// Lower bound price
+    /** Lower bound price */
     LowerStrikePrice,
-    /// Outstanding quantity
+    /** Outstanding quantity */
     OutstandingQty,
-    /// Outstanding ratio
+    /** Outstanding ratio */
     OutstandingRatio,
-    /// Premium
+    /** Premium */
     Premium,
-    /// In/out of the bound
+    /** In/out of the bound */
     ItmOtm,
-    /// Implied volatility
+    /** Implied volatility */
     ImpliedVolatility,
-    /// Warrant delta
+    /** Warrant delta */
     WarrantDelta,
-    /// Call price
+    /** Call price */
     CallPrice,
-    /// Price interval from the call price
+    /** Price interval from the call price */
     ToCallPrice,
-    /// Effective leverage
+    /** Effective leverage */
     EffectiveLeverage,
-    /// Leverage ratio
+    /** Leverage ratio */
     LeverageRatio,
-    /// Conversion ratio
+    /** Conversion ratio */
     ConversionRatio,
-    /// Breakeven point
+    /** Breakeven point */
     BalancePoint,
-    /// Open interest
+    /** Open interest */
     OpenInterest,
-    /// Delta
+    /** Delta */
     Delta,
-    /// Gamma
+    /** Gamma */
     Gamma,
-    /// Theta
+    /** Theta */
     Theta,
-    /// Vega
+    /** Vega */
     Vega,
-    /// Rho
+    /** Rho */
     Rho,
 }

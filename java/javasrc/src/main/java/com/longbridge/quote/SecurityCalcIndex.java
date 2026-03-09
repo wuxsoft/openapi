@@ -3,250 +3,417 @@ package com.longbridge.quote;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Calculated indexes for a security.
+ */
 public class SecurityCalcIndex {
-    /// Security code
     private String symbol;
-    /// Latest price
     private BigDecimal lastDone;
-    /// Change value
     private BigDecimal changeValue;
-    /// Change ratio
     private BigDecimal changeRate;
-    /// Volume
     private long volume;
-    /// Turnover
     private BigDecimal turnover;
-    /// Year-to-date change ratio
     private BigDecimal ytdChangeRate;
-    /// Turnover rate
     private BigDecimal turnoverRate;
-    /// Total market value
     private BigDecimal totalMarketValue;
-    /// Capital flow
     private BigDecimal capitalFlow;
-    /// Amplitude
     private BigDecimal amplitude;
-    /// Volume ratio
     private BigDecimal volumeRatio;
-    /// PE (TTM)
     private BigDecimal peTtmRatio;
-    /// PB
     private BigDecimal pbRatio;
-    /// Dividend ratio (TTM)
     private BigDecimal dividendRatioTtm;
-    /// Five days change ratio
     private BigDecimal fiveDayChangeRate;
-    /// Ten days change ratio
     private BigDecimal tenDayChangeRate;
-    /// Half year change ratio
     private BigDecimal halfYearChangeRate;
-    /// Five minutes change ratio
     private BigDecimal fiveMinutesChangeRate;
-    /// Expiry date
     private LocalDate expiryDate;
-    /// Strike price
     private BigDecimal strikePrice;
-    /// Upper bound price
     private BigDecimal upperStrikePrice;
-    /// Lower bound price
     private BigDecimal lowerStrikePrice;
-    /// Outstanding quantity
     private long outstandingQty;
-    /// Outstanding ratio
     private BigDecimal outstandingRatio;
-    /// Premium
     private BigDecimal premium;
-    /// In/out of the bound
     private BigDecimal itmOtm;
-    /// Implied volatility
     private BigDecimal impliedVolatility;
-    /// Warrant delta
     private BigDecimal warrantDelta;
-    /// Call price
     private BigDecimal callPrice;
-    /// Price interval from the call price
     private BigDecimal toCallPrice;
-    /// Effective leverage
     private BigDecimal effectiveLeverage;
-    /// Leverage ratio
     private BigDecimal leverageRatio;
-    /// Conversion ratio
     private BigDecimal conversionRatio;
-    /// Breakeven point
     private BigDecimal balancePoint;
-    /// Open interest
     private long openInterest;
-    /// Delta
     private BigDecimal delta;
-    /// Gamma
     private BigDecimal gamma;
-    /// Theta
     private BigDecimal theta;
-    /// Vega
     private BigDecimal vega;
-    /// Rho
     private BigDecimal rho;
 
+    /**
+     * Returns the security code.
+     *
+     * @return the security code
+     */
     public String getSymbol() {
         return symbol;
     }
 
+    /**
+     * Returns the latest price.
+     *
+     * @return the latest price
+     */
     public BigDecimal getLastDone() {
         return lastDone;
     }
 
+    /**
+     * Returns the change value.
+     *
+     * @return the change value
+     */
     public BigDecimal getChangeValue() {
         return changeValue;
     }
 
+    /**
+     * Returns the change ratio.
+     *
+     * @return the change ratio
+     */
     public BigDecimal getChangeRate() {
         return changeRate;
     }
 
+    /**
+     * Returns the volume.
+     *
+     * @return the volume
+     */
     public long getVolume() {
         return volume;
     }
 
+    /**
+     * Returns the turnover.
+     *
+     * @return the turnover
+     */
     public BigDecimal getTurnover() {
         return turnover;
     }
 
+    /**
+     * Returns the year-to-date change ratio.
+     *
+     * @return the year-to-date change ratio
+     */
     public BigDecimal getYtdChangeRate() {
         return ytdChangeRate;
     }
 
+    /**
+     * Returns the turnover rate.
+     *
+     * @return the turnover rate
+     */
     public BigDecimal getTurnoverRate() {
         return turnoverRate;
     }
 
+    /**
+     * Returns the total market value.
+     *
+     * @return the total market value
+     */
     public BigDecimal getTotalMarketValue() {
         return totalMarketValue;
     }
 
+    /**
+     * Returns the capital flow.
+     *
+     * @return the capital flow
+     */
     public BigDecimal getCapitalFlow() {
         return capitalFlow;
     }
 
+    /**
+     * Returns the amplitude.
+     *
+     * @return the amplitude
+     */
     public BigDecimal getAmplitude() {
         return amplitude;
     }
 
+    /**
+     * Returns the volume ratio.
+     *
+     * @return the volume ratio
+     */
     public BigDecimal getVolumeRatio() {
         return volumeRatio;
     }
 
+    /**
+     * Returns the PE (TTM).
+     *
+     * @return the PE (TTM)
+     */
     public BigDecimal getPeTtmRatio() {
         return peTtmRatio;
     }
 
+    /**
+     * Returns the PB.
+     *
+     * @return the PB
+     */
     public BigDecimal getPbRatio() {
         return pbRatio;
     }
 
+    /**
+     * Returns the dividend ratio (TTM).
+     *
+     * @return the dividend ratio (TTM)
+     */
     public BigDecimal getDividendRatioTtm() {
         return dividendRatioTtm;
     }
 
+    /**
+     * Returns the five days change ratio.
+     *
+     * @return the five days change ratio
+     */
     public BigDecimal getFiveDayChangeRate() {
         return fiveDayChangeRate;
     }
 
+    /**
+     * Returns the ten days change ratio.
+     *
+     * @return the ten days change ratio
+     */
     public BigDecimal getTenDayChangeRate() {
         return tenDayChangeRate;
     }
 
+    /**
+     * Returns the half year change ratio.
+     *
+     * @return the half year change ratio
+     */
     public BigDecimal getHalfYearChangeRate() {
         return halfYearChangeRate;
     }
 
+    /**
+     * Returns the five minutes change ratio.
+     *
+     * @return the five minutes change ratio
+     */
     public BigDecimal getFiveMinutesChangeRate() {
         return fiveMinutesChangeRate;
     }
 
+    /**
+     * Returns the expiry date.
+     *
+     * @return the expiry date
+     */
     public LocalDate getExpiryDate() {
         return expiryDate;
     }
 
+    /**
+     * Returns the strike price.
+     *
+     * @return the strike price
+     */
     public BigDecimal getStrikePrice() {
         return strikePrice;
     }
 
+    /**
+     * Returns the upper bound price.
+     *
+     * @return the upper bound price
+     */
     public BigDecimal getUpperStrikePrice() {
         return upperStrikePrice;
     }
 
+    /**
+     * Returns the lower bound price.
+     *
+     * @return the lower bound price
+     */
     public BigDecimal getLowerStrikePrice() {
         return lowerStrikePrice;
     }
 
+    /**
+     * Returns the outstanding quantity.
+     *
+     * @return the outstanding quantity
+     */
     public long getOutstandingQty() {
         return outstandingQty;
     }
 
+    /**
+     * Returns the outstanding ratio.
+     *
+     * @return the outstanding ratio
+     */
     public BigDecimal getOutstandingRatio() {
         return outstandingRatio;
     }
 
+    /**
+     * Returns the premium.
+     *
+     * @return the premium
+     */
     public BigDecimal getPremium() {
         return premium;
     }
 
+    /**
+     * Returns the in/out of the bound value.
+     *
+     * @return the ITM/OTM value
+     */
     public BigDecimal getItmOtm() {
         return itmOtm;
     }
 
+    /**
+     * Returns the implied volatility.
+     *
+     * @return the implied volatility
+     */
     public BigDecimal getImpliedVolatility() {
         return impliedVolatility;
     }
 
+    /**
+     * Returns the warrant delta.
+     *
+     * @return the warrant delta
+     */
     public BigDecimal getWarrantDelta() {
         return warrantDelta;
     }
 
+    /**
+     * Returns the call price.
+     *
+     * @return the call price
+     */
     public BigDecimal getCallPrice() {
         return callPrice;
     }
 
+    /**
+     * Returns the price interval from the call price.
+     *
+     * @return the price interval from the call price
+     */
     public BigDecimal getToCallPrice() {
         return toCallPrice;
     }
 
+    /**
+     * Returns the effective leverage.
+     *
+     * @return the effective leverage
+     */
     public BigDecimal getEffectiveLeverage() {
         return effectiveLeverage;
     }
 
+    /**
+     * Returns the leverage ratio.
+     *
+     * @return the leverage ratio
+     */
     public BigDecimal getLeverageRatio() {
         return leverageRatio;
     }
 
+    /**
+     * Returns the conversion ratio.
+     *
+     * @return the conversion ratio
+     */
     public BigDecimal getConversionRatio() {
         return conversionRatio;
     }
 
+    /**
+     * Returns the breakeven point.
+     *
+     * @return the breakeven point
+     */
     public BigDecimal getBalancePoint() {
         return balancePoint;
     }
 
+    /**
+     * Returns the open interest.
+     *
+     * @return the open interest
+     */
     public long getOpenInterest() {
         return openInterest;
     }
 
+    /**
+     * Returns the delta.
+     *
+     * @return the delta
+     */
     public BigDecimal getDelta() {
         return delta;
     }
 
+    /**
+     * Returns the gamma.
+     *
+     * @return the gamma
+     */
     public BigDecimal getGamma() {
         return gamma;
     }
 
+    /**
+     * Returns the theta.
+     *
+     * @return the theta
+     */
     public BigDecimal getTheta() {
         return theta;
     }
 
+    /**
+     * Returns the vega.
+     *
+     * @return the vega
+     */
     public BigDecimal getVega() {
         return vega;
     }
 
+    /**
+     * Returns the rho.
+     *
+     * @return the rho
+     */
     public BigDecimal getRho() {
         return rho;
     }
