@@ -263,11 +263,8 @@ jobs:
       - name: Get CMake
         uses: lukka/get-cmake@latest
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
-
       - name: Install cargo make
-        run: cargo binstall --no-confirm cargo-make
+        run: cargo install cargo-make
 
       - name: Build
         if: ${{ matrix.settings.target != 'aarch64-apple-darwin' }}
@@ -350,11 +347,8 @@ jobs:
       - name: Get CMake
         uses: lukka/get-cmake@latest
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
-
       - name: Install cargo make
-        run: cargo binstall --no-confirm cargo-make
+        run: cargo install cargo-make
 
       - name: Build
         if: ${{ matrix.settings.target != 'aarch64-apple-darwin' }}
