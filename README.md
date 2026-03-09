@@ -23,33 +23,9 @@ Longbridge OpenAPI provides programmatic quote trading interfaces for investors 
 | Go                          |                                                                       | https://github.com/longbridge/openapi-go         |
 | [MCP](mcp/README.md)        |                                                                       | An MCP server implementation for Longbridge OpenAPI |
 
-## Environment Variables
-
-| Name                           | Description                                                                      |
-|--------------------------------|----------------------------------------------------------------------------------|
-| LONGBRIDGE_LANGUAGE              | Language identifier, `zh-CN`, `zh-HK` or `en` (Default: `en`)                    |
-| LONGBRIDGE_APP_KEY               | App key                                                                          |
-| LONGBRIDGE_APP_SECRET            | App secret                                                                       |
-| LONGBRIDGE_ACCESS_TOKEN          | Access token                                                                     |
-| LONGBRIDGE_HTTP_URL              | HTTP endpoint url (Default: `https://openapi.longbridge.com`)                   |
-| LONGBRIDGE_QUOTE_WS_URL          | Quote websocket endpoint url (Default: `wss://openapi-quote.longbridge.com/v2`) |
-| LONGBRIDGE_TRADE_WS_URL          | Trade websocket endpoint url (Default: `wss://openapi-trade.longbridge.com/v2`) |
-| LONGBRIDGE_ENABLE_OVERNIGHT      | Enable overnight quote, `true` or `false` (Default: `false`)                     |
-| LONGBRIDGE_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                  |
-| LONGBRIDGE_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)         |
-| LONGBRIDGE_LOG_PATH              | Set the path of the log files (Default: `no logs`)                               |
-
 ## Quickstart
 
-- Pick a language SDK and follow its README for install + first request:
-  - Rust: `rust/README.md`
-  - Python: `python/README.md`
-  - Node.js: `nodejs/README.md`
-  - Java: `java/README.md`
-  - C: `c/README.md`
-  - C++: `cpp/README.md`
-  - Go: https://github.com/longbridge/openapi-go
-- Full reference docs: https://longbridge.github.io/openapi
+Pick a language SDK from the table above and follow its README for install and first request. Full reference docs: https://longbridge.github.io/openapi
 
 ## SDK Documentation
 
