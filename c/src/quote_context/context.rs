@@ -497,7 +497,7 @@ pub unsafe extern "C" fn lb_quote_context_unsubscribe_candlesticks(
 
 /// Get subscription information
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_quote_context_subscrptions(
+pub unsafe extern "C" fn lb_quote_context_subscriptions(
     ctx: *const CQuoteContext,
     callback: CAsyncCallback,
     userdata: *mut c_void,

@@ -234,7 +234,7 @@ void
 QuoteContext::subscriptions(
   AsyncCallback<QuoteContext, std::vector<Subscription>> callback) const
 {
-  lb_quote_context_subscrptions(
+  lb_quote_context_subscriptions(
     ctx_,
     [](auto res) {
       auto callback_ptr =

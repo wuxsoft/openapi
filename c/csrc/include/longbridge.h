@@ -4208,9 +4208,9 @@ void lb_quote_context_unsubscribe_candlesticks(const struct lb_quote_context_t *
 /**
  * Get subscription information
  */
-void lb_quote_context_subscrptions(const struct lb_quote_context_t *ctx,
-                                   lb_async_callback_t callback,
-                                   void *userdata);
+void lb_quote_context_subscriptions(const struct lb_quote_context_t *ctx,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
 
 /**
  * Get basic information of securities
