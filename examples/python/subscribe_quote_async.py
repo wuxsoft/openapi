@@ -14,7 +14,8 @@ async def main() -> None:
         lambda url: print(f"Open this URL to authorize: {url}")
     )
     config = Config.from_oauth(oauth)
-    ctx = await AsyncQuoteContext.create(config)
+    # Pass the event loop so async callbacks (e.g. async def on_quote) are scheduled.
+    ctx = await AsyncQuoteContext.create(config, loop_=asyncio.get_running_loop())
     ctx.set_on_quote(on_quote)
     await ctx.subscribe(
         ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],

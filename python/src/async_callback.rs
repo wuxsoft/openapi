@@ -4,8 +4,8 @@
 
 use pyo3::prelude::*;
 
-/// If `result` is a coroutine and `event_loop` is `Some`, schedules it via
-/// `loop.call_soon_thread_safe(loop.create_task, coro)`. Otherwise a no-op.
+/// If `result` is a coroutine and `event_loop` is `Some`, schedules it on the
+/// loop via `asyncio.run_coroutine_threadsafe(coro, loop)`.
 pub(crate) fn schedule_coro_if_needed(
     result: &Bound<PyAny>,
     event_loop: Option<&Bound<PyAny>>,
@@ -23,8 +23,7 @@ pub(crate) fn schedule_coro_if_needed(
         .call1((result,))?
         .extract::<bool>()?;
     if is_coro {
-        let create_task = loop_ref.getattr("create_task")?;
-        loop_ref.call_method("call_soon_thread_safe", (create_task, result), None)?;
+        asyncio.getattr("run_coroutine_threadsafe")?.call1((result, loop_ref))?;
     }
     Ok(())
 }

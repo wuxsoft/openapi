@@ -40,17 +40,18 @@ pub(crate) struct AsyncTradeContext {
 #[pymethods]
 impl AsyncTradeContext {
     /// Create an async trade context. Returns an awaitable; must be awaited
-    /// inside asyncio.
+    /// inside asyncio. Pass `loop_=asyncio.get_running_loop()` when using async
+    /// callbacks (e.g. `async def` for `set_on_order_changed`) so they are scheduled.
     #[classmethod]
-    fn create(cls: &Bound<PyType>, config: &Config) -> PyResult<Py<PyAny>> {
+    #[pyo3(signature = (config, loop_=None))]
+    fn create(
+        cls: &Bound<PyType>,
+        config: &Config,
+        loop_: Option<Bound<PyAny>>,
+    ) -> PyResult<Py<PyAny>> {
         let py = cls.py();
         let config = Arc::new(config.0.clone());
-        let event_loop = py
-            .import("asyncio")
-            .ok()
-            .and_then(|m| m.getattr("get_running_loop").ok())
-            .and_then(|f| f.call0().ok())
-            .map(|l| l.unbind());
+        let event_loop = loop_.map(|l| l.unbind());
         let event_loop = Arc::new(event_loop);
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let (ctx, mut event_rx) = TradeContext::try_new(config).await.map_err(ErrorNewType)?;

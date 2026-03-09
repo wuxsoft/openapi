@@ -6,35 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [4.0.0]
 
-- Add OAuth 2.0 authentication support across all language bindings (Rust, C, C++, Java, Python, Node.js).
-  - New `OAuthBuilder` / `OAuth` types: use `OAuthBuilder` to run the browser-based authorization flow; the resulting `OAuth` handle is passed to `Config::from_oauth()`.
-  - Tokens are automatically persisted to `~/.longbridge-openapi/tokens/<client_id>` and reused on subsequent runs; the browser authorization flow is only triggered when no valid token exists.
+## Added
 
-- **Breaking** (Rust):
-  - `Config::new` → `Config::from_apikey`
-  - `Config::from_env` → `Config::from_apikey_env`
-  - `Config::refresh_access_token` and `Config::refresh_access_token_blocking` removed
+- **OAuth 2.0** authentication for all language bindings (Rust, C, C++, Java, Python, Node.js). Use `OAuthBuilder` to run the browser flow; pass the resulting `OAuth` handle to `Config::from_oauth()`. Tokens are persisted under `~/.longbridge-openapi/tokens/<client_id>` and reused; the browser is only opened when no valid token exists.
 
-- **Breaking** (C/C++):
-  - `lb_config_new` → `lb_config_from_apikey`
-  - `lb_config_from_env` → `lb_config_from_apikey_env`
-  - `lb_config_refresh_access_token` removed
-  - `lb_http_client_new` → `lb_http_client_from_apikey`
-  - `lb_http_client_from_env` → `lb_http_client_from_apikey_env`
+- **Python — async callbacks:** `AsyncQuoteContext` and `AsyncTradeContext` accept async callbacks for `set_on_quote`, `set_on_depth`, `set_on_brokers`, `set_on_trades`, `set_on_candlestick`, and `set_on_order_changed`. If a callback returns a coroutine, the SDK schedules it on the asyncio loop. Sync callbacks still work as before.
+- **Python — `loop_` parameter:** `AsyncQuoteContext.create()` and `AsyncTradeContext.create()` take an optional `loop_` argument. When using async callbacks, pass `loop_=asyncio.get_running_loop()` so the SDK can schedule coroutines with `asyncio.run_coroutine_threadsafe`. Omit `loop_` when using only sync callbacks.
 
-- **Breaking** (Java):
-  - `Config.fromEnv()` → `Config.fromApikeyEnv()`
-  - `Config.refreshAccessToken()` removed
+## Breaking changes
 
-- **Breaking** (Python):
-  - `Config.from_env()` → `Config.from_apikey_env()`
-  - `Config.refresh_access_token()` removed
-  - `HttpClient.from_env()` → `HttpClient.from_apikey_env()`
-
-- **Breaking** (Node.js):
-  - `Config.fromEnv()` → `Config.fromApikeyEnv()`
-
-- Python: `AsyncQuoteContext` and `AsyncTradeContext` support async callbacks for `set_on_quote`, `set_on_depth`, `set_on_brokers`, `set_on_trades`, `set_on_candlestick`, and `set_on_order_changed`. If a callback returns a coroutine, it is scheduled on the asyncio event loop. (Non-breaking: sync callbacks continue to work as before.)
+- **Rust:** `Config::new` → `Config::from_apikey`, `Config::from_env` → `Config::from_apikey_env`; removed `Config::refresh_access_token` and `Config::refresh_access_token_blocking`.
+- **C/C++:** `lb_config_new` → `lb_config_from_apikey`, `lb_config_from_env` → `lb_config_from_apikey_env`, removed `lb_config_refresh_access_token`; `lb_http_client_new` → `lb_http_client_from_apikey`, `lb_http_client_from_env` → `lb_http_client_from_apikey_env`.
+- **Java:** `Config.fromEnv()` → `Config.fromApikeyEnv()`, removed `Config.refreshAccessToken()`.
+- **Python:** `Config.from_env()` → `Config.from_apikey_env()`, removed `Config.refresh_access_token()`; `HttpClient.from_env()` → `HttpClient.from_apikey_env()`.
+- **Node.js:** `Config.fromEnv()` → `Config.fromApikeyEnv()`.
 
 # [3.0.22]
 

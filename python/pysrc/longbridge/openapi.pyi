@@ -3928,12 +3928,16 @@ class AsyncQuoteContext:
 
     @classmethod
     def create(cls: Type["AsyncQuoteContext"],
-               config: Config) -> Awaitable["AsyncQuoteContext"]:
+               config: Config,
+               loop_: Optional[Any] = None) -> Awaitable["AsyncQuoteContext"]:
         """
         Create an async quote context. Returns an awaitable; must be awaited inside asyncio.
+        When using async callbacks (e.g. async def for set_on_quote), pass
+        loop_=asyncio.get_running_loop() so they are scheduled.
 
         Args:
             config: Configuration object (same as sync QuoteContext).
+            loop_: Optional event loop; pass asyncio.get_running_loop() when using async callbacks.
 
         Returns:
             An awaitable that resolves to the AsyncQuoteContext instance.
@@ -7080,12 +7084,16 @@ class AsyncTradeContext:
 
     @classmethod
     def create(cls: Type["AsyncTradeContext"],
-               config: Config) -> Awaitable["AsyncTradeContext"]:
+               config: Config,
+               loop_: Optional[Any] = None) -> Awaitable["AsyncTradeContext"]:
         """
         Create an async trade context. Returns an awaitable; must be awaited inside asyncio.
+        When using async callbacks (e.g. async def for set_on_order_changed), pass
+        loop_=asyncio.get_running_loop() so they are scheduled.
 
         Args:
             config: Configuration object (same as sync TradeContext).
+            loop_: Optional event loop; pass asyncio.get_running_loop() when using async callbacks.
 
         Returns:
             An awaitable that resolves to the AsyncTradeContext instance.
