@@ -1096,6 +1096,20 @@ public class QuoteContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
+    /**
+     * Get filings list
+     *
+     * @param symbol Security symbol
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<FilingItem[]> getFilings(String symbol)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.quoteContextFilings(this.raw, symbol, callback);
+        });
+    }
+
     public CompletableFuture<Security[]> getSecurityList(Market market, SecurityListCategory category)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
