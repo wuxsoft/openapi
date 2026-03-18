@@ -74,7 +74,10 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         (OPENAPI_EXCEPTION_CLASS, "com/longbridge/OpenApiException"),
         (QUOTE_CONTEXT_CLASS, "com/longbridge/quote/QuoteContext"),
         (TRADE_CONTEXT_CLASS, "com/longbridge/trade/TradeContext"),
-        (CONTENT_CONTEXT_CLASS, "com/longbridge/content/ContentContext")
+        (
+            CONTENT_CONTEXT_CLASS,
+            "com/longbridge/content/ContentContext"
+        )
     );
 
     init_timezone_id(&mut env);

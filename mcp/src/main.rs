@@ -66,7 +66,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .at(
                 "/",
                 streamable_http::endpoint(move |_| {
-                    create_mcp_server(quote_context.clone(), trade_context.clone(), content_context.clone(), readonly)
+                    create_mcp_server(
+                        quote_context.clone(),
+                        trade_context.clone(),
+                        content_context.clone(),
+                        readonly,
+                    )
                 }),
             )
             .with(Cors::new());
@@ -82,7 +87,11 @@ fn create_mcp_server(
     content_context: ContentContext,
     readonly: bool,
 ) -> McpServer<Longbridge> {
-    let mut server = McpServer::new().tools(Longbridge::new(quote_context, trade_context, content_context));
+    let mut server = McpServer::new().tools(Longbridge::new(
+        quote_context,
+        trade_context,
+        content_context,
+    ));
     if readonly {
         server = server.disable_tools(["submit_order"]);
     }

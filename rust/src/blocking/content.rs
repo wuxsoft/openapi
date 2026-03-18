@@ -2,7 +2,11 @@ use std::sync::Arc;
 
 use tokio::sync::mpsc;
 
-use crate::{Config, Result, blocking::runtime::BlockingRuntime, content::{ContentContext, NewsItem, TopicItem}};
+use crate::{
+    Config, Result,
+    blocking::runtime::BlockingRuntime,
+    content::{ContentContext, NewsItem, TopicItem},
+};
 
 /// Blocking content context
 pub struct ContentContextSync {

@@ -3,9 +3,8 @@ use std::sync::Arc;
 use longbridge_httpcli::{HttpClient, Json, Method};
 use serde::Deserialize;
 
-use crate::{Config, Result};
-
 use super::types::{NewsItem, TopicItem};
+use crate::{Config, Result};
 
 struct InnerContentContext {
     http_cli: HttpClient,
