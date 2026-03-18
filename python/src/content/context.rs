@@ -13,10 +13,10 @@ pub(crate) struct ContentContext {
 #[pymethods]
 impl ContentContext {
     #[new]
-    fn new(config: &Config) -> Self {
-        Self {
-            ctx: ContentContextSync::new(Arc::new(config.0.clone())),
-        }
+    fn new(config: &Config) -> PyResult<Self> {
+        Ok(Self {
+            ctx: ContentContextSync::try_new(Arc::new(config.0.clone())).map_err(ErrorNewType)?,
+        })
     }
 
     /// Get discussion topics list

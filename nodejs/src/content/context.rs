@@ -17,7 +17,7 @@ impl ContentContext {
     #[napi]
     pub async fn new(config: &Config) -> napi::Result<ContentContext> {
         Ok(Self {
-            ctx: longbridge::content::ContentContext::new(Arc::new(config.0.clone())),
+            ctx: longbridge::content::ContentContext::try_new(Arc::new(config.0.clone())).map_err(ErrorNewType)?,
         })
     }
 

@@ -7,14 +7,20 @@ use crate::{Config, Result};
 
 use super::types::{NewsItem, TopicItem};
 
+struct InnerContentContext {
+    http_cli: HttpClient,
+}
+
 /// Content context
 #[derive(Clone)]
-pub struct ContentContext(HttpClient);
+pub struct ContentContext(Arc<InnerContentContext>);
 
 impl ContentContext {
     /// Create a `ContentContext`
-    pub fn new(config: Arc<Config>) -> Self {
-        Self(config.create_http_client())
+    pub fn try_new(config: Arc<Config>) -> Result<Self> {
+        Ok(Self(Arc::new(InnerContentContext {
+            http_cli: config.create_http_client(),
+        })))
     }
 
     /// Get discussion topics list
@@ -27,6 +33,7 @@ impl ContentContext {
         let symbol = symbol.into();
         Ok(self
             .0
+            .http_cli
             .request(Method::GET, format!("/v1/content/{symbol}/topics"))
             .response::<Json<Response>>()
             .send()
@@ -45,6 +52,7 @@ impl ContentContext {
         let symbol = symbol.into();
         Ok(self
             .0
+            .http_cli
             .request(Method::GET, format!("/v1/content/{symbol}/news"))
             .response::<Json<Response>>()
             .send()

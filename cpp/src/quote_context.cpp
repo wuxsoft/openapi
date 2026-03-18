@@ -1287,29 +1287,26 @@ QuoteContext::filings(const std::string& symbol,
   lb_quote_context_filings(
     ctx_,
     symbol.c_str(),
-    [](const lb_async_result_t* res) {
-      auto* callback_ptr =
-        (AsyncCallback<QuoteContext, std::vector<FilingItem>>*)res->userdata;
-      if (res->error) {
-        (*callback_ptr)(
-          AsyncResult<QuoteContext, std::vector<FilingItem>>(
-            QuoteContext((const lb_quote_context_t*)res->ctx),
-            Status(res->error),
-            nullptr));
-      } else {
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, std::vector<FilingItem>>(
+          res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+
+      if (status) {
         auto* rows = (const lb_filing_item_t*)res->data;
         std::vector<FilingItem> items;
         std::transform(rows,
                        rows + res->length,
                        std::back_inserter(items),
                        [](auto row) { return convert(&row); });
-        (*callback_ptr)(
-          AsyncResult<QuoteContext, std::vector<FilingItem>>(
-            QuoteContext((const lb_quote_context_t*)res->ctx),
-            Status(res->error),
-            &items));
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<FilingItem>>(
+          ctx, std::move(status), &items));
+      } else {
+        (*callback_ptr)(AsyncResult<QuoteContext, std::vector<FilingItem>>(
+          ctx, std::move(status), nullptr));
       }
-      delete callback_ptr;
     },
     new AsyncCallback<QuoteContext, std::vector<FilingItem>>(callback));
 }

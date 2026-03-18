@@ -33,7 +33,7 @@ pub unsafe extern "C" fn lb_content_context_new(
         std::ptr::null_mut::<c_void>(),
         userdata,
         async move {
-            let ctx = ContentContext::new(config);
+            let ctx = ContentContext::try_new(config)?;
             let arc_ctx = Arc::new(CContentContext { ctx });
             let ctx = Arc::into_raw(arc_ctx);
             Ok(CAsyncResult {

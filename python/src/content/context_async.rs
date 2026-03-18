@@ -15,10 +15,15 @@ pub(crate) struct AsyncContentContext {
 impl AsyncContentContext {
     /// Create an async content context.
     #[classmethod]
-    fn create(_cls: Bound<PyType>, config: &Config) -> Self {
-        Self {
-            ctx: Arc::new(ContentContext::new(Arc::new(config.0.clone()))),
-        }
+    fn create(cls: &Bound<PyType>, config: &Config) -> PyResult<Py<PyAny>> {
+        let py = cls.py();
+        let config = Arc::new(config.0.clone());
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(AsyncContentContext {
+                ctx: Arc::new(ContentContext::try_new(config).map_err(ErrorNewType)?),
+            })
+        })
+        .map(|b| b.unbind())
     }
 
     /// Get discussion topics list. Returns awaitable.

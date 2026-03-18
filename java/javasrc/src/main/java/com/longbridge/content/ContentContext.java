@@ -30,34 +30,6 @@ public class ContentContext implements AutoCloseable {
     }
 
     /**
-     * Get news list
-     *
-     * <pre>
-     * {@code
-     * import com.longbridge.*;
-     * import com.longbridge.content.*;
-     *
-     * class Main {
-     *     public static void main(String[] args) throws Exception {
-     *         OAuth oauth = new OAuthBuilder("your-client-id")
-     *                 .build(url -> System.out.println("Visit: " + url)).get();
-     *         try (Config config = Config.fromOAuth(oauth);
-     *                 ContentContext ctx = ContentContext.create(config).get()) {
-     *             NewsItem[] items = ctx.getNews("700.HK").get();
-     *             for (NewsItem item : items) {
-     *                 System.out.println(item);
-     *             }
-     *         }
-     *     }
-     * }
-     * }
-     * </pre>
-     *
-     * @param symbol Security symbol
-     * @return A Future representing the result of the operation
-     * @throws OpenApiException If an error occurs
-     */
-    /**
      * Get discussion topics list
      *
      * @param symbol Security symbol
@@ -71,6 +43,13 @@ public class ContentContext implements AutoCloseable {
         });
     }
 
+    /**
+     * Get news list
+     *
+     * @param symbol Security symbol
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
     public CompletableFuture<NewsItem[]> getNews(String symbol)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {

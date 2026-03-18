@@ -39,7 +39,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newContentContext(
         let config = Arc::new((*(config as *const Config)).clone());
 
         async_util::execute(env, callback, async move {
-            let ctx = ContentContext::new(config);
+            let ctx = ContentContext::try_new(config)?;
             Ok(ContextObjRef(
                 Box::into_raw(Box::new(ContextObj { ctx })) as i64,
             ))
