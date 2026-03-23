@@ -12,12 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All bindings:** `member_id`, `quote_level`, and `quote_package_details` are now async methods (were previously sync fields/properties).
 - **Rust:** A single global Tokio runtime is shared across all SDK components; per-binding runtimes removed.
 
+## Performance
+
+- Reduced connection latency by ~1.3 s by fixing a geo-probe cache issue and a WebSocket rate-limiter initialisation bug.
+- Quote: trading days are now loaded lazily on first use instead of eagerly at connect time.
+
 ## Fixed
 
-- **Java:** Restored broken Javadoc comment formatting in `QuoteContext` and `TradeContext` example blocks.
-- **Java:** `Makefile.toml` now uses a platform-aware classpath separator (`:` on Unix, `;` on Windows) and adds `--enable-native-access=ALL-UNNAMED` to suppress JVM native-access warnings on JDK 17+.
-- **Java:** Added missing `content` package classes (`ContentContext`, `NewsItem`, `TopicItem`) to the compile task.
-- **Node.js:** Updated all doc-comment examples to use sync `QuoteContext.new(config)` / `TradeContext.new(config)`.
+- OAuth token refresh now triggers at 5 minutes before expiry instead of only after expiry, preventing a blocking refresh on the first API call.
+- CN region detection updated to use a new probe endpoint.
 
 # [4.0.4]
 
