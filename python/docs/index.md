@@ -180,7 +180,7 @@ async def main():
         lambda url: print(f"Open this URL to authorize: {url}")
     )
     config = Config.from_oauth(oauth)
-    ctx = await AsyncQuoteContext.create(config)
+    ctx = AsyncQuoteContext.create(config)
     ctx.set_on_quote(on_quote)
     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
     quotes = await ctx.quote(["700.HK"])

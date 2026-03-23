@@ -32,8 +32,8 @@ use crate::{
     types::Market,
 };
 
-/// Async quote context. Create via `AsyncQuoteContext.create(config)` and await
-/// in asyncio.
+/// Async quote context. Create via `AsyncQuoteContext.create(config)`
+/// (synchronous, no await needed). Use in asyncio.
 #[pyclass]
 pub(crate) struct AsyncQuoteContext {
     ctx: Arc<QuoteContext>,
@@ -42,8 +42,8 @@ pub(crate) struct AsyncQuoteContext {
 
 #[pymethods]
 impl AsyncQuoteContext {
-    /// Create an async quote context. Returns an awaitable; must be awaited
-    /// inside asyncio. Pass `loop_=asyncio.get_running_loop()` when using async
+    /// Create an async quote context (synchronous, no await needed).
+    /// Pass `loop_=asyncio.get_running_loop()` when using async
     /// callbacks (e.g. `async def` for `set_on_quote`) so they are scheduled.
     #[classmethod]
     #[pyo3(signature = (config, loop_=None))]

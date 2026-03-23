@@ -220,7 +220,7 @@ export declare class Config {
 /** Content context */
 export declare class ContentContext {
   /** Create a new `ContentContext` */
-  static new(config: Config): Promise<ContentContext>
+  static new(config: Config): ContentContext
   /** Get discussion topics list */
   topics(symbol: string): Promise<Array<TopicItem>>
   /** Get news list */

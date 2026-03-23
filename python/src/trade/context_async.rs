@@ -29,8 +29,8 @@ use crate::{
     types::Market,
 };
 
-/// Async trade context. Create via `AsyncTradeContext.create(config)` and await
-/// in asyncio.
+/// Async trade context. Create via `AsyncTradeContext.create(config)`
+/// (synchronous, no await needed). Use in asyncio.
 #[pyclass]
 pub(crate) struct AsyncTradeContext {
     ctx: Arc<TradeContext>,
@@ -39,8 +39,8 @@ pub(crate) struct AsyncTradeContext {
 
 #[pymethods]
 impl AsyncTradeContext {
-    /// Create an async trade context. Returns an awaitable; must be awaited
-    /// inside asyncio. Pass `loop_=asyncio.get_running_loop()` when using async
+    /// Create an async trade context (synchronous, no await needed).
+    /// Pass `loop_=asyncio.get_running_loop()` when using async
     /// callbacks (e.g. `async def` for `set_on_order_changed`) so they are
     /// scheduled.
     #[classmethod]

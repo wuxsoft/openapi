@@ -243,10 +243,10 @@ print(resp)
 
 ## Asynchronous API
 
-The SDK provides async contexts and an async HTTP client for use with Python's `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API. **Async quote/trade contexts support async callbacks**: if a `set_on_quote`, `set_on_candlestick`, or `set_on_order_changed` callback is an async function (returns a coroutine), it is scheduled on the event loop. When using async callbacks, pass the loop so the SDK can schedule them: `await AsyncQuoteContext.create(config, loop_=asyncio.get_running_loop())`.
+The SDK provides async contexts and an async HTTP client for use with Python's `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API. **Async quote/trade contexts support async callbacks**: if a `set_on_quote`, `set_on_candlestick`, or `set_on_order_changed` callback is an async function (returns a coroutine), it is scheduled on the event loop. When using async callbacks, pass the loop so the SDK can schedule them: `AsyncQuoteContext.create(config, loop_=asyncio.get_running_loop())`.
 
-- **Async quote**: create with `ctx = await AsyncQuoteContext.create(config)`, then e.g. `await ctx.quote(["700.HK"])`, `await ctx.subscribe(...)`.
-- **Async trade**: create with `ctx = await AsyncTradeContext.create(config)`, then e.g. `await ctx.today_orders()`, `await ctx.submit_order(...)`.
+- **Async quote**: create with `ctx = AsyncQuoteContext.create(config)` (synchronous, no await), then e.g. `await ctx.quote(["700.HK"])`, `await ctx.subscribe(...)`.
+- **Async trade**: create with `ctx = AsyncTradeContext.create(config)` (synchronous, no await), then e.g. `await ctx.today_orders()`, `await ctx.submit_order(...)`.
 - **Async HTTP**: `resp = await http_cli.request_async("get", "/v1/trade/execution/today")`.
 
 Example (async quote):
@@ -263,7 +263,7 @@ async def main():
         lambda url: print(f"Open this URL to authorize: {url}")
     )
     config = Config.from_oauth(oauth)
-    ctx = await AsyncQuoteContext.create(config, loop_=asyncio.get_running_loop())
+    ctx = AsyncQuoteContext.create(config, loop_=asyncio.get_running_loop())
     ctx.set_on_quote(on_quote)
     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
     quotes = await ctx.quote(["700.HK"])

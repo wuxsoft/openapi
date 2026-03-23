@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Changed
 
-- **All bindings:** `QuoteContext::new` / `TradeContext::new` are now synchronous and infallible — no more `await` or `.get()` at construction time. The WebSocket connection is established lazily on first use.
+- **All bindings:** `QuoteContext::new` / `TradeContext::new` / `ContentContext::new` are now synchronous and infallible — no more `await`, `.get()`, or callback at construction time. The WebSocket connection is established lazily on first use.
 - **All bindings:** `member_id`, `quote_level`, and `quote_package_details` are now async methods (were previously sync fields/properties).
 - **Rust:** A single global Tokio runtime is shared across all SDK components; per-binding runtimes removed.
 

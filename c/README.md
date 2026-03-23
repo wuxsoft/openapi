@@ -180,18 +180,6 @@ on_quote(const struct lb_async_result_t* res)
 }
 
 static void
-on_quote_context_created(const struct lb_async_result_t* res)
-{
-  if (res->error) {
-    printf("failed to create quote context: %s\n", lb_error_message(res->error));
-    return;
-  }
-
-  const char* symbols[] = { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" };
-  lb_quote_context_quote(res->ctx, symbols, 4, on_quote, NULL);
-}
-
-static void
 on_oauth_ready(const struct lb_async_result_t* res)
 {
   if (res->error) {
@@ -201,9 +189,12 @@ on_oauth_ready(const struct lb_async_result_t* res)
 
   lb_oauth_t* oauth = (lb_oauth_t*)res->data;
   lb_config_t* config = lb_config_from_oauth(oauth);
-  lb_quote_context_new(config, on_quote_context_created, NULL);
+  const lb_quote_context_t* ctx = lb_quote_context_new(config);
   lb_config_free(config);
   lb_oauth_free(oauth);
+
+  const char* symbols[] = { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" };
+  lb_quote_context_quote(ctx, symbols, 4, on_quote, NULL);
 }
 
 static void
@@ -260,20 +251,6 @@ on_subscribe(const struct lb_async_result_t* res)
 }
 
 static void
-on_quote_context_created(const struct lb_async_result_t* res)
-{
-  if (res->error) {
-    printf("failed to create quote context: %s\n", lb_error_message(res->error));
-    return;
-  }
-
-  lb_quote_context_set_on_quote(res->ctx, on_quote, NULL, NULL);
-
-  const char* symbols[] = { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" };
-  lb_quote_context_subscribe(res->ctx, symbols, 4, LB_SUBFLAGS_QUOTE, on_subscribe, NULL);
-}
-
-static void
 on_oauth_ready(const struct lb_async_result_t* res)
 {
   if (res->error) {
@@ -283,9 +260,14 @@ on_oauth_ready(const struct lb_async_result_t* res)
 
   lb_oauth_t* oauth = (lb_oauth_t*)res->data;
   lb_config_t* config = lb_config_from_oauth(oauth);
-  lb_quote_context_new(config, on_quote_context_created, NULL);
+  const lb_quote_context_t* ctx = lb_quote_context_new(config);
   lb_config_free(config);
   lb_oauth_free(oauth);
+
+  lb_quote_context_set_on_quote(ctx, on_quote, NULL, NULL);
+
+  const char* symbols[] = { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" };
+  lb_quote_context_subscribe(ctx, symbols, 4, LB_SUBFLAGS_QUOTE, on_subscribe, NULL);
 }
 
 static void
@@ -329,12 +311,18 @@ on_submit_order(const struct lb_async_result_t* res)
 }
 
 static void
-on_trade_context_created(const struct lb_async_result_t* res)
+on_oauth_ready(const struct lb_async_result_t* res)
 {
   if (res->error) {
-    printf("failed to create trade context: %s\n", lb_error_message(res->error));
+    printf("OAuth failed: %s\n", lb_error_message(res->error));
     return;
   }
+
+  lb_oauth_t* oauth = (lb_oauth_t*)res->data;
+  lb_config_t* config = lb_config_from_oauth(oauth);
+  const lb_trade_context_t* ctx = lb_trade_context_new(config);
+  lb_config_free(config);
+  lb_oauth_free(oauth);
 
   lb_decimal_t* submitted_price = lb_decimal_from_double(50.0);
   lb_decimal_t* submitted_quantity = lb_decimal_from_double(200.0);
@@ -349,22 +337,7 @@ on_trade_context_created(const struct lb_async_result_t* res)
   };
   lb_decimal_free(submitted_price);
   lb_decimal_free(submitted_quantity);
-  lb_trade_context_submit_order(res->ctx, &opts, on_submit_order, NULL);
-}
-
-static void
-on_oauth_ready(const struct lb_async_result_t* res)
-{
-  if (res->error) {
-    printf("OAuth failed: %s\n", lb_error_message(res->error));
-    return;
-  }
-
-  lb_oauth_t* oauth = (lb_oauth_t*)res->data;
-  lb_config_t* config = lb_config_from_oauth(oauth);
-  lb_trade_context_new(config, on_trade_context_created, NULL);
-  lb_config_free(config);
-  lb_oauth_free(oauth);
+  lb_trade_context_submit_order(ctx, &opts, on_submit_order, NULL);
 }
 
 static void

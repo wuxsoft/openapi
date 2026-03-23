@@ -172,34 +172,27 @@ main(int argc, char const* argv[])
           return;
         }
         Config config = Config::from_oauth(*res);
-        QuoteContext::create(config, [](auto res) {
+        QuoteContext ctx = QuoteContext::create(config);
+        std::vector<std::string> symbols = {
+          "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+        };
+        ctx.quote(symbols, [](auto res) {
           if (!res) {
-            std::cout << "failed to create quote context: "
-                      << *res.status().message() << std::endl;
+            std::cout << "failed to get quote: " << *res.status().message()
+                      << std::endl;
             return;
           }
 
-          std::vector<std::string> symbols = {
-            "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-          };
-          res.context().quote(symbols, [](auto res) {
-            if (!res) {
-              std::cout << "failed to get quote: " << *res.status().message()
-                        << std::endl;
-              return;
-            }
-
-            for (auto it = res->cbegin(); it != res->cend(); ++it) {
-              std::cout << it->symbol << " timestamp=" << it->timestamp
-                        << " last_done=" << (double)it->last_done
-                        << " prev_close=" << (double)it->prev_close
-                        << " open=" << (double)it->open
-                        << " high=" << (double)it->high
-                        << " low=" << (double)it->low
-                        << " volume=" << it->volume
-                        << " turnover=" << it->turnover << std::endl;
-            }
-          });
+          for (auto it = res->cbegin(); it != res->cend(); ++it) {
+            std::cout << it->symbol << " timestamp=" << it->timestamp
+                      << " last_done=" << (double)it->last_done
+                      << " prev_close=" << (double)it->prev_close
+                      << " open=" << (double)it->open
+                      << " high=" << (double)it->high
+                      << " low=" << (double)it->low
+                      << " volume=" << it->volume
+                      << " turnover=" << it->turnover << std::endl;
+          }
         });
       });
 
@@ -239,32 +232,25 @@ main(int argc, char const* argv[])
           return;
         }
         Config config = Config::from_oauth(*res);
-        QuoteContext::create(config, [](auto res) {
+        QuoteContext ctx = QuoteContext::create(config);
+        ctx.set_on_quote([](auto event) {
+          std::cout << event->symbol << " timestamp=" << event->timestamp
+                    << " last_done=" << (double)event->last_done
+                    << " open=" << (double)event->open
+                    << " high=" << (double)event->high
+                    << " low=" << (double)event->low
+                    << " volume=" << event->volume
+                    << " turnover=" << event->turnover << std::endl;
+        });
+
+        std::vector<std::string> symbols = {
+          "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+        };
+        ctx.subscribe(symbols, SubFlags::QUOTE(), [](auto res) {
           if (!res) {
-            std::cout << "failed to create quote context: "
-                      << *res.status().message() << std::endl;
-            return;
+            std::cout << "failed to subscribe: " << *res.status().message()
+                      << std::endl;
           }
-
-          res.context().set_on_quote([](auto event) {
-            std::cout << event->symbol << " timestamp=" << event->timestamp
-                      << " last_done=" << (double)event->last_done
-                      << " open=" << (double)event->open
-                      << " high=" << (double)event->high
-                      << " low=" << (double)event->low
-                      << " volume=" << event->volume
-                      << " turnover=" << event->turnover << std::endl;
-          });
-
-          std::vector<std::string> symbols = {
-            "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-          };
-          res.context().subscribe(symbols, SubFlags::QUOTE(), [](auto res) {
-            if (!res) {
-              std::cout << "failed to subscribe: " << *res.status().message()
-                        << std::endl;
-            }
-          });
         });
       });
 
@@ -304,28 +290,21 @@ main(int argc, char const* argv[])
           return;
         }
         Config config = Config::from_oauth(*res);
-        TradeContext::create(config, [](auto res) {
+        TradeContext ctx = TradeContext::create(config);
+        SubmitOrderOptions opts{
+          "700.HK",     OrderType::LO,        OrderSide::Buy,
+          Decimal(200), TimeInForceType::Day, Decimal(50.0),
+          std::nullopt, std::nullopt,         std::nullopt,
+          std::nullopt, std::nullopt,         std::nullopt,
+          std::nullopt,
+        };
+        ctx.submit_order(opts, [](auto res) {
           if (!res) {
-            std::cout << "failed to create trade context: "
-                      << *res.status().message() << std::endl;
+            std::cout << "failed to submit order: " << *res.status().message()
+                      << std::endl;
             return;
           }
-
-          SubmitOrderOptions opts{
-            "700.HK",     OrderType::LO,        OrderSide::Buy,
-            Decimal(200), TimeInForceType::Day, Decimal(50.0),
-            std::nullopt, std::nullopt,         std::nullopt,
-            std::nullopt, std::nullopt,         std::nullopt,
-            std::nullopt,
-          };
-          res.context().submit_order(opts, [](auto res) {
-            if (!res) {
-              std::cout << "failed to submit order: " << *res.status().message()
-                        << std::endl;
-              return;
-            }
-            std::cout << "order id: " << res->order_id << std::endl;
-          });
+          std::cout << "order id: " << res->order_id << std::endl;
         });
       });
 
