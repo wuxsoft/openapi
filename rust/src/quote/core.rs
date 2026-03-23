@@ -97,8 +97,8 @@ pub(crate) enum Command {
 
 #[derive(Debug, Default)]
 struct TradingDays {
-    normal_days: HashMap<Market, HashSet<Date>>,
     half_days: HashMap<Market, HashSet<Date>>,
+    fetched: HashSet<Market>,
 }
 
 impl TradingDays {
@@ -265,8 +265,6 @@ impl Core {
             .collect();
         ws_cli.set_rate_limit(rate_limit.clone());
 
-        let current_trade_days = fetch_trading_days(&ws_cli).await?;
-
         let mut table = Table::new();
         for market_packages in quote_package_details_by_market {
             if market_packages.warning.is_empty() {
@@ -301,7 +299,7 @@ impl Core {
         });
 
         self.rate_limit = rate_limit;
-        self.trading_days = current_trade_days;
+        self.trading_days = TradingDays::default();
         self.ws_cli = Some(ws_cli);
         self.session = Some(session);
         Ok(())
@@ -422,10 +420,23 @@ impl Core {
                     }
                 }
                 _ = update_trading_days_interval.tick() => {
-                    if let Some(ws_cli) = &self.ws_cli
-                        && let Ok(days) = fetch_trading_days(ws_cli).await
-                    {
-                        self.trading_days = days;
+                    if let Some(ws_cli) = &self.ws_cli {
+                        let markets: Vec<Market> =
+                            self.trading_days.fetched.iter().copied().collect();
+                        for market in markets {
+                            match fetch_trading_days_for_market(ws_cli, market).await {
+                                Ok(half_days) => {
+                                    self.trading_days.half_days.insert(market, half_days);
+                                }
+                                Err(err) => {
+                                    tracing::warn!(
+                                        market = ?market,
+                                        error = %err,
+                                        "failed to refresh trading days"
+                                    );
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -823,7 +834,26 @@ impl Core {
     async fn handle_ws_event(&mut self, event: WsEvent) -> Result<()> {
         match event {
             WsEvent::Error(err) => Err(err.into()),
-            WsEvent::Push { command_code, body } => self.handle_push(command_code, body),
+            WsEvent::Push { command_code, body } => self.handle_push(command_code, body).await,
+        }
+    }
+
+    /// Fetch and cache trading days for `market` if not already fetched.
+    /// Errors are logged and silently swallowed so a failed fetch never
+    /// disrupts the push handling path.
+    async fn ensure_trading_days(&mut self, market: Market) {
+        if self.trading_days.fetched.contains(&market) {
+            return;
+        }
+        let Some(ws_cli) = &self.ws_cli else { return };
+        match fetch_trading_days_for_market(ws_cli, market).await {
+            Ok(half_days) => {
+                self.trading_days.half_days.insert(market, half_days);
+                self.trading_days.fetched.insert(market);
+            }
+            Err(err) => {
+                tracing::warn!(market = ?market, error = %err, "failed to fetch trading days");
+            }
         }
     }
 
@@ -954,7 +984,7 @@ impl Core {
         }
     }
 
-    fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
+    async fn handle_push(&mut self, command_code: u8, body: Vec<u8>) -> Result<()> {
         match PushEvent::parse(command_code, &body) {
             Ok((mut event, tag)) => {
                 tracing::info!(event = ?event, tag = ?tag, "push event");
@@ -964,6 +994,9 @@ impl Core {
                 }
 
                 if let PushEventDetail::Quote(push_quote) = &event.detail {
+                    if let Some(market) = parse_market_from_symbol(&event.symbol) {
+                        self.ensure_trading_days(market).await;
+                    }
                     self.merge_candlesticks_by_quote(&event.symbol, push_quote);
 
                     if !self
@@ -975,6 +1008,9 @@ impl Core {
                         return Ok(());
                     }
                 } else if let PushEventDetail::Trade(trades) = &event.detail {
+                    if let Some(market) = parse_market_from_symbol(&event.symbol) {
+                        self.ensure_trading_days(market).await;
+                    }
                     self.merge_candlesticks_by_trades(&event.symbol, trades);
 
                     if !self
@@ -1115,46 +1151,28 @@ fn merge_type(
     })
 }
 
-async fn fetch_trading_days(cli: &WsClient) -> Result<TradingDays> {
-    let mut days = TradingDays::default();
+async fn fetch_trading_days_for_market(cli: &WsClient, market: Market) -> Result<HashSet<Date>> {
     let begin_day = OffsetDateTime::now_utc().date() - time::Duration::days(5);
     let end_day = begin_day + time::Duration::days(30);
 
-    for market in [Market::HK, Market::US, Market::SG, Market::CN] {
-        let resp = cli
-            .request::<_, MarketTradeDayResponse>(
-                cmd_code::GET_TRADING_DAYS,
-                None,
-                MarketTradeDayRequest {
-                    market: market.to_string(),
-                    beg_day: format_date(begin_day),
-                    end_day: format_date(end_day),
-                },
-            )
-            .await?;
+    let resp = cli
+        .request::<_, MarketTradeDayResponse>(
+            cmd_code::GET_TRADING_DAYS,
+            None,
+            MarketTradeDayRequest {
+                market: market.to_string(),
+                beg_day: format_date(begin_day),
+                end_day: format_date(end_day),
+            },
+        )
+        .await?;
 
-        days.normal_days.insert(
-            market,
-            resp.trade_day
-                .iter()
-                .map(|value| {
-                    parse_date(value).map_err(|err| Error::parse_field_error("half_trade_day", err))
-                })
-                .collect::<Result<HashSet<_>>>()?,
-        );
-
-        days.half_days.insert(
-            market,
-            resp.half_trade_day
-                .iter()
-                .map(|value| {
-                    parse_date(value).map_err(|err| Error::parse_field_error("half_trade_day", err))
-                })
-                .collect::<Result<HashSet<_>>>()?,
-        );
-    }
-
-    Ok(days)
+    resp.half_trade_day
+        .iter()
+        .map(|value| {
+            parse_date(value).map_err(|err| Error::parse_field_error("half_trade_day", err))
+        })
+        .collect()
 }
 
 #[allow(clippy::too_many_arguments)]
