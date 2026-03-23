@@ -56,22 +56,13 @@ impl OAuthToken {
         }
     }
 
-    /// True if the access token is past its expiry time.
-    pub(crate) fn is_expired(&self) -> bool {
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-        now >= self.expires_at
-    }
-
-    /// True if the token expires within one hour.
+    /// True if the token expires within 5 minutes.
     pub(crate) fn expires_soon(&self) -> bool {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs();
-        self.expires_at.saturating_sub(now) < 3600
+        self.expires_at.saturating_sub(now) < 300
     }
 
     /// Load token from a JSON file at the given path.

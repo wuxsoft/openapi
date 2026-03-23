@@ -69,23 +69,13 @@ mod tests {
     }
 
     #[test]
-    fn test_oauth_token_not_expired() {
-        assert!(!make_token(now_secs() + 7200).is_expired());
-    }
-
-    #[test]
-    fn test_oauth_token_expired() {
-        assert!(make_token(now_secs() - 1).is_expired());
-    }
-
-    #[test]
-    fn test_oauth_token_expires_soon() {
-        assert!(make_token(now_secs() + 1800).expires_soon());
+    fn test_oauth_token_expires_soon_within_5_minutes() {
+        assert!(make_token(now_secs() + 299).expires_soon());
     }
 
     #[test]
     fn test_oauth_token_not_expires_soon() {
-        assert!(!make_token(now_secs() + 7200).expires_soon());
+        assert!(!make_token(now_secs() + 301).expires_soon());
     }
 
     #[test]

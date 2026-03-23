@@ -74,12 +74,8 @@ impl OAuth {
                 tracing::debug!(client_id = %self.0.client_id, "no in-memory token, refresh needed");
                 true
             }
-            Some(t) if t.is_expired() => {
-                tracing::debug!(client_id = %self.0.client_id, "token expired, refresh needed");
-                true
-            }
             Some(t) if t.expires_soon() => {
-                tracing::debug!(client_id = %self.0.client_id, expires_at = t.expires_at, "token expiring soon, proactive refresh");
+                tracing::debug!(client_id = %self.0.client_id, expires_at = t.expires_at, "token expired or expiring soon, refresh needed");
                 true
             }
             Some(_) => false,

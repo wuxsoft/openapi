@@ -90,14 +90,14 @@ impl OAuthBuilder {
         let loaded = OAuthToken::load_from_path(&token_path).ok();
 
         let token = match loaded {
-            Some(t) if !t.is_expired() => {
+            Some(t) if !t.expires_soon() => {
                 tracing::debug!(path = %token_path.display(), expires_at = t.expires_at, "loaded valid token from disk");
                 t
             }
             Some(t) => {
                 tracing::debug!(
                     path = %token_path.display(),
-                    "loaded expired token from disk, attempting refresh"
+                    "loaded expired or expiring-soon token from disk, attempting refresh"
                 );
                 match oauth.refresh_token(&t).await {
                     Ok(refreshed) => {
