@@ -17,13 +17,12 @@ impl<Ctx> BlockingRuntime<Ctx>
 where
     Ctx: Send + Sync + 'static,
 {
-    pub(crate) fn try_new<CreateCtx, CreateCtxFut, PushType, PushCallback>(
+    pub(crate) fn try_new<CreateCtx, PushType, PushCallback>(
         create_ctx: CreateCtx,
         mut push_callback: PushCallback,
     ) -> Result<Self>
     where
-        CreateCtx: FnOnce() -> CreateCtxFut + Send + 'static,
-        CreateCtxFut: Future<Output = Result<(Ctx, mpsc::UnboundedReceiver<PushType>)>>,
+        CreateCtx: FnOnce() -> Result<(Ctx, mpsc::UnboundedReceiver<PushType>)> + Send + 'static,
         PushCallback: FnMut(PushType) + Send + 'static,
         PushType: Send + 'static,
     {
@@ -51,7 +50,7 @@ where
                 let handle = rt.handle().clone();
 
                 rt.block_on(async move {
-                    let (ctx, mut event_rx) = match create_ctx().await {
+                    let (ctx, mut event_rx) = match create_ctx() {
                         Ok(res) => {
                             let _ = init_tx.send(Ok(()));
                             res

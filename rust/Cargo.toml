@@ -20,7 +20,7 @@ longbridge-proto.workspace = true
 longbridge-candlesticks.workspace = true
 longbridge-oauth.workspace = true
 
-tokio = { workspace = true, features = ["time", "rt", "macros", "sync", "net"] }
+tokio = { workspace = true, features = ["time", "rt", "rt-multi-thread", "macros", "sync", "net"] }
 tokio-tungstenite.workspace = true
 rust_decimal = { workspace = true, features = ["serde-with-str", "maths"] }
 num_enum.workspace = true

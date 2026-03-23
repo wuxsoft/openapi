@@ -3,7 +3,7 @@ use std::sync::Arc;
 use jni::{
     JNIEnv, JavaVM,
     errors::Result,
-    objects::{GlobalRef, JClass, JObject, JString, JValueOwned},
+    objects::{GlobalRef, JClass, JObject, JString},
     sys::jobjectArray,
 };
 use longbridge::{
@@ -22,8 +22,7 @@ use time::{Date, OffsetDateTime};
 use crate::{
     async_util,
     error::jni_result,
-    init::TRADE_CONTEXT_CLASS,
-    types::{FromJValue, IntoJValue, JavaInteger, ObjectArray, get_field, set_field},
+    types::{FromJValue, IntoJValue, JavaInteger, ObjectArray, get_field},
 };
 
 #[derive(Default)]
@@ -61,42 +60,25 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newTradeContext(
     mut env: JNIEnv,
     _class: JClass,
     config: i64,
-    callback: JObject,
-) {
-    struct ContextObjRef(i64);
-
-    impl IntoJValue for ContextObjRef {
-        fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
-            let ctx_obj = env.new_object(TRADE_CONTEXT_CLASS.get().unwrap(), "()V", &[])?;
-            set_field(env, &ctx_obj, "raw", self.0)?;
-            Ok(JValueOwned::from(ctx_obj))
-        }
-    }
-
-    jni_result(&mut env, (), |env| {
+) -> i64 {
+    jni_result(&mut env, 0i64, |env| {
         let config = Arc::new((*(config as *const Config)).clone());
         let jvm = env.get_java_vm()?;
 
-        async_util::execute(env, callback, async move {
-            let (ctx, mut receiver) = TradeContext::try_new(config).await?;
-            let callbacks = Arc::new(Mutex::new(Callbacks::default()));
+        let (ctx, mut receiver) = TradeContext::new(config);
+        let callbacks = Arc::new(Mutex::new(Callbacks::default()));
 
-            tokio::spawn({
-                let callbacks = callbacks.clone();
-                async move {
-                    while let Some(event) = receiver.recv().await {
-                        let callbacks = callbacks.lock();
-                        let _ = send_push_event(&jvm, &callbacks, event);
-                    }
+        longbridge::runtime_handle().spawn({
+            let callbacks = callbacks.clone();
+            async move {
+                while let Some(event) = receiver.recv().await {
+                    let callbacks = callbacks.lock();
+                    let _ = send_push_event(&jvm, &callbacks, event);
                 }
-            });
+            }
+        });
 
-            Ok(ContextObjRef(
-                Box::into_raw(Box::new(ContextObj { ctx, callbacks })) as i64,
-            ))
-        })?;
-
-        Ok(())
+        Ok(Box::into_raw(Box::new(ContextObj { ctx, callbacks })) as i64)
     })
 }
 

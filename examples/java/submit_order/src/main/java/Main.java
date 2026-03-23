@@ -10,7 +10,7 @@ public class Main {
                 .get();
         try (oauth;
              Config config = Config.fromOAuth(oauth);
-             TradeContext ctx = TradeContext.create(config).get()) {
+             TradeContext ctx = TradeContext.create(config)) {
             SubmitOrderOptions opts = new SubmitOrderOptions("700.HK",
                     OrderType.LO,
                     OrderSide.Buy,

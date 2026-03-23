@@ -28,8 +28,7 @@ public:
 
   size_t ref_count() const;
 
-  static void create(const Config& config,
-                     AsyncCallback<TradeContext, void> callback);
+  static TradeContext create(const Config& config);
 
   /// Subscribe
   void subscribe(const std::vector<TopicType>& topics,

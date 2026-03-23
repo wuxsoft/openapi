@@ -14,37 +14,28 @@ static void
 run(const OAuth& oauth)
 {
   Config config = Config::from_oauth(oauth);
+  g_ctx = QuoteContext::create(config);
 
-  QuoteContext::create(config, [](auto res) {
-    if (!res) {
-      std::cout << "failed to create quote context: "
-                << *res.status().message() << std::endl;
-      return;
-    }
-
-    g_ctx = res.context();
-
-    res.context().set_on_candlestick([](auto event) {
-      std::cout << event->symbol
-                << " timestamp=" << event->candlestick.timestamp
-                << " close=" << (double)event->candlestick.close
-                << " open=" << (double)event->candlestick.open
-                << " high=" << (double)event->candlestick.high
-                << " low=" << (double)event->candlestick.low
-                << " volume=" << event->candlestick.volume
-                << " turnover=" << (double)event->candlestick.turnover
-                << std::endl;
-    });
-
-    res.context().subscribe_candlesticks(
-      "AAPL.US", Period::Min1, TradeSessions::All, [](auto res) {
-        if (!res) {
-          std::cout << "failed to subscribe quote: "
-                    << *res.status().message() << std::endl;
-          return;
-        }
-      });
+  g_ctx.set_on_candlestick([](auto event) {
+    std::cout << event->symbol
+              << " timestamp=" << event->candlestick.timestamp
+              << " close=" << (double)event->candlestick.close
+              << " open=" << (double)event->candlestick.open
+              << " high=" << (double)event->candlestick.high
+              << " low=" << (double)event->candlestick.low
+              << " volume=" << event->candlestick.volume
+              << " turnover=" << (double)event->candlestick.turnover
+              << std::endl;
   });
+
+  g_ctx.subscribe_candlesticks(
+    "AAPL.US", Period::Min1, TradeSessions::All, [](auto res) {
+      if (!res) {
+        std::cout << "failed to subscribe quote: "
+                  << *res.status().message() << std::endl;
+        return;
+      }
+    });
 }
 
 int

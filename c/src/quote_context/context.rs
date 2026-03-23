@@ -1,9 +1,4 @@
-use std::{
-    ffi::{CString, c_void},
-    os::raw::c_char,
-    sync::{Arc, OnceLock},
-    time::Instant,
-};
+use std::{ffi::c_void, os::raw::c_char, sync::Arc, time::Instant};
 
 use longbridge::{
     QuoteContext,
@@ -15,7 +10,7 @@ use longbridge::{
 use parking_lot::Mutex;
 
 use crate::{
-    async_call::{CAsyncCallback, CAsyncResult, execute_async},
+    async_call::{CAsyncCallback, execute_async},
     callback::{CFreeUserDataFunc, Callback},
     config::CConfig,
     quote_context::{
@@ -72,7 +67,6 @@ unsafe impl Send for CQuoteContextState {}
 /// Quote context
 pub struct CQuoteContext {
     ctx: QuoteContext,
-    quote_level: OnceLock<CString>,
     state: Mutex<CQuoteContextState>,
 }
 
@@ -86,186 +80,107 @@ impl Drop for CQuoteContext {
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_quote_context_new(
-    config: *const CConfig,
-    callback: CAsyncCallback,
-    userdata: *mut c_void,
-) {
+pub unsafe extern "C" fn lb_quote_context_new(config: *const CConfig) -> *const CQuoteContext {
     let config = std::sync::Arc::new((*config).0.clone());
-    let userdata_pointer = userdata as usize;
+    let (ctx, mut receiver) = QuoteContext::new(config);
+    let state = Mutex::new(CQuoteContextState {
+        userdata: std::ptr::null_mut(),
+        callbacks: Callbacks::default(),
+        free_userdata: None,
+    });
+    let arc_ctx = Arc::new(CQuoteContext { ctx, state });
+    let weak_ctx = Arc::downgrade(&arc_ctx);
+    let ctx = Arc::into_raw(arc_ctx);
 
-    execute_async(
-        callback,
-        std::ptr::null_mut::<c_void>(),
-        userdata,
-        async move {
-            let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
-            let state = Mutex::new(CQuoteContextState {
-                userdata: std::ptr::null_mut(),
-                callbacks: Callbacks::default(),
-                free_userdata: None,
-            });
-            let arc_ctx = Arc::new(CQuoteContext {
-                ctx,
-                quote_level: OnceLock::new(),
-                state,
-            });
-            let weak_ctx = Arc::downgrade(&arc_ctx);
-            let ctx = Arc::into_raw(arc_ctx);
+    longbridge::runtime_handle().spawn(async move {
+        while let Some(event) = receiver.recv().await {
+            let ctx = match weak_ctx.upgrade() {
+                Some(ctx) => ctx,
+                None => return,
+            };
 
-            tokio::spawn(async move {
-                while let Some(event) = receiver.recv().await {
-                    let ctx = match weak_ctx.upgrade() {
-                        Some(ctx) => ctx,
-                        None => return,
-                    };
-
-                    let state = ctx.state.lock();
-                    match event {
-                        PushEvent {
-                            symbol,
-                            detail: PushEventDetail::Quote(quote),
-                            ..
-                        } => {
-                            if let Some(callback) = &state.callbacks.quote {
-                                let log_subscriber = ctx.ctx.log_subscriber();
-                                let _guard =
-                                    tracing::dispatcher::set_default(&log_subscriber.into());
-
-                                let s = Instant::now();
-                                tracing::info!("begin call on_quote callback");
-
-                                let quote_owned: CPushQuoteOwned = (symbol, quote).into();
-                                (callback.f)(
-                                    Arc::as_ptr(&ctx),
-                                    &quote_owned.to_ffi_type(),
-                                    callback.userdata,
-                                );
-
-                                tracing::info!(
-                                    duration = ?s.elapsed(),
-                                    "after call on_quote callback"
-                                );
-                            }
-                        }
-                        PushEvent {
-                            symbol,
-                            detail: PushEventDetail::Depth(depth),
-                            ..
-                        } => {
-                            if let Some(callback) = &state.callbacks.depth {
-                                let log_subscriber = ctx.ctx.log_subscriber();
-                                let _guard =
-                                    tracing::dispatcher::set_default(&log_subscriber.into());
-
-                                let s = Instant::now();
-                                tracing::info!("begin call on_depth callback");
-
-                                let depth_owned: CPushDepthOwned = (symbol, depth).into();
-                                (callback.f)(
-                                    Arc::as_ptr(&ctx),
-                                    &depth_owned.to_ffi_type(),
-                                    callback.userdata,
-                                );
-
-                                tracing::info!(
-                                    duration = ?s.elapsed(),
-                                    "after call on_depth callback"
-                                );
-                            }
-                        }
-                        PushEvent {
-                            symbol,
-                            detail: PushEventDetail::Brokers(brokers),
-                            ..
-                        } => {
-                            if let Some(callback) = &state.callbacks.brokers {
-                                let log_subscriber = ctx.ctx.log_subscriber();
-                                let _guard =
-                                    tracing::dispatcher::set_default(&log_subscriber.into());
-
-                                let s = Instant::now();
-                                tracing::info!("begin call on_brokers callback");
-
-                                let brokers_owned: CPushBrokersOwned = (symbol, brokers).into();
-                                (callback.f)(
-                                    Arc::as_ptr(&ctx),
-                                    &brokers_owned.to_ffi_type(),
-                                    callback.userdata,
-                                );
-
-                                tracing::info!(
-                                    duration = ?s.elapsed(),
-                                    "after call on_brokers callback"
-                                );
-                            }
-                        }
-                        PushEvent {
-                            symbol,
-                            detail: PushEventDetail::Trade(trades),
-                            ..
-                        } => {
-                            if let Some(callback) = &state.callbacks.trades {
-                                let log_subscriber = ctx.ctx.log_subscriber();
-                                let _guard =
-                                    tracing::dispatcher::set_default(&log_subscriber.into());
-
-                                let s = Instant::now();
-                                tracing::info!("begin call on_trades callback");
-
-                                let trades_owned: CPushTradesOwned = (symbol, trades).into();
-                                (callback.f)(
-                                    Arc::as_ptr(&ctx),
-                                    &trades_owned.to_ffi_type(),
-                                    callback.userdata,
-                                );
-
-                                tracing::info!(
-                                    duration = ?s.elapsed(),
-                                    "after call on_trades callback"
-                                );
-                            }
-                        }
-                        PushEvent {
-                            symbol,
-                            detail: PushEventDetail::Candlestick(candlestick),
-                            ..
-                        } => {
-                            if let Some(callback) = &state.callbacks.candlestick {
-                                let log_subscriber = ctx.ctx.log_subscriber();
-                                let _guard =
-                                    tracing::dispatcher::set_default(&log_subscriber.into());
-
-                                let s = Instant::now();
-                                tracing::info!("begin call on_candlestick callback");
-
-                                let candlestick_owned: CPushCandlestickOwned =
-                                    (symbol, candlestick).into();
-                                (callback.f)(
-                                    Arc::as_ptr(&ctx),
-                                    &candlestick_owned.to_ffi_type(),
-                                    callback.userdata,
-                                );
-
-                                tracing::info!(
-                                    duration = ?s.elapsed(),
-                                    "after call on_candlestick callback"
-                                );
-                            }
-                        }
+            let state = ctx.state.lock();
+            match event {
+                PushEvent {
+                    symbol,
+                    detail: PushEventDetail::Quote(quote),
+                    ..
+                } => {
+                    if let Some(callback) = &state.callbacks.quote {
+                        let log_subscriber = ctx.ctx.log_subscriber();
+                        let _guard = tracing::dispatcher::set_default(&log_subscriber.into());
+                        let s = Instant::now();
+                        tracing::info!("begin call on_quote callback");
+                        let quote_owned: CPushQuoteOwned = (symbol, quote).into();
+                        (callback.f)(Arc::as_ptr(&ctx), &quote_owned.to_ffi_type(), callback.userdata);
+                        tracing::info!(duration = ?s.elapsed(), "after call on_quote callback");
                     }
                 }
-            });
+                PushEvent {
+                    symbol,
+                    detail: PushEventDetail::Depth(depth),
+                    ..
+                } => {
+                    if let Some(callback) = &state.callbacks.depth {
+                        let log_subscriber = ctx.ctx.log_subscriber();
+                        let _guard = tracing::dispatcher::set_default(&log_subscriber.into());
+                        let s = Instant::now();
+                        tracing::info!("begin call on_depth callback");
+                        let depth_owned: CPushDepthOwned = (symbol, depth).into();
+                        (callback.f)(Arc::as_ptr(&ctx), &depth_owned.to_ffi_type(), callback.userdata);
+                        tracing::info!(duration = ?s.elapsed(), "after call on_depth callback");
+                    }
+                }
+                PushEvent {
+                    symbol,
+                    detail: PushEventDetail::Brokers(brokers),
+                    ..
+                } => {
+                    if let Some(callback) = &state.callbacks.brokers {
+                        let log_subscriber = ctx.ctx.log_subscriber();
+                        let _guard = tracing::dispatcher::set_default(&log_subscriber.into());
+                        let s = Instant::now();
+                        tracing::info!("begin call on_brokers callback");
+                        let brokers_owned: CPushBrokersOwned = (symbol, brokers).into();
+                        (callback.f)(Arc::as_ptr(&ctx), &brokers_owned.to_ffi_type(), callback.userdata);
+                        tracing::info!(duration = ?s.elapsed(), "after call on_brokers callback");
+                    }
+                }
+                PushEvent {
+                    symbol,
+                    detail: PushEventDetail::Trade(trades),
+                    ..
+                } => {
+                    if let Some(callback) = &state.callbacks.trades {
+                        let log_subscriber = ctx.ctx.log_subscriber();
+                        let _guard = tracing::dispatcher::set_default(&log_subscriber.into());
+                        let s = Instant::now();
+                        tracing::info!("begin call on_trades callback");
+                        let trades_owned: CPushTradesOwned = (symbol, trades).into();
+                        (callback.f)(Arc::as_ptr(&ctx), &trades_owned.to_ffi_type(), callback.userdata);
+                        tracing::info!(duration = ?s.elapsed(), "after call on_trades callback");
+                    }
+                }
+                PushEvent {
+                    symbol,
+                    detail: PushEventDetail::Candlestick(candlestick),
+                    ..
+                } => {
+                    if let Some(callback) = &state.callbacks.candlestick {
+                        let log_subscriber = ctx.ctx.log_subscriber();
+                        let _guard = tracing::dispatcher::set_default(&log_subscriber.into());
+                        let s = Instant::now();
+                        tracing::info!("begin call on_candlestick callback");
+                        let candlestick_owned: CPushCandlestickOwned = (symbol, candlestick).into();
+                        (callback.f)(Arc::as_ptr(&ctx), &candlestick_owned.to_ffi_type(), callback.userdata);
+                        tracing::info!(duration = ?s.elapsed(), "after call on_candlestick callback");
+                    }
+                }
+            }
+        }
+    });
 
-            Ok(CAsyncResult {
-                ctx: ctx as *const c_void,
-                error: std::ptr::null(),
-                data: std::ptr::null_mut(),
-                length: 0,
-                userdata: userdata_pointer as *mut c_void,
-            })
-        },
-    );
+    ctx
 }
 
 #[unsafe(no_mangle)]
@@ -307,16 +222,27 @@ pub unsafe extern "C" fn lb_quote_context_set_free_userdata_func(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_quote_context_member_id(ctx: *const CQuoteContext) -> i64 {
-    (*ctx).ctx.member_id()
+pub unsafe extern "C" fn lb_quote_context_member_id(
+    ctx: *const CQuoteContext,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    execute_async(callback, ctx, userdata, async move {
+        ctx_inner.member_id().await
+    });
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_quote_context_quote_level(ctx: *const CQuoteContext) -> *const c_char {
-    let quote_level = (*ctx)
-        .quote_level
-        .get_or_init(|| CString::new((*ctx).ctx.quote_level()).unwrap());
-    quote_level.as_ptr() as *const _
+pub unsafe extern "C" fn lb_quote_context_quote_level(
+    ctx: *const CQuoteContext,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    execute_async(callback, ctx, userdata, async move {
+        Ok(crate::types::CString::from(ctx_inner.quote_level().await?))
+    });
 }
 
 #[unsafe(no_mangle)]
@@ -327,8 +253,7 @@ pub unsafe extern "C" fn lb_quote_context_quote_package_details(
 ) {
     let ctx_inner = (*ctx).ctx.clone();
     execute_async(callback, ctx, userdata, async move {
-        let rows: CVec<CQuotePackageDetailOwned> =
-            ctx_inner.quote_package_details().to_vec().into();
+        let rows: CVec<CQuotePackageDetailOwned> = ctx_inner.quote_package_details().await?.into();
         Ok(rows)
     });
 }

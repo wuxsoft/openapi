@@ -20,12 +20,13 @@ pub struct TradeContextSync {
 
 impl TradeContextSync {
     /// Create a `TradeContextSync` object
-    pub fn try_new<F>(config: Arc<Config>, push_callback: F) -> Result<Self>
+    pub fn new<F>(config: Arc<Config>, push_callback: F) -> Self
     where
         F: FnMut(PushEvent) + Send + 'static,
     {
-        let rt = BlockingRuntime::try_new(move || TradeContext::try_new(config), push_callback)?;
-        Ok(Self { rt })
+        let rt = BlockingRuntime::try_new(move || Ok(TradeContext::new(config)), push_callback)
+            .expect("create trade context");
+        Self { rt }
     }
 
     /// Subscribe topics
@@ -60,7 +61,7 @@ impl TradeContextSync {
     /// let oauth = OAuthBuilder::new("your-client-id")
     ///     .build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let opts = GetHistoryExecutionsOptions::new().symbol("700.HK")
     ///     .start_at(datetime!(2022-05-09 0:00 UTC))
@@ -94,7 +95,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let opts = GetTodayExecutionsOptions::new().symbol("700.HK");
     /// let resp = ctx.today_executions(opts)?;
@@ -129,7 +130,7 @@ impl TradeContextSync {
     /// let oauth = OAuthBuilder::new("your-client-id")
     ///     .build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let opts = GetHistoryOrdersOptions::new()
     ///     .symbol("700.HK")
@@ -169,7 +170,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let opts = GetTodayOrdersOptions::new()
     ///     .symbol("700.HK")
@@ -205,7 +206,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let opts =
     ///     ReplaceOrderOptions::new("709043056541253632", decimal!(100)).price(decimal!(300i32));
@@ -238,7 +239,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let opts = SubmitOrderOptions::new(
     ///     "700.HK",
@@ -271,7 +272,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// ctx.cancel_order("709043056541253632")?;
     /// # Ok(())
@@ -295,7 +296,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.account_balance(None)?;
     /// println!("{:?}", resp);
@@ -322,7 +323,7 @@ impl TradeContextSync {
     /// let oauth = OAuthBuilder::new("your-client-id")
     ///     .build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let opts = GetCashFlowOptions::new(datetime!(2022-05-09 0:00 UTC), datetime!(2022-05-12 0:00 UTC));
     /// let resp = ctx.cash_flow(opts)?;
@@ -348,7 +349,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.fund_positions(None)?;
     /// println!("{:?}", resp);
@@ -376,7 +377,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.stock_positions(None)?;
     /// println!("{:?}", resp);
@@ -404,7 +405,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.margin_ratio("700.HK")?;
     /// println!("{:?}", resp);
@@ -431,7 +432,7 @@ impl TradeContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = TradeContextSync::try_new(config, |_| ())?;
+    /// let ctx = TradeContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.order_detail("701276261045858304")?;
     /// println!("{:?}", resp);

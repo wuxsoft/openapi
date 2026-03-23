@@ -4261,9 +4261,7 @@ struct lb_oauth_t *lb_oauth_clone(const struct lb_oauth_t *oauth);
  */
 void lb_oauth_free(struct lb_oauth_t *oauth);
 
-void lb_quote_context_new(const struct lb_config_t *config,
-                          lb_async_callback_t callback,
-                          void *userdata);
+const struct lb_quote_context_t *lb_quote_context_new(const struct lb_config_t *config);
 
 void lb_quote_context_retain(const struct lb_quote_context_t *ctx);
 
@@ -4278,9 +4276,13 @@ void *lb_quote_context_userdata(const struct lb_quote_context_t *ctx);
 void lb_quote_context_set_free_userdata_func(const struct lb_quote_context_t *ctx,
                                              lb_free_userdata_func_t f);
 
-int64_t lb_quote_context_member_id(const struct lb_quote_context_t *ctx);
+void lb_quote_context_member_id(const struct lb_quote_context_t *ctx,
+                                lb_async_callback_t callback,
+                                void *userdata);
 
-const char *lb_quote_context_quote_level(const struct lb_quote_context_t *ctx);
+void lb_quote_context_quote_level(const struct lb_quote_context_t *ctx,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
 
 void lb_quote_context_quote_package_details(const struct lb_quote_context_t *ctx,
                                             lb_async_callback_t callback,
@@ -4704,9 +4706,7 @@ void lb_quote_context_history_market_temperature(const struct lb_quote_context_t
                                                  lb_async_callback_t callback,
                                                  void *userdata);
 
-void lb_trade_context_new(const struct lb_config_t *config,
-                          lb_async_callback_t callback,
-                          void *userdata);
+const struct lb_trade_context_t *lb_trade_context_new(const struct lb_config_t *config);
 
 void lb_trade_context_retain(const struct lb_trade_context_t *ctx);
 

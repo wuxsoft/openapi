@@ -21,25 +21,18 @@ main(int argc, char const* argv[])
               << *status.message() << std::endl;
     return -1;
   }
-  quote::QuoteContext::create(config, [](auto res) {
+  quote::QuoteContext ctx = quote::QuoteContext::create(config);
+
+  ctx.set_on_quote([](auto event) {
+    std::cout << event->symbol << ": " << event->last_done.to_double()
+              << std::endl;
+  });
+
+  ctx.subscribe({ "700.HK" }, quote::SubFlags::QUOTE(), [](auto res) {
     if (!res) {
-      std::cout << "failed to create quote context: " << *res.status().message()
+      std::cout << "failed to subscribe: " << *res.status().message()
                 << std::endl;
-      return;
     }
-
-    res.context().set_on_quote([](auto event) {
-      std::cout << event->symbol << ": " << event->last_done.to_double()
-                << std::endl;
-    });
-
-    res.context().subscribe(
-      { "700.HK" }, quote::SubFlags::QUOTE(), [](auto res) {
-        if (!res) {
-          std::cout << "failed to subscribe: " << *res.status().message()
-                    << std::endl;
-        }
-      });
   });
 
   std::cin.get();

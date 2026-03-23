@@ -175,7 +175,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Arc::new(Config::from_oauth(oauth));
 
     // Create a context for quote APIs
-    let (ctx, _) = QuoteContext::try_new(config).await?;
+    let (ctx, _) = QuoteContext::new(config);
 
     // Get basic information of securities
     let resp = ctx
@@ -199,7 +199,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Arc::new(Config::from_apikey_env()?);
 
     // Create a context for quote APIs
-    let (ctx, _) = QuoteContext::try_new(config.clone()).await?;
+    let (ctx, _) = QuoteContext::new(config.clone());
 
     // Get basic information of securities
     let resp = ctx
@@ -223,7 +223,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Arc::new(Config::from_apikey_env()?);
 
     // Create a context for quote APIs
-    let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
+    let (ctx, mut receiver) = QuoteContext::new(config);
 
     // Subscribe
     ctx.subscribe(["700.HK"], SubFlags::QUOTE).await?;
@@ -253,7 +253,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = Arc::new(Config::from_apikey_env()?);
 
     // Create a context for trade APIs
-    let (ctx, _) = TradeContext::try_new(config).await?;
+    let (ctx, _) = TradeContext::new(config);
 
     // Submit order
     let opts = SubmitOrderOptions::new(

@@ -12,27 +12,20 @@ static void
 run(const OAuth& oauth)
 {
   Config config = Config::from_oauth(oauth);
+  TradeContext ctx = TradeContext::create(config);
 
-  TradeContext::create(config, [](auto res) {
+  ctx.today_orders(std::nullopt, [](auto res) {
     if (!res) {
-      std::cout << "failed to create trade context: "
+      std::cout << "failed to get today orders: "
                 << *res.status().message() << std::endl;
       return;
     }
 
-    res.context().today_orders(std::nullopt, [](auto res) {
-      if (!res) {
-        std::cout << "failed to get today orders: "
-                  << *res.status().message() << std::endl;
-        return;
-      }
-
-      for (auto it = res->cbegin(); it != res->cend(); ++it) {
-        std::cout << "order_id=" << it->order_id
-                  << " quantity=" << it->quantity
-                  << " submitted_at=" << it->submitted_at << std::endl;
-      }
-    });
+    for (auto it = res->cbegin(); it != res->cend(); ++it) {
+      std::cout << "order_id=" << it->order_id
+                << " quantity=" << it->quantity
+                << " submitted_at=" << it->submitted_at << std::endl;
+    }
   });
 }
 

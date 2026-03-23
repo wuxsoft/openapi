@@ -42,16 +42,15 @@ pub(crate) struct TradeContext {
 #[pymethods]
 impl TradeContext {
     #[new]
-    fn new(config: &Config) -> PyResult<Self> {
+    fn new(config: &Config) -> Self {
         let callbacks = Arc::new(Mutex::new(Callbacks::default()));
-        let ctx = TradeContextSync::try_new(Arc::new(config.0.clone()), {
+        let ctx = TradeContextSync::new(Arc::new(config.0.clone()), {
             let callbacks = callbacks.clone();
             move |event| {
                 handle_push_event(&callbacks.lock(), event, None);
             }
-        })
-        .map_err(ErrorNewType)?;
-        Ok(Self { ctx, callbacks })
+        });
+        Self { ctx, callbacks }
     }
 
     /// Set order changed callback, after receiving the order changed event, it

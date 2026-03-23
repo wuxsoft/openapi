@@ -9,7 +9,7 @@ class Main {
                 .get();
         try (oauth;
              Config config = Config.fromOAuth(oauth);
-             TradeContext ctx = TradeContext.create(config).get()) {
+             TradeContext ctx = TradeContext.create(config)) {
             for (AccountBalance obj : ctx.getAccountBalance().get()) {
                 System.out.println(obj);
             }

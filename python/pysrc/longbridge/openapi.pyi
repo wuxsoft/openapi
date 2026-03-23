@@ -3929,18 +3929,16 @@ class AsyncQuoteContext:
     @classmethod
     def create(cls: Type["AsyncQuoteContext"],
                config: Config,
-               loop_: Optional[Any] = None) -> Awaitable["AsyncQuoteContext"]:
+               loop_: Optional[Any] = None) -> "AsyncQuoteContext":
         """
-        Create an async quote context. Returns an awaitable; must be awaited inside asyncio.
-        When using async callbacks (e.g. async def for set_on_quote), pass
-        loop_=asyncio.get_running_loop() so they are scheduled.
+        Create an async quote context.
 
         Args:
-            config: Configuration object (same as sync QuoteContext).
+            config: Configuration object.
             loop_: Optional event loop; pass asyncio.get_running_loop() when using async callbacks.
 
         Returns:
-            An awaitable that resolves to the AsyncQuoteContext instance.
+            AsyncQuoteContext instance.
 
         Examples:
             ::
@@ -3953,7 +3951,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.quote(["700.HK", "AAPL.US"])
                     print(resp)
 
@@ -3961,15 +3959,15 @@ class AsyncQuoteContext:
         """
         ...
 
-    def member_id(self) -> int:
+    async def member_id(self) -> int:
         """Returns the member ID."""
         ...
 
-    def quote_level(self) -> str:
+    async def quote_level(self) -> str:
         """Returns the quote level."""
         ...
 
-    def quote_package_details(self) -> List[QuotePackageDetail]:
+    async def quote_package_details(self) -> List[QuotePackageDetail]:
         """Returns the quote package details."""
         ...
 
@@ -4021,7 +4019,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     ctx.set_on_quote(on_quote)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     await asyncio.sleep(30)
@@ -4050,7 +4048,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     await ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
 
@@ -4088,7 +4086,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     ctx.set_on_candlestick(on_candlestick)
                     await ctx.subscribe_candlesticks(
                         "700.HK",
@@ -4126,7 +4124,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.subscribe_candlesticks(
                         "700.HK",
                         Period.Min_1,
@@ -4153,7 +4151,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     resp = await ctx.subscriptions()
                     print(resp)
@@ -4181,7 +4179,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.static_info(
                         ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
                     )
@@ -4209,7 +4207,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
                     print(resp)
 
@@ -4236,7 +4234,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.option_quote(["AAPL230317P160000.US"])
                     print(resp)
 
@@ -4263,7 +4261,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_quote(["21125.HK"])
                     print(resp)
 
@@ -4289,7 +4287,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.depth("700.HK")
                     print(resp)
 
@@ -4315,7 +4313,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.brokers("700.HK")
                     print(resp)
 
@@ -4338,7 +4336,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.participants()
                     print(resp)
 
@@ -4365,7 +4363,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.trades("700.HK", 10)
                     print(resp)
 
@@ -4393,7 +4391,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.intraday("700.HK", TradeSessions.Intraday)
                     print(resp)
 
@@ -4430,7 +4428,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.candlesticks(
                         "700.HK",
                         Period.Day,
@@ -4476,7 +4474,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.history_candlesticks_by_offset(
                         "700.HK",
                         Period.Day,
@@ -4523,7 +4521,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.history_candlesticks_by_date(
                         "700.HK",
                         Period.Day,
@@ -4557,7 +4555,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.option_chain_expiry_date_list("AAPL.US")
                     print(resp)
 
@@ -4586,7 +4584,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.option_chain_info_by_date(
                         "AAPL.US",
                         date(2023, 1, 20),
@@ -4612,7 +4610,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_issuers()
                     print(resp)
 
@@ -4651,7 +4649,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.warrant_list(
                         "700.HK",
                         WarrantSortBy.LastDone,
@@ -4678,7 +4676,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.trading_session()
                     print(resp)
 
@@ -4708,7 +4706,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.trading_days(
                         Market.HK,
                         date(2022, 1, 1),
@@ -4739,7 +4737,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.capital_flow("700.HK")
                     print(resp)
 
@@ -4766,7 +4764,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.capital_distribution("700.HK")
                     print(resp)
 
@@ -4794,7 +4792,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.calc_indexes(
                         ["700.HK", "APPL.US"],
                         [CalcIndex.LastDone, CalcIndex.ChangeRate],
@@ -4820,7 +4818,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.watchlist()
                     print(resp)
 
@@ -4848,7 +4846,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     group_id = await ctx.create_watchlist_group(
                         name="Watchlist1",
                         securities=["700.HK", "AAPL.US"],
@@ -4879,7 +4877,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.delete_watchlist_group(10086)
 
                 asyncio.run(main())
@@ -4908,7 +4906,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.update_watchlist_group(
                         10086,
                         name="Watchlist2",
@@ -4940,7 +4938,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.security_list(
                         Market.HK,
                         SecurityListCategory.Overnight,
@@ -4970,7 +4968,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.market_temperature(Market.HK)
                     print(resp)
 
@@ -5000,7 +4998,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     resp = await ctx.history_market_temperature(
                         Market.HK,
                         datetime.date(2023, 1, 1),
@@ -5031,7 +5029,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                     await asyncio.sleep(5)
                     resp = await ctx.realtime_quote(["700.HK", "AAPL.US"])
@@ -5059,7 +5057,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
                     await asyncio.sleep(5)
                     resp = await ctx.realtime_depth("700.HK")
@@ -5087,7 +5085,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
                     await asyncio.sleep(5)
                     resp = await ctx.realtime_brokers("700.HK")
@@ -5117,7 +5115,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
                     await asyncio.sleep(5)
                     resp = await ctx.realtime_trades("700.HK", 10)
@@ -5148,7 +5146,7 @@ class AsyncQuoteContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncQuoteContext.create(config)
+                    ctx = AsyncQuoteContext.create(config)
                     await ctx.subscribe_candlesticks(
                         "AAPL.US",
                         Period.Min_1,
@@ -7085,18 +7083,16 @@ class AsyncTradeContext:
     @classmethod
     def create(cls: Type["AsyncTradeContext"],
                config: Config,
-               loop_: Optional[Any] = None) -> Awaitable["AsyncTradeContext"]:
+               loop_: Optional[Any] = None) -> "AsyncTradeContext":
         """
-        Create an async trade context. Returns an awaitable; must be awaited inside asyncio.
-        When using async callbacks (e.g. async def for set_on_order_changed), pass
-        loop_=asyncio.get_running_loop() so they are scheduled.
+        Create an async trade context.
 
         Args:
-            config: Configuration object (same as sync TradeContext).
+            config: Configuration object.
             loop_: Optional event loop; pass asyncio.get_running_loop() when using async callbacks.
 
         Returns:
-            An awaitable that resolves to the AsyncTradeContext instance.
+            AsyncTradeContext instance.
 
         Examples:
             ::
@@ -7109,7 +7105,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.today_orders()
                     print(resp)
 
@@ -7152,7 +7148,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     ctx.set_on_order_changed(on_order_changed)
                     await ctx.subscribe([TopicType.Private])
                     resp = await ctx.submit_order(
@@ -7190,7 +7186,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     await ctx.subscribe([TopicType.Private])
                     await ctx.unsubscribe([TopicType.Private])
 
@@ -7220,7 +7216,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.history_executions(
                         symbol="700.HK",
                         start_at=datetime.datetime(2022, 5, 9),
@@ -7252,7 +7248,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.today_executions(symbol="700.HK")
                     print(resp)
 
@@ -7291,7 +7287,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.history_orders(
                         symbol="700.HK",
                         status=[OrderStatus.Filled, OrderStatus.New],
@@ -7335,7 +7331,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.today_orders(
                         symbol="700.HK",
                         status=[OrderStatus.Filled, OrderStatus.New],
@@ -7378,7 +7374,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     await ctx.replace_order(
                         order_id="709043056541253632",
                         quantity=Decimal(100),
@@ -7430,7 +7426,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.submit_order(
                         symbol="700.HK",
                         order_type=OrderType.LO,
@@ -7464,7 +7460,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     await ctx.cancel_order("709043056541253632")
 
                 asyncio.run(main())
@@ -7490,7 +7486,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.account_balance()
                     print(resp)
 
@@ -7523,7 +7519,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.cash_flow(
                         start_at=datetime.datetime(2022, 5, 9),
                         end_at=datetime.datetime(2022, 5, 12),
@@ -7553,7 +7549,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.fund_positions()
                     print(resp)
 
@@ -7580,7 +7576,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.stock_positions()
                     print(resp)
 
@@ -7606,7 +7602,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.margin_ratio("700.HK")
                     print(resp)
 
@@ -7632,7 +7628,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.order_detail("701276261045858304")
                     print(resp)
 
@@ -7665,7 +7661,7 @@ class AsyncTradeContext:
                         lambda url: print("Visit:", url)
                     )
                     config = Config.from_oauth(oauth)
-                    ctx = await AsyncTradeContext.create(config)
+                    ctx = AsyncTradeContext.create(config)
                     resp = await ctx.estimate_max_purchase_quantity(
                         symbol="700.HK",
                         order_type=OrderType.LO,

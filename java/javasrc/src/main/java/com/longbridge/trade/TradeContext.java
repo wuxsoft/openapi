@@ -12,16 +12,14 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Create a TradeContext object
-     * 
+     *
      * @param config Config object
-     * @return A Future representing the result of the operation
-     * @throws OpenApiException If an error occurs
+     * @return A TradeContext object
      */
-    public static CompletableFuture<TradeContext> create(Config config)
-            throws OpenApiException {
-        return AsyncCallback.executeTask((callback) -> {
-            SdkNative.newTradeContext(config.getRaw(), callback);
-        });
+    public static TradeContext create(Config config) {
+        TradeContext ctx = new TradeContext();
+        ctx.raw = SdkNative.newTradeContext(config.getRaw());
+        return ctx;
     }
 
     @Override
@@ -51,8 +49,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             ctx.setOnOrderChange((order_changed) -> {
      *                 System.out.println(order_changed);
      *             });
@@ -107,8 +105,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             GetHistoryExecutionsOptions opts = new GetHistoryExecutionsOptions().setSymbol("700.HK")
      *                     .setStartAt(OffsetDateTime.of(2022, 5, 9, 0, 0, 0, 0, ZoneOffset.UTC))
      *                     .setEndAt(OffsetDateTime.of(2022, 5, 12, 0, 0, 0, 0, ZoneOffset.UTC));
@@ -144,8 +142,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             GetTodayExecutionsOptions opts = new GetTodayExecutionsOptions().setSymbol("700.HK");
      *             Execution[] resp = ctx.getTodayExecutions(opts).get();
      *             for (Execution obj : resp) {
@@ -180,8 +178,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             GetHistoryOrdersOptions opts = new GetHistoryOrdersOptions().setSymbol("700.HK")
      *                     .setStatus(new OrderStatus[] { OrderStatus.Filled, OrderStatus.New })
      *                     .setSide(OrderSide.Buy)
@@ -219,8 +217,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             GetTodayOrdersOptions opts = new GetTodayOrdersOptions().setSymbol("700.HK")
      *                     .setStatus(new OrderStatus[] { OrderStatus.Filled, OrderStatus.New })
      *                     .setSide(OrderSide.Buy)
@@ -257,8 +255,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             ReplaceOrderOptions opts = new ReplaceOrderOptions("709043056541253632", new BigDecimal(100))
      *                     .setPrice(new BigDecimal(300));
      *             ctx.replaceOrder(opts).get();
@@ -290,8 +288,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             SubmitOrderOptions opts = new SubmitOrderOptions(
      *                     "700.HK",
      *                     OrderType.LO,
@@ -327,8 +325,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             ctx.cancelOrder("709043056541253632").get();
      *         }
      *     }
@@ -357,8 +355,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             AccountBalance[] resp = ctx.getAccountBalance("HKD").get();
      *             for (AccountBalance obj : resp) {
      *                 System.out.println(obj);
@@ -390,8 +388,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             AccountBalance[] resp = ctx.getAccountBalance().get();
      *             for (AccountBalance obj : resp) {
      *                 System.out.println(obj);
@@ -423,8 +421,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             GetCashFlowOptions opts = new GetCashFlowOptions(
      *                     OffsetDateTime.of(2022, 5, 9, 0, 0, 0, 0, ZoneOffset.UTC),
      *                     OffsetDateTime.of(2022, 5, 12, 0, 0, 0, 0, ZoneOffset.UTC));
@@ -459,8 +457,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             FundPositionsResponse resp = ctx.getFundPositions(null).get();
      *             System.out.println(resp);
      *         }
@@ -491,8 +489,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             StockPositionsResponse resp = ctx.getStockPositions(null).get();
      *             System.out.println(resp);
      *         }
@@ -523,8 +521,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             StockPositionsResponse resp = ctx.getMarginRatio("700.HK").get();
      *             System.out.println(resp);
      *         }
@@ -555,8 +553,8 @@ public class TradeContext implements AutoCloseable {
      * class Main {
      *     public static void main(String[] args) throws Exception {
      *         OAuth oauth = new OAuthBuilder("your-client-id")
-                .build(url -> System.out.println("Visit: " + url)).get();
-        try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config).get()) {
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
      *             OrderDetail detail = ctx.getOrderDetail("701276261045858304").get();
      *             System.out.println(resp);
      *         }

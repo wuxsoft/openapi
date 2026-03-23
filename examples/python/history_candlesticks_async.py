@@ -17,7 +17,7 @@ async def main() -> None:
         lambda url: print(f"Open this URL to authorize: {url}")
     )
     config = Config.from_oauth(oauth)
-    ctx = await AsyncQuoteContext.create(config)
+    ctx = AsyncQuoteContext.create(config)
 
     # get candlesticks by offset
     print("get candlesticks by offset")

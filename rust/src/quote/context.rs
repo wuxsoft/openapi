@@ -1,4 +1,7 @@
-use std::{sync::Arc, time::Duration};
+use std::{
+    sync::{Arc, RwLock},
+    time::Duration,
+};
 
 use longbridge_httpcli::{HttpClient, Json, Method};
 use longbridge_proto::quote;
@@ -20,7 +23,7 @@ use crate::{
         Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantType, WatchlistGroup,
         cache::{Cache, CacheWithKey},
         cmd_code,
-        core::{Command, Core},
+        core::{Command, Core, UserProfile},
         sub_flags::SubFlags,
         types::{
             FilterWarrantExpiryDate, FilterWarrantInOutBoundsType, SecuritiesUpdateMode,
@@ -47,9 +50,7 @@ struct InnerQuoteContext {
     cache_option_chain_expiry_date_list: CacheWithKey<String, Vec<Date>>,
     cache_option_chain_strike_info: CacheWithKey<(String, Date), Vec<StrikePriceInfo>>,
     cache_trading_session: Cache<Vec<MarketTradingSession>>,
-    member_id: i64,
-    quote_level: String,
-    quote_package_details: Vec<QuotePackageDetail>,
+    user_profile: Arc<RwLock<Option<UserProfile>>>,
     log_subscriber: Arc<dyn Subscriber + Send + Sync>,
 }
 
@@ -67,9 +68,7 @@ pub struct QuoteContext(Arc<InnerQuoteContext>);
 
 impl QuoteContext {
     /// Create a `QuoteContext`
-    pub async fn try_new(
-        config: Arc<Config>,
-    ) -> Result<(Self, mpsc::UnboundedReceiver<PushEvent>)> {
+    pub fn new(config: Arc<Config>) -> (Self, mpsc::UnboundedReceiver<PushEvent>) {
         let log_subscriber = config.create_log_subscriber("quote");
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
@@ -86,19 +85,17 @@ impl QuoteContext {
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
-        let core = Core::try_new(config, command_rx, push_tx)
-            .with_subscriber(log_subscriber.clone())
-            .await?;
-        let member_id = core.member_id();
-        let quote_level = core.quote_level().to_string();
-        let quote_package_details = core.quote_package_details().to_vec();
-        tokio::spawn(core.run().with_subscriber(log_subscriber.clone()));
+        let user_profile = Arc::new(RwLock::new(None::<UserProfile>));
+        let core = Core::new(config, command_rx, push_tx, user_profile.clone());
+        crate::runtime::RUNTIME
+            .handle()
+            .spawn(core.run().with_subscriber(log_subscriber.clone()));
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
             tracing::info!("quote context created");
         });
 
-        Ok((
+        (
             QuoteContext(Arc::new(InnerQuoteContext {
                 language,
                 http_cli,
@@ -112,13 +109,11 @@ impl QuoteContext {
                     OPTION_CHAIN_STRIKE_INFO_CACHE_TIMEOUT,
                 ),
                 cache_trading_session: Cache::new(TRADING_SESSION_CACHE_TIMEOUT),
-                member_id,
-                quote_level,
-                quote_package_details,
+                user_profile,
                 log_subscriber,
             })),
             push_rx,
-        ))
+        )
     }
 
     /// Returns the log subscriber
@@ -127,22 +122,57 @@ impl QuoteContext {
         self.0.log_subscriber.clone()
     }
 
+    async fn ensure_user_profile(&self) -> Result<()> {
+        if self.0.user_profile.read().unwrap().is_some() {
+            return Ok(());
+        }
+        let (reply_tx, reply_rx) = oneshot::channel();
+        self.0
+            .command_tx
+            .send(Command::EnsureConnected { reply_tx })
+            .map_err(|_| WsClientError::ClientClosed)?;
+        reply_rx.await.map_err(|_| WsClientError::ClientClosed)?
+    }
+
     /// Returns the member ID
-    #[inline]
-    pub fn member_id(&self) -> i64 {
-        self.0.member_id
+    pub async fn member_id(&self) -> Result<i64> {
+        self.ensure_user_profile().await?;
+        Ok(self
+            .0
+            .user_profile
+            .read()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .member_id)
     }
 
     /// Returns the quote level
-    #[inline]
-    pub fn quote_level(&self) -> &str {
-        &self.0.quote_level
+    pub async fn quote_level(&self) -> Result<String> {
+        self.ensure_user_profile().await?;
+        Ok(self
+            .0
+            .user_profile
+            .read()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .quote_level
+            .clone())
     }
 
     /// Returns the quote package details
-    #[inline]
-    pub fn quote_package_details(&self) -> &[QuotePackageDetail] {
-        &self.0.quote_package_details
+    pub async fn quote_package_details(&self) -> Result<Vec<QuotePackageDetail>> {
+        self.ensure_user_profile().await?;
+        Ok(self
+            .0
+            .user_profile
+            .read()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .quote_package_details
+            .clone())
     }
 
     /// Send a raw request
@@ -208,7 +238,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
+    /// let (ctx, mut receiver) = QuoteContext::new(config);
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
     ///     .await?;
@@ -258,7 +288,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
     ///     .await?;
@@ -304,7 +334,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
+    /// let (ctx, mut receiver) = QuoteContext::new(config);
     ///
     /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)
     ///     .await?;
@@ -371,7 +401,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
     ///     .await?;
@@ -405,7 +435,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx
     ///     .static_info(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
@@ -449,7 +479,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx
     ///     .quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
@@ -490,7 +520,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.option_quote(["AAPL230317P160000.US"]).await?;
     /// println!("{:?}", resp);
@@ -529,7 +559,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.warrant_quote(["21125.HK"]).await?;
     /// println!("{:?}", resp);
@@ -568,7 +598,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.depth("700.HK").await?;
     /// println!("{:?}", resp);
@@ -614,7 +644,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.brokers("700.HK").await?;
     /// println!("{:?}", resp);
@@ -652,7 +682,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.participants().await?;
     /// println!("{:?}", resp);
@@ -694,7 +724,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.trades("700.HK", 10).await?;
     /// println!("{:?}", resp);
@@ -739,7 +769,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.intraday("700.HK", TradeSessions::Intraday).await?;
     /// println!("{:?}", resp);
@@ -788,7 +818,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx
     ///     .candlesticks(
@@ -957,7 +987,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.option_chain_expiry_date_list("AAPL.US").await?;
     /// println!("{:?}", resp);
@@ -1004,7 +1034,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx
     ///     .option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20))
@@ -1057,7 +1087,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.warrant_issuers().await?;
     /// println!("{:?}", resp);
@@ -1141,7 +1171,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.trading_session().await?;
     /// println!("{:?}", resp);
@@ -1185,7 +1215,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx
     ///     .trading_days(Market::HK, date!(2022 - 01 - 20), date!(2022 - 02 - 20))
@@ -1246,7 +1276,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.capital_flow("700.HK").await?;
     /// println!("{:?}", resp);
@@ -1282,7 +1312,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.capital_distribution("700.HK").await?;
     /// println!("{:?}", resp);
@@ -1350,7 +1380,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.watchlist().await?;
     /// println!("{:?}", resp);
@@ -1394,7 +1424,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let req = RequestCreateWatchlistGroup::new("Watchlist1").securities(["700.HK", "BABA.US"]);
     /// let group_id = ctx.create_watchlist_group(req).await?;
@@ -1448,7 +1478,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// ctx.delete_watchlist_group(10086, true).await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
@@ -1492,7 +1522,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     /// let req = RequestUpdateWatchlistGroup::new(10086)
     ///     .name("Watchlist2")
     ///     .securities(["700.HK", "BABA.US"]);
@@ -1605,7 +1635,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx.market_temperature(Market::HK).await?;
     /// println!("{:?}", resp);
@@ -1647,7 +1677,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// let resp = ctx
     ///     .history_market_temperature(Market::HK, date!(2023 - 01 - 01), date!(2023 - 01 - 31))
@@ -1706,7 +1736,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
     ///     .await?;
@@ -1754,7 +1784,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::DEPTH)
     ///     .await?;
@@ -1798,7 +1828,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::TRADE)
     ///     .await?;
@@ -1848,7 +1878,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::BROKER)
     ///     .await?;
@@ -1892,7 +1922,7 @@ impl QuoteContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = QuoteContext::try_new(config).await?;
+    /// let (ctx, _) = QuoteContext::new(config);
     ///
     /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)
     ///     .await?;

@@ -65,15 +65,15 @@ public class SdkNative {
 
         public static native void contentContextNews(long context, String symbol, AsyncCallback callback);
 
-        public static native void newQuoteContext(long config, AsyncCallback callback);
+        public static native long newQuoteContext(long config);
 
         public static native void freeQuoteContext(long config);
 
-        public static native long quoteContextGetMemberId(long context);
+        public static native void quoteContextGetMemberId(long context, AsyncCallback callback);
 
-        public static native String quoteContextGetQuoteLevel(long context);
+        public static native void quoteContextGetQuoteLevel(long context, AsyncCallback callback);
 
-        public static native QuotePackageDetail[] quoteContextGetQuotePackageDetails(long context);
+        public static native void quoteContextGetQuotePackageDetails(long context, AsyncCallback callback);
 
         public static native void quoteContextSetOnQuote(long context, QuoteHandler handler);
 
@@ -186,7 +186,7 @@ public class SdkNative {
                         int count,
                         AsyncCallback callback);
 
-        public static native void newTradeContext(long config, AsyncCallback callback);
+        public static native long newTradeContext(long config);
 
         public static native void freeTradeContext(long config);
 

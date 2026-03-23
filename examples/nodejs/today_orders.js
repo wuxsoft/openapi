@@ -5,7 +5,7 @@ async function main() {
     console.log("Open this URL to authorize: " + url);
   });
   let config = Config.fromOAuth(oauth);
-  let ctx = await TradeContext.new(config);
+  let ctx = TradeContext.new(config);
   let resp = await ctx.todayOrders();
   for (let obj of resp) {
     console.log(obj.toString());

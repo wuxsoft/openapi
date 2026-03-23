@@ -47,16 +47,15 @@ pub(crate) struct QuoteContext {
 #[pymethods]
 impl QuoteContext {
     #[new]
-    fn new(config: &Config) -> PyResult<Self> {
+    fn new(config: &Config) -> Self {
         let callbacks = Arc::new(Mutex::new(Callbacks::default()));
-        let ctx = QuoteContextSync::try_new(Arc::new(config.0.clone()), {
+        let ctx = QuoteContextSync::new(Arc::new(config.0.clone()), {
             let callbacks = callbacks.clone();
             move |event| {
                 handle_push_event(&callbacks.lock(), event, None);
             }
-        })
-        .map_err(ErrorNewType)?;
-        Ok(Self { ctx, callbacks })
+        });
+        Self { ctx, callbacks }
     }
 
     /// Returns the member ID

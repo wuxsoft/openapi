@@ -48,14 +48,11 @@ pub struct QuoteContext {
 #[napi_derive::napi]
 impl QuoteContext {
     #[napi]
-    pub async fn new(config: &Config) -> Result<QuoteContext> {
+    pub fn new(config: &Config) -> QuoteContext {
         let callbacks = Arc::new(Mutex::new(Callbacks::default()));
-        let (ctx, mut receiver) =
-            longbridge::quote::QuoteContext::try_new(Arc::new(config.0.clone()))
-                .await
-                .map_err(ErrorNewType)?;
+        let (ctx, mut receiver) = longbridge::quote::QuoteContext::new(Arc::new(config.0.clone()));
 
-        tokio::spawn({
+        longbridge::runtime_handle().spawn({
             let callbacks = callbacks.clone();
             async move {
                 while let Some(msg) = receiver.recv().await {
@@ -166,28 +163,29 @@ impl QuoteContext {
             }
         });
 
-        Ok(QuoteContext { ctx, callbacks })
+        QuoteContext { ctx, callbacks }
     }
 
     /// Returns the member ID
     #[napi]
-    pub fn member_id(&self) -> i64 {
-        self.ctx.member_id()
+    pub async fn member_id(&self) -> Result<i64> {
+        Ok(self.ctx.member_id().await.map_err(ErrorNewType)?)
     }
 
     /// Returns the quote level
     #[napi]
-    pub fn quote_level(&self) -> &str {
-        self.ctx.quote_level()
+    pub async fn quote_level(&self) -> Result<String> {
+        Ok(self.ctx.quote_level().await.map_err(ErrorNewType)?)
     }
 
     /// Returns the quote package details
     #[napi]
-    pub fn quote_package_details(&self) -> Result<Vec<QuotePackageDetail>> {
+    pub async fn quote_package_details(&self) -> Result<Vec<QuotePackageDetail>> {
         self.ctx
             .quote_package_details()
-            .iter()
-            .cloned()
+            .await
+            .map_err(ErrorNewType)?
+            .into_iter()
             .map(TryInto::try_into)
             .collect()
     }
@@ -265,7 +263,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// ctx.setOnQuote((_, event) => console.log(event.toString()));
     /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
     /// ```
@@ -286,7 +284,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
     /// await ctx.unsubscribe(["AAPL.US"], [SubType.Quote]);
     /// ```
@@ -334,7 +332,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
     /// const resp = await ctx.subscriptions();
     /// console.log(resp.toString());
@@ -358,7 +356,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.staticInfo(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]);
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -383,7 +381,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]);
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -408,7 +406,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.optionQuote(["AAPL230317P160000.US"]);
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -433,7 +431,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.warrantQuote(["21125.HK"]);
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -458,7 +456,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.depth("700.HK");
     /// console.log(resp.toString());
     /// ```
@@ -479,7 +477,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.brokers("700.HK");
     /// console.log(resp.toString());
     /// ```
@@ -500,7 +498,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.participants();
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -525,7 +523,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.trades("700.HK", 10);
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -550,7 +548,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, TradeSessions } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.intraday("700.HK", TradeSessions.Intraday);
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -579,7 +577,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, Period, AdjustType, TradeSessions } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.candlesticks("700.HK", Period.Day, 10, AdjustType.NoAdjust, TradeSessions.Intraday);
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -674,7 +672,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.optionChainExpiryDateList("AAPL.US");
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -700,7 +698,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, NaiveDate } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.optionChainInfoByDate("AAPL.US", new NaiveDate(2023, 1, 20));
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -729,7 +727,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.warrantIssuers();
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -754,7 +752,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, WarrantSortBy, SortOrderType } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.warrantList("700.HK", WarrantSortBy.LastDone, SortOrderType.Asc);
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -807,7 +805,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.tradingSession();
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -832,7 +830,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, Market, NaiveDate } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.tradingDays(Market.HK, new NaiveDate(2022, 1, 20), new NaiveDate(2022, 2, 20));
     /// console.log(resp.toString());
     /// ```
@@ -858,7 +856,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.capitalFlow("700.HK");
     /// for (let obj of resp) {
     ///   console.log(obj.toString());
@@ -883,7 +881,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.capitalDistribution("700.HK");
     /// console.log(resp.toString());
     /// ```
@@ -923,7 +921,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.watchList();
     /// console.log(resp.toString());
     /// ```
@@ -946,7 +944,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const groupId = await ctx.createWatchlistGroup({
     ///   name: "Watchlist1",
     ///   securities: ["700.HK", "BABA.US"],
@@ -970,7 +968,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.deleteWatchlistGroup({ id: 10086 });
     /// ```
     #[napi]
@@ -990,7 +988,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.updateWatchlistGroup({
     ///   id: 10086,
     ///   name: "Watchlist2",
@@ -1026,7 +1024,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, Market, SecurityListCategory } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.securityList(Market.US, SecurityListCategory.Overnight);
     /// console.log(resp.toString());
     /// ```
@@ -1053,7 +1051,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, Market } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.marketTemperature(Market.HK);
     /// console.log(resp.toString());
     /// ```
@@ -1074,7 +1072,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, Market, NaiveDate } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// const resp = await ctx.historyMarketTemperature(Market.HK, new NaiveDate(2023, 1, 20), new NaiveDate(2023, 2, 20));
     /// console.log(resp.toString());
     /// ```
@@ -1100,7 +1098,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
     /// await new Promise((resolve) => setTimeout(resolve, 5000));
     /// const resp = await ctx.realtimeQuote(["700.HK", "AAPL.US"]);
@@ -1127,7 +1125,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth]);
     /// await new Promise((resolve) => setTimeout(resolve, 5000));
     /// const resp = await ctx.realtimeDepth("700.HK");
@@ -1150,7 +1148,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers]);
     /// await new Promise((resolve) => setTimeout(resolve, 5000));
     /// const resp = await ctx.realtimeBrokers("700.HK");
@@ -1173,7 +1171,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, SubType } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade]);
     /// await new Promise((resolve) => setTimeout(resolve, 5000));
     /// const resp = await ctx.realtimeTrades("700.HK", 10);
@@ -1200,7 +1198,7 @@ impl QuoteContext {
     /// const { OAuth, Config, QuoteContext, Period } = require('longbridge')
     ///
     /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
-    /// const ctx = await QuoteContext.new(Config.fromOAuth(oauth));
+    /// const ctx = QuoteContext.new(Config.fromOAuth(oauth));
     /// await ctx.subscribeCandlesticks("700.HK", Period.Min_1);
     /// await new Promise((resolve) => setTimeout(resolve, 5000));
     /// const resp = await ctx.realtimeCandlesticks("700.HK", Period.Min_1, 10);

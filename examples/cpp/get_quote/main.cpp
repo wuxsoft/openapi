@@ -12,35 +12,28 @@ static void
 run(const OAuth& oauth)
 {
   Config config = Config::from_oauth(oauth);
+  QuoteContext ctx = QuoteContext::create(config);
 
-  QuoteContext::create(config, [](auto res) {
+  std::vector<std::string> symbols = {
+    "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+  };
+  ctx.quote(symbols, [](auto res) {
     if (!res) {
-      std::cout << "failed to create quote context: "
-                << *res.status().message() << std::endl;
+      std::cout << "failed to get quote: " << *res.status().message()
+                << std::endl;
       return;
     }
 
-    std::vector<std::string> symbols = {
-      "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-    };
-    res.context().quote(symbols, [](auto res) {
-      if (!res) {
-        std::cout << "failed to get quote: " << *res.status().message()
-                  << std::endl;
-        return;
-      }
-
-      for (auto it = res->cbegin(); it != res->cend(); ++it) {
-        std::cout << it->symbol << " timestamp=" << it->timestamp
-                  << " last_done=" << (double)it->last_done
-                  << " prev_close=" << (double)it->prev_close
-                  << " open=" << (double)it->open
-                  << " high=" << (double)it->high
-                  << " low=" << (double)it->low
-                  << " volume=" << it->volume
-                  << " turnover=" << (double)it->turnover << std::endl;
-      }
-    });
+    for (auto it = res->cbegin(); it != res->cend(); ++it) {
+      std::cout << it->symbol << " timestamp=" << it->timestamp
+                << " last_done=" << (double)it->last_done
+                << " prev_close=" << (double)it->prev_close
+                << " open=" << (double)it->open
+                << " high=" << (double)it->high
+                << " low=" << (double)it->low
+                << " volume=" << it->volume
+                << " turnover=" << (double)it->turnover << std::endl;
+    }
   });
 }
 

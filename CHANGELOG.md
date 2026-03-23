@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [4.0.5]
+
+## Changed
+
+- **All bindings:** `QuoteContext::new` / `TradeContext::new` are now synchronous and infallible — no more `await` or `.get()` at construction time. The WebSocket connection is established lazily on first use.
+- **All bindings:** `member_id`, `quote_level`, and `quote_package_details` are now async methods (were previously sync fields/properties).
+- **Rust:** A single global Tokio runtime is shared across all SDK components; per-binding runtimes removed.
+
+## Fixed
+
+- **Java:** Restored broken Javadoc comment formatting in `QuoteContext` and `TradeContext` example blocks.
+- **Java:** `Makefile.toml` now uses a platform-aware classpath separator (`:` on Unix, `;` on Windows) and adds `--enable-native-access=ALL-UNNAMED` to suppress JVM native-access warnings on JDK 17+.
+- **Java:** Added missing `content` package classes (`ContentContext`, `NewsItem`, `TopicItem`) to the compile task.
+- **Node.js:** Updated all doc-comment examples to use sync `QuoteContext.new(config)` / `TradeContext.new(config)`.
+
 # [4.0.4]
 
 ## Fixed

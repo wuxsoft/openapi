@@ -10,6 +10,8 @@ mod macros;
 
 mod config;
 mod error;
+pub mod runtime;
+pub use runtime::runtime_handle;
 mod serde_utils;
 mod types;
 

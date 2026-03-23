@@ -13,7 +13,7 @@ class Main {
                 .get();
         try (oauth;
              Config config = Config.fromOAuth(oauth);
-             QuoteContext ctx = QuoteContext.create(config).get()) {
+             QuoteContext ctx = QuoteContext.create(config)) {
             System.out.println("get candlesticks by offset");
             System.out.println("====================");
 

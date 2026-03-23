@@ -25,29 +25,29 @@ pub struct QuoteContextSync {
 
 impl QuoteContextSync {
     /// Create a `QuoteContextSync` object
-    pub fn try_new<F>(config: Arc<Config>, push_callback: F) -> Result<Self>
+    pub fn new<F>(config: Arc<Config>, push_callback: F) -> Self
     where
         F: FnMut(PushEvent) + Send + 'static,
     {
-        let rt = BlockingRuntime::try_new(move || QuoteContext::try_new(config), push_callback)?;
-        Ok(Self { rt })
+        let rt = BlockingRuntime::try_new(move || Ok(QuoteContext::new(config)), push_callback)
+            .expect("create quote context");
+        Self { rt }
     }
 
     /// Returns the member ID
     pub fn member_id(&self) -> Result<i64> {
-        self.rt.call(|ctx| async move { Ok(ctx.member_id()) })
+        self.rt.call(|ctx| async move { ctx.member_id().await })
     }
 
     /// Returns the quote level
     pub fn quote_level(&self) -> Result<String> {
-        self.rt
-            .call(|ctx| async move { Ok(ctx.quote_level().to_string()) })
+        self.rt.call(|ctx| async move { ctx.quote_level().await })
     }
 
     /// Returns the quote package details
     pub fn quote_package_details(&self) -> Result<Vec<QuotePackageDetail>> {
         self.rt
-            .call(|ctx| async move { Ok(ctx.quote_package_details().to_vec()) })
+            .call(|ctx| async move { ctx.quote_package_details().await })
     }
 
     /// Subscribe
@@ -72,7 +72,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, event_handler)?;
+    /// let ctx = QuoteContextSync::new(config, event_handler);
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
     /// sleep(Duration::from_secs(30));
@@ -103,7 +103,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
     /// ctx.subscribe(["AAPL.US"], SubFlags::QUOTE)?;
@@ -143,7 +143,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, event_handler)?;
+    /// let ctx = QuoteContextSync::new(config, event_handler);
     ///
     /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)?;
     /// sleep(Duration::from_secs(30));
@@ -187,7 +187,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
     /// let resp = ctx.subscriptions();
@@ -213,7 +213,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.static_info(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])?;
     /// println!("{:?}", resp);
@@ -243,7 +243,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])?;
     /// println!("{:?}", resp);
@@ -273,7 +273,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.option_quote(["AAPL230317P160000.US"])?;
     /// println!("{:?}", resp);
@@ -303,7 +303,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.warrant_quote(["21125.HK"])?;
     /// println!("{:?}", resp);
@@ -333,7 +333,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.depth("700.HK")?;
     /// println!("{:?}", resp);
@@ -358,7 +358,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.brokers("700.HK")?;
     /// println!("{:?}", resp);
@@ -383,7 +383,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.participants()?;
     /// println!("{:?}", resp);
@@ -408,7 +408,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.trades("700.HK", 10)?;
     /// println!("{:?}", resp);
@@ -439,7 +439,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.intraday("700.HK", TradeSessions::Intraday)?;
     /// println!("{:?}", resp);
@@ -473,7 +473,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.candlesticks(
     ///     "700.HK",
@@ -562,7 +562,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.option_chain_expiry_date_list("AAPL.US")?;
     /// println!("{:?}", resp);
@@ -591,7 +591,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.option_chain_info_by_date("AAPL.US", date!(2023 - 01 - 20))?;
     /// println!("{:?}", resp);
@@ -621,7 +621,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.warrant_issuers()?;
     /// println!("{:?}", resp);
@@ -679,7 +679,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.trading_session()?;
     /// println!("{:?}", resp);
@@ -708,7 +708,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.trading_days(Market::HK, date!(2022 - 01 - 20), date!(2022 - 02 - 20))?;
     /// println!("{:?}", resp);
@@ -739,7 +739,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.capital_flow("700.HK")?;
     /// println!("{:?}", resp);
@@ -768,7 +768,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.capital_distribution("700.HK")?;
     /// println!("{:?}", resp);
@@ -809,7 +809,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.watchlist()?;
     /// println!("{:?}", resp);
@@ -836,7 +836,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let req = RequestCreateWatchlistGroup::new("Watchlist1").securities(["700.HK", "BABA.US"]);
     /// let group_id = ctx.create_watchlist_group(req)?;
@@ -862,7 +862,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// ctx.delete_watchlist_group(10086, true)?;
     /// # Ok(())
@@ -888,7 +888,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let req = RequestUpdateWatchlistGroup::new(10086)
     ///     .name("Watchlist2")
@@ -933,7 +933,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp = ctx.market_temperature(Market::HK)?;
     /// println!("{:?}", resp);
@@ -959,7 +959,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// let resp =
     ///     ctx.history_market_temperature(Market::HK, date!(2023 - 01 - 01), date!(2023 - 01 - 31))?;
@@ -997,7 +997,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
     /// sleep(Duration::from_secs(5));
@@ -1035,7 +1035,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::DEPTH)?;
     /// sleep(Duration::from_secs(5));
@@ -1071,7 +1071,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::TRADE)?;
     /// sleep(Duration::from_secs(5));
@@ -1108,7 +1108,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::BROKER)?;
     /// sleep(Duration::from_secs(5));
@@ -1147,7 +1147,7 @@ impl QuoteContextSync {
     /// let oauth =
     ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
+    /// let ctx = QuoteContextSync::new(config, |_| ());
     ///
     /// ctx.subscribe_candlesticks("AAPL.US", Period::OneMinute, TradeSessions::Intraday)?;
     /// sleep(Duration::from_secs(5));

@@ -60,24 +60,15 @@ TradeContext::ref_count() const
   return ctx_ ? lb_trade_context_ref_count(ctx_) : 0;
 }
 
-void
-TradeContext::create(const Config& config,
-                     AsyncCallback<TradeContext, void> callback)
+TradeContext
+TradeContext::create(const Config& config)
 {
-  lb_trade_context_new(
-    config,
-    [](auto res) {
-      auto callback_ptr =
-        callback::get_async_callback<TradeContext, void>(res->userdata);
-      auto* ctx_ptr = (lb_trade_context_t*)res->ctx;
-      TradeContext ctx(ctx_ptr);
-      if (ctx_ptr) {
-        lb_trade_context_release(ctx_ptr);
-      }
-      (*callback_ptr)(
-        AsyncResult<TradeContext, void>(ctx, Status(res->error), nullptr));
-    },
-    new AsyncCallback<TradeContext, void>(callback));
+  auto* ctx_ptr = lb_trade_context_new(config);
+  TradeContext ctx(ctx_ptr);
+  if (ctx_ptr) {
+    lb_trade_context_release(ctx_ptr);
+  }
+  return ctx;
 }
 
 void

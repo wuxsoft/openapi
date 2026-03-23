@@ -249,7 +249,7 @@ impl Config {
     ///         .await?;
     ///     let config = Arc::new(Config::from_oauth(oauth));
     ///
-    ///     let (ctx, receiver) = longbridge::quote::QuoteContext::try_new(config).await?;
+    ///     let (ctx, receiver) = longbridge::quote::QuoteContext::new(config);
     ///     Ok(())
     /// }
     /// ```
@@ -564,12 +564,9 @@ mod tests {
     fn test_config_default_values() {
         let config = Config::from_apikey("key", "secret", "token");
 
-        assert_eq!(config.language, Language::EN);
-        assert_eq!(config.quote_ws_url, None);
-        assert_eq!(config.trade_ws_url, None);
+        // Fields not controlled by environment variables
         assert_eq!(config.enable_overnight, None);
         assert_eq!(config.push_candlestick_mode, None);
         assert!(config.enable_print_quote_packages);
-        assert_eq!(config.log_path, None);
     }
 }

@@ -59,41 +59,64 @@ QuoteContext::ref_count() const
   return ctx_ ? lb_quote_context_ref_count(ctx_) : 0;
 }
 
-void
-QuoteContext::create(const Config& config,
-                     AsyncCallback<QuoteContext, void> callback)
+QuoteContext
+QuoteContext::create(const Config& config)
 {
-  lb_quote_context_new(
-    config,
+  auto* ctx_ptr = lb_quote_context_new(config);
+  QuoteContext ctx(ctx_ptr);
+  if (ctx_ptr) {
+    lb_quote_context_release(ctx_ptr);
+  }
+  return ctx;
+}
+
+void
+QuoteContext::member_id(AsyncCallback<QuoteContext, int64_t> callback) const
+{
+  lb_quote_context_member_id(
+    ctx_,
     [](auto res) {
       auto callback_ptr =
-        callback::get_async_callback<QuoteContext, void>(res->userdata);
-      auto* ctx_ptr = (lb_quote_context_t*)res->ctx;
-      QuoteContext ctx(ctx_ptr);
-      if (ctx_ptr) {
-        lb_quote_context_release(ctx_ptr);
+        callback::get_async_callback<QuoteContext, int64_t>(res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+      if (status) {
+        auto value = *(const int64_t*)res->data;
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, int64_t>(ctx, std::move(status), &value));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, int64_t>(ctx, std::move(status), nullptr));
       }
-      (*callback_ptr)(
-        AsyncResult<QuoteContext, void>(ctx, Status(res->error), nullptr));
     },
-    new AsyncCallback<QuoteContext, void>(callback));
+    new AsyncCallback<QuoteContext, int64_t>(callback));
 }
 
-int64_t
-QuoteContext::member_id()
+void
+QuoteContext::quote_level(
+  AsyncCallback<QuoteContext, std::string> callback) const
 {
-  return lb_quote_context_member_id(ctx_);
-}
-
-std::string
-QuoteContext::quote_level() const
-{
-  return lb_quote_context_quote_level(ctx_);
+  lb_quote_context_quote_level(
+    ctx_,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<QuoteContext, std::string>(res->userdata);
+      QuoteContext ctx((const lb_quote_context_t*)res->ctx);
+      Status status(res->error);
+      if (status) {
+        std::string value((const char*)res->data);
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, std::string>(ctx, std::move(status), &value));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<QuoteContext, std::string>(ctx, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<QuoteContext, std::string>(callback));
 }
 
 void
 QuoteContext::quote_package_details(
-  const std::vector<std::string>& symbols,
   AsyncCallback<QuoteContext, std::vector<QuotePackageDetail>> callback) const
 {
   lb_quote_context_quote_package_details(

@@ -1,20 +1,8 @@
-use std::{
-    ffi::c_void,
-    future::Future,
-    sync::{Arc, LazyLock},
-};
+use std::{ffi::c_void, future::Future, sync::Arc};
 
 use longbridge::Result;
-use tokio::runtime::Runtime;
 
 use crate::error::CError;
-
-static RUNTIME: LazyLock<Runtime> = LazyLock::new(|| {
-    tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .expect("create tokio runtime")
-});
 
 pub type CAsyncCallback = extern "C" fn(*const CAsyncResult);
 
@@ -128,14 +116,13 @@ pub(crate) fn execute_async<P, F, T>(
     P: Send,
 {
     unsafe {
-        let _guard = RUNTIME.enter();
         let ctx_pointer = ctx as usize;
         let userdata_pointer = userdata as usize;
 
         if !ctx.is_null() {
             Arc::increment_strong_count(ctx);
         }
-        tokio::spawn(async move {
+        longbridge::runtime_handle().spawn(async move {
             match fut.await {
                 Ok(res) => {
                     let mut res = res.to_async_result(ctx_pointer as *const c_void);

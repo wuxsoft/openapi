@@ -8,7 +8,7 @@ async def main() -> None:
         lambda url: print(f"Open this URL to authorize: {url}")
     )
     config = Config.from_oauth(oauth)
-    ctx = await AsyncTradeContext.create(config)
+    ctx = AsyncTradeContext.create(config)
     resp = await ctx.account_balance()
     print(resp)
 

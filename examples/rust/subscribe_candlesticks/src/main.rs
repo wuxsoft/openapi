@@ -17,8 +17,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build(|url| println!("Open this URL to authorize: {url}"))
         .await?;
     let config = Arc::new(Config::from_oauth(oauth));
-    let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
-    println!("member id: {}", ctx.member_id());
+    let (ctx, mut receiver) = QuoteContext::new(config);
+    println!("member id: {}", ctx.member_id().await?);
     ctx.subscribe_candlesticks(".SPX.US", Period::OneMinute, TradeSessions::All)
         .await?;
 

@@ -15,7 +15,7 @@ async function main() {
     console.log("Open this URL to authorize: " + url);
   });
   const config = Config.fromOAuth(oauth);
-  const ctx = await QuoteContext.new(config);
+  const ctx = QuoteContext.new(config);
 
   // get candlesticks by offset
   console.log("get candlesticks by offset");

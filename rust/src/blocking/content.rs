@@ -17,7 +17,7 @@ impl ContentContextSync {
     /// Create a `ContentContextSync`
     pub fn try_new(config: Arc<Config>) -> Result<Self> {
         let rt = BlockingRuntime::try_new(
-            move || async move {
+            move || {
                 let ctx = ContentContext::try_new(config)?;
                 let (tx, rx) = mpsc::unbounded_channel::<std::convert::Infallible>();
                 std::mem::forget(tx); // keep sender alive so event_rx never closes

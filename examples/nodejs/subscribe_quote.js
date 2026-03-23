@@ -7,7 +7,7 @@ async function main() {
     console.log("Open this URL to authorize: " + url);
   });
   let config = Config.fromOAuth(oauth);
-  globalCtx = await QuoteContext.new(config);
+  globalCtx = QuoteContext.new(config);
   globalCtx.setOnQuote((_, event) => console.log(event.toString()));
   await globalCtx.subscribe(["TSLA.US"], [SubType.Quote]);
 }

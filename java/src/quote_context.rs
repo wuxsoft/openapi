@@ -3,7 +3,7 @@ use std::sync::Arc;
 use jni::{
     JNIEnv, JavaVM,
     errors::Result,
-    objects::{GlobalRef, JClass, JObject, JString, JValueOwned},
+    objects::{GlobalRef, JClass, JObject, JString},
     sys::{jboolean, jobjectArray},
 };
 use longbridge::{
@@ -21,10 +21,8 @@ use time::{Date, PrimitiveDateTime};
 use crate::{
     async_util,
     error::jni_result,
-    init::QUOTE_CONTEXT_CLASS,
     types::{
         CreateWatchlistGroupResponse, FromJValue, IntoJValue, ObjectArray, PrimaryArray, get_field,
-        set_field,
     },
 };
 
@@ -116,42 +114,25 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_newQuoteContext(
     mut env: JNIEnv,
     _class: JClass,
     config: i64,
-    callback: JObject,
-) {
-    struct ContextObjRef(i64);
-
-    impl IntoJValue for ContextObjRef {
-        fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
-            let ctx_obj = env.new_object(QUOTE_CONTEXT_CLASS.get().unwrap(), "()V", &[])?;
-            set_field(env, &ctx_obj, "raw", self.0)?;
-            Ok(JValueOwned::from(ctx_obj))
-        }
-    }
-
-    jni_result(&mut env, (), |env| {
+) -> i64 {
+    jni_result(&mut env, 0i64, |env| {
         let config = Arc::new((*(config as *const Config)).clone());
         let jvm = env.get_java_vm()?;
 
-        async_util::execute(env, callback, async move {
-            let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
-            let callbacks = Arc::new(Mutex::new(Callbacks::default()));
+        let (ctx, mut receiver) = QuoteContext::new(config);
+        let callbacks = Arc::new(Mutex::new(Callbacks::default()));
 
-            tokio::spawn({
-                let callbacks = callbacks.clone();
-                async move {
-                    while let Some(event) = receiver.recv().await {
-                        let callbacks = callbacks.lock();
-                        let _ = send_push_event(&jvm, &callbacks, event);
-                    }
+        longbridge::runtime_handle().spawn({
+            let callbacks = callbacks.clone();
+            async move {
+                while let Some(event) = receiver.recv().await {
+                    let callbacks = callbacks.lock();
+                    let _ = send_push_event(&jvm, &callbacks, event);
                 }
-            });
+            }
+        });
 
-            Ok(ContextObjRef(
-                Box::into_raw(Box::new(ContextObj { ctx, callbacks })) as i64,
-            ))
-        })?;
-
-        Ok(())
+        Ok(Box::into_raw(Box::new(ContextObj { ctx, callbacks })) as i64)
     })
 }
 
@@ -166,45 +147,59 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeQuoteContext(
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextGetMemberId(
-    mut _env: JNIEnv,
+    mut env: JNIEnv,
     _class: JClass,
     ctx: i64,
-) -> i64 {
+    callback: JObject,
+) {
     let context = &*(ctx as *const ContextObj);
-    context.ctx.member_id()
+    let ctx = context.ctx.clone();
+    jni_result(&mut env, (), |env| {
+        Ok(async_util::execute::<i64, _>(env, callback, async move {
+            ctx.member_id().await.map_err(Into::into)
+        })?)
+    });
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextGetQuoteLevel<'a>(
-    mut env: JNIEnv<'a>,
-    _class: JClass<'a>,
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextGetQuoteLevel(
+    mut env: JNIEnv,
+    _class: JClass,
     ctx: i64,
-) -> JObject<'a> {
+    callback: JObject,
+) {
     let context = &*(ctx as *const ContextObj);
-    context
-        .ctx
-        .quote_level()
-        .to_string()
-        .into_jvalue(&mut env)
-        .unwrap()
-        .l()
-        .unwrap()
+    let ctx = context.ctx.clone();
+    jni_result(&mut env, (), |env| {
+        Ok(async_util::execute::<String, _>(
+            env,
+            callback,
+            async move { ctx.quote_level().await.map_err(Into::into) },
+        )?)
+    });
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextGetQuotePackageDetails<
-    'a,
->(
-    mut env: JNIEnv<'a>,
-    _class: JClass<'a>,
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_quoteContextGetQuotePackageDetails(
+    mut env: JNIEnv,
+    _class: JClass,
     ctx: i64,
-) -> JObject<'a> {
+    callback: JObject,
+) {
     let context = &*(ctx as *const ContextObj);
-    ObjectArray(context.ctx.quote_package_details().to_vec())
-        .into_jvalue(&mut env)
-        .unwrap()
-        .l()
-        .unwrap()
+    let ctx = context.ctx.clone();
+    jni_result(&mut env, (), |env| {
+        Ok(async_util::execute::<ObjectArray<_>, _>(
+            env,
+            callback,
+            async move {
+                ctx.quote_package_details()
+                    .await
+                    .map(ObjectArray)
+                    .map_err(Into::into)
+            },
+        )?)
+    });
 }
 
 #[unsafe(no_mangle)]

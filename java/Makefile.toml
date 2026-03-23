@@ -1,3 +1,6 @@
+[env]
+CLASSPATH_SEP = { source = "${CARGO_MAKE_RUST_TARGET_OS}", mapping = { "windows" = ";" }, default_value = ":" }
+
 [tasks.java]
 command = "cargo"
 args = ["build", "-p", "longbridge-java"]
@@ -9,7 +12,7 @@ args = [
   "-h",
   "c",
   "-cp",
-  "libs/native-lib-loader-2.4.0.jar;libs/slf4j-api-1.7.30.jar;libs/slf4j-nop-1.7.30.jar;libs/gson-2.10.1.jar",
+  "libs/native-lib-loader-2.4.0.jar${CLASSPATH_SEP}libs/slf4j-api-1.7.30.jar${CLASSPATH_SEP}libs/slf4j-nop-1.7.30.jar${CLASSPATH_SEP}libs/gson-2.10.1.jar",
   "-sourcepath",
   "javasrc/src/main/java",
   "-d",
@@ -22,7 +25,7 @@ cwd = "java"
 [tasks.compile-java-test]
 args = [
   "-cp",
-  "libs/native-lib-loader-2.4.0.jar;libs/slf4j-api-1.7.30.jar;libs/slf4j-nop-1.7.30.jar;libs/gson-2.10.1.jar",
+  "libs/native-lib-loader-2.4.0.jar${CLASSPATH_SEP}libs/slf4j-api-1.7.30.jar${CLASSPATH_SEP}libs/slf4j-nop-1.7.30.jar${CLASSPATH_SEP}libs/gson-2.10.1.jar",
   "-sourcepath",
   "javasrc/src/main/java",
   "-d",
@@ -108,6 +111,10 @@ args = [
   "javasrc/src/main/java/com/longbridge/quote/MarketTemperature.java",
   "javasrc/src/main/java/com/longbridge/quote/HistoryMarketTemperatureResponse.java",
 
+  "javasrc/src/main/java/com/longbridge/content/ContentContext.java",
+  "javasrc/src/main/java/com/longbridge/content/NewsItem.java",
+  "javasrc/src/main/java/com/longbridge/content/TopicItem.java",
+
   "javasrc/src/main/java/com/longbridge/trade/AccountBalance.java",
   "javasrc/src/main/java/com/longbridge/trade/BalanceType.java",
   "javasrc/src/main/java/com/longbridge/trade/CashFlow.java",
@@ -160,9 +167,10 @@ cwd = "java"
 [tasks.test-java]
 command = "java"
 args = [
+  "--enable-native-access=ALL-UNNAMED",
   "-Djava.library.path=target/debug",
   "-cp",
-  "java/classes;java/libs/native-lib-loader-2.4.0.jar;java/libs/slf4j-api-1.7.30.jar;java/libs/slf4j-nop-1.7.30.jar;java/libs/gson-2.10.1.jar",
+  "java/classes${CLASSPATH_SEP}java/libs/native-lib-loader-2.4.0.jar${CLASSPATH_SEP}java/libs/slf4j-api-1.7.30.jar${CLASSPATH_SEP}java/libs/slf4j-nop-1.7.30.jar${CLASSPATH_SEP}java/libs/gson-2.10.1.jar",
   "Main",
 ]
 dependencies = ["java", "compile-java-test"]

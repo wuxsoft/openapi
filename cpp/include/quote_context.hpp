@@ -28,18 +28,16 @@ public:
 
   size_t ref_count() const;
 
-  static void create(const Config& config,
-                     AsyncCallback<QuoteContext, void> callback);
+  static QuoteContext create(const Config& config);
 
   /// Returns the member id
-  int64_t member_id();
+  void member_id(AsyncCallback<QuoteContext, int64_t> callback) const;
 
   /// Returns the quote level
-  std::string quote_level() const;
+  void quote_level(AsyncCallback<QuoteContext, std::string> callback) const;
 
   /// Returns the quote package details
   void quote_package_details(
-    const std::vector<std::string>& symbols,
     AsyncCallback<QuoteContext, std::vector<QuotePackageDetail>> callback)
     const;
 

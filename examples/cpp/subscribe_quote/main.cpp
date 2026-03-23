@@ -14,37 +14,28 @@ static void
 run(const OAuth& oauth)
 {
   Config config = Config::from_oauth(oauth);
+  g_ctx = QuoteContext::create(config);
 
-  QuoteContext::create(config, [](auto res) {
+  g_ctx.set_on_quote([](auto event) {
+    std::cout << event->symbol << " timestamp=" << event->timestamp
+              << " last_done=" << (double)event->last_done
+              << " open=" << (double)event->open
+              << " high=" << (double)event->high
+              << " low=" << (double)event->low
+              << " volume=" << event->volume
+              << " turnover=" << (double)event->turnover << std::endl;
+  });
+
+  std::vector<std::string> symbols = {
+    "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
+  };
+
+  g_ctx.subscribe(symbols, SubFlags::QUOTE(), [](auto res) {
     if (!res) {
-      std::cout << "failed to create quote context: "
+      std::cout << "failed to subscribe quote: "
                 << *res.status().message() << std::endl;
       return;
     }
-
-    g_ctx = res.context();
-
-    res.context().set_on_quote([](auto event) {
-      std::cout << event->symbol << " timestamp=" << event->timestamp
-                << " last_done=" << (double)event->last_done
-                << " open=" << (double)event->open
-                << " high=" << (double)event->high
-                << " low=" << (double)event->low
-                << " volume=" << event->volume
-                << " turnover=" << (double)event->turnover << std::endl;
-    });
-
-    std::vector<std::string> symbols = {
-      "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
-    };
-
-    res.context().subscribe(symbols, SubFlags::QUOTE(), [](auto res) {
-      if (!res) {
-        std::cout << "failed to subscribe quote: "
-                  << *res.status().message() << std::endl;
-        return;
-      }
-    });
   });
 }
 

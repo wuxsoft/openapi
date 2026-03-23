@@ -45,35 +45,26 @@ impl AsyncTradeContext {
     /// scheduled.
     #[classmethod]
     #[pyo3(signature = (config, loop_=None))]
-    fn create(
-        cls: &Bound<PyType>,
-        config: &Config,
-        loop_: Option<Bound<PyAny>>,
-    ) -> PyResult<Py<PyAny>> {
-        let py = cls.py();
+    fn create(_cls: &Bound<PyType>, config: &Config, loop_: Option<Bound<PyAny>>) -> Self {
         let config = Arc::new(config.0.clone());
-        let event_loop = loop_.map(|l| l.unbind());
-        let event_loop = Arc::new(event_loop);
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let (ctx, mut event_rx) = TradeContext::try_new(config).await.map_err(ErrorNewType)?;
-            let callbacks = Arc::new(Mutex::new(Callbacks::default()));
-            let callbacks_clone = callbacks.clone();
-            let event_loop_clone = event_loop.clone();
-            pyo3_async_runtimes::tokio::get_runtime().spawn(async move {
-                while let Some(event) = event_rx.recv().await {
-                    pyo3::Python::attach(|py| {
-                        let loop_ref = event_loop_clone.as_ref().as_ref().map(|l| l.bind(py));
-                        #[allow(clippy::needless_option_as_deref)]
-                        handle_push_event(&callbacks_clone.lock(), event, loop_ref.as_deref());
-                    });
-                }
-            });
-            Ok(AsyncTradeContext {
-                ctx: Arc::new(ctx),
-                callbacks,
-            })
-        })
-        .map(|b| b.unbind())
+        let event_loop = Arc::new(loop_.map(|l| l.unbind()));
+        let (ctx, mut event_rx) = TradeContext::new(config);
+        let callbacks = Arc::new(Mutex::new(Callbacks::default()));
+        let callbacks_clone = callbacks.clone();
+        let event_loop_clone = event_loop.clone();
+        pyo3_async_runtimes::tokio::get_runtime().spawn(async move {
+            while let Some(event) = event_rx.recv().await {
+                pyo3::Python::attach(|py| {
+                    let loop_ref = event_loop_clone.as_ref().as_ref().map(|l| l.bind(py));
+                    #[allow(clippy::needless_option_as_deref)]
+                    handle_push_event(&callbacks_clone.lock(), event, loop_ref.as_deref());
+                });
+            }
+        });
+        AsyncTradeContext {
+            ctx: Arc::new(ctx),
+            callbacks,
+        }
     }
 
     /// Set order changed callback. May be sync or async (coroutines are

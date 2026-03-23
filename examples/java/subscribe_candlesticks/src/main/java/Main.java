@@ -9,7 +9,7 @@ class Main {
                 .get();
         try (oauth;
              Config config = Config.fromOAuth(oauth);
-             QuoteContext ctx = QuoteContext.create(config).get()) {
+             QuoteContext ctx = QuoteContext.create(config)) {
             ctx.setOnCandlestick((symbol, event) -> {
                 System.out.printf("%s\t%s\n", symbol, event);
             });

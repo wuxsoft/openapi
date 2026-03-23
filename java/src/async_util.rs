@@ -1,18 +1,10 @@
-use std::{future::Future, sync::LazyLock};
+use std::future::Future;
 
 use jni::{
     JNIEnv,
     errors::Result,
     objects::{JObject, JValue},
 };
-use tokio::runtime::Runtime;
-
-static RUNTIME: LazyLock<Runtime> = LazyLock::new(|| {
-    tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .expect("create tokio runtime")
-});
 
 use crate::{error::JniError, types::IntoJValue};
 
@@ -52,8 +44,7 @@ where
     let jvm = env.get_java_vm()?;
     let callback = env.new_global_ref(callback)?;
 
-    let _guard = RUNTIME.enter();
-    tokio::spawn(async move {
+    longbridge::runtime_handle().spawn(async move {
         let res = fut.await;
         let mut env = jvm.attach_current_thread().unwrap();
         match res {

@@ -18,7 +18,7 @@ async def main() -> None:
         lambda url: print(f"Open this URL to authorize: {url}")
     )
     config = Config.from_oauth(oauth)
-    ctx = await AsyncTradeContext.create(config)
+    ctx = AsyncTradeContext.create(config)
     resp = await ctx.submit_order(
         symbol="700.HK",
         order_type=OrderType.MO,

@@ -47,8 +47,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .inspect_err(|err| tracing::error!(error = %err, "failed to load config"))?
             .dont_print_quote_packages(),
     );
-    let (quote_context, _) = QuoteContext::try_new(config.clone()).await?;
-    let (trade_context, _) = TradeContext::try_new(config.clone()).await?;
+    let (quote_context, _) = QuoteContext::new(config.clone());
+    let (trade_context, _) = TradeContext::new(config.clone());
     let content_context = ContentContext::try_new(config.clone())?;
     let readonly = cli.readonly;
 

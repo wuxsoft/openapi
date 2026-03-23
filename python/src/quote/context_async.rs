@@ -47,55 +47,55 @@ impl AsyncQuoteContext {
     /// callbacks (e.g. `async def` for `set_on_quote`) so they are scheduled.
     #[classmethod]
     #[pyo3(signature = (config, loop_=None))]
-    fn create(
-        cls: &Bound<PyType>,
-        config: &Config,
-        loop_: Option<Bound<PyAny>>,
-    ) -> PyResult<Py<PyAny>> {
-        let py = cls.py();
+    fn create(_cls: &Bound<PyType>, config: &Config, loop_: Option<Bound<PyAny>>) -> Self {
         let config = Arc::new(config.0.clone());
-        let event_loop = loop_.map(|l| l.unbind());
-        let event_loop = Arc::new(event_loop);
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let (ctx, mut event_rx) = QuoteContext::try_new(config).await.map_err(ErrorNewType)?;
-            let callbacks = Arc::new(Mutex::new(Callbacks::default()));
-            let callbacks_clone = callbacks.clone();
-            let event_loop_clone = event_loop.clone();
-            pyo3_async_runtimes::tokio::get_runtime().spawn(async move {
-                while let Some(event) = event_rx.recv().await {
-                    pyo3::Python::attach(|py| {
-                        let loop_ref = event_loop_clone.as_ref().as_ref().map(|l| l.bind(py));
-                        #[allow(clippy::needless_option_as_deref)]
-                        handle_push_event(&callbacks_clone.lock(), event, loop_ref.as_deref());
-                    });
-                }
-            });
-            Ok(AsyncQuoteContext {
-                ctx: Arc::new(ctx),
-                callbacks,
-            })
-        })
-        .map(|b| b.unbind())
+        let event_loop = Arc::new(loop_.map(|l| l.unbind()));
+        let (ctx, mut event_rx) = QuoteContext::new(config);
+        let callbacks = Arc::new(Mutex::new(Callbacks::default()));
+        let callbacks_clone = callbacks.clone();
+        let event_loop_clone = event_loop.clone();
+        pyo3_async_runtimes::tokio::get_runtime().spawn(async move {
+            while let Some(event) = event_rx.recv().await {
+                pyo3::Python::attach(|py| {
+                    let loop_ref = event_loop_clone.as_ref().as_ref().map(|l| l.bind(py));
+                    #[allow(clippy::needless_option_as_deref)]
+                    handle_push_event(&callbacks_clone.lock(), event, loop_ref.as_deref());
+                });
+            }
+        });
+        AsyncQuoteContext {
+            ctx: Arc::new(ctx),
+            callbacks,
+        }
     }
 
     /// Returns the member ID.
-    fn member_id(&self) -> PyResult<i64> {
-        Ok(self.ctx.member_id())
+    fn member_id<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(ctx.member_id().await.map_err(ErrorNewType)?)
+        })
     }
 
     /// Returns the quote level.
-    fn quote_level(&self) -> PyResult<String> {
-        Ok(self.ctx.quote_level().to_string())
+    fn quote_level<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            Ok(ctx.quote_level().await.map_err(ErrorNewType)?)
+        })
     }
 
     /// Returns the quote package details.
-    fn quote_package_details(&self) -> PyResult<Vec<QuotePackageDetail>> {
-        self.ctx
-            .quote_package_details()
-            .to_vec()
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect()
+    fn quote_package_details<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let ctx = self.ctx.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            ctx.quote_package_details()
+                .await
+                .map_err(ErrorNewType)?
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<PyResult<Vec<QuotePackageDetail>>>()
+        })
     }
 
     /// Set quote callback. The callback may be sync or async; if it returns a

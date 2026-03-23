@@ -60,9 +60,7 @@ pub struct TradeContext(Arc<InnerTradeContext>);
 
 impl TradeContext {
     /// Create a `TradeContext`
-    pub async fn try_new(
-        config: Arc<Config>,
-    ) -> Result<(Self, mpsc::UnboundedReceiver<PushEvent>)> {
+    pub fn new(config: Arc<Config>) -> (Self, mpsc::UnboundedReceiver<PushEvent>) {
         let log_subscriber = config.create_log_subscriber("trade");
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
@@ -72,23 +70,23 @@ impl TradeContext {
         let http_cli = config.create_http_client();
         let (command_tx, command_rx) = mpsc::unbounded_channel();
         let (push_tx, push_rx) = mpsc::unbounded_channel();
-        let core = Core::try_new(config, command_rx, push_tx)
-            .with_subscriber(log_subscriber.clone())
-            .await?;
-        tokio::spawn(core.run().with_subscriber(log_subscriber.clone()));
+        let core = Core::new(config, command_rx, push_tx);
+        crate::runtime::RUNTIME
+            .handle()
+            .spawn(core.run().with_subscriber(log_subscriber.clone()));
 
         dispatcher::with_default(&log_subscriber.clone().into(), || {
             tracing::info!("trade context created");
         });
 
-        Ok((
+        (
             TradeContext(Arc::new(InnerTradeContext {
                 http_cli,
                 command_tx,
                 log_subscriber,
             })),
             push_rx,
-        ))
+        )
     }
 
     /// Returns the log subscriber
@@ -117,7 +115,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, mut receiver) = TradeContext::try_new(config).await?;
+    /// let (ctx, mut receiver) = TradeContext::new(config);
     ///
     /// let opts = SubmitOrderOptions::new(
     ///     "700.HK",
@@ -191,7 +189,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let opts = GetHistoryExecutionsOptions::new()
     ///     .symbol("700.HK")
@@ -244,7 +242,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let opts = GetTodayExecutionsOptions::new().symbol("700.HK");
     /// let resp = ctx.today_executions(opts).await?;
@@ -295,7 +293,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let opts = GetHistoryOrdersOptions::new()
     ///     .symbol("700.HK")
@@ -351,7 +349,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let opts = GetTodayOrdersOptions::new()
     ///     .symbol("700.HK")
@@ -405,7 +403,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let opts =
     ///     ReplaceOrderOptions::new("709043056541253632", decimal!(100)).price(decimal!(300i32));
@@ -447,7 +445,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let opts = SubmitOrderOptions::new(
     ///     "700.HK",
@@ -495,7 +493,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// ctx.cancel_order("709043056541253632").await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
@@ -537,7 +535,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let resp = ctx.account_balance(None).await?;
     /// println!("{:?}", resp);
@@ -589,7 +587,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let opts = GetCashFlowOptions::new(datetime!(2022-05-09 0:00 UTC), datetime!(2022-05-12 0:00 UTC));
     /// let resp = ctx.cash_flow(opts).await?;
@@ -632,7 +630,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let resp = ctx.fund_positions(None).await?;
     /// println!("{:?}", resp);
@@ -671,7 +669,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let resp = ctx.stock_positions(None).await?;
     /// println!("{:?}", resp);
@@ -710,7 +708,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let resp = ctx.margin_ratio("700.HK").await?;
     /// println!("{:?}", resp);
@@ -758,7 +756,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let resp = ctx.order_detail("701276261045858304").await?;
     /// println!("{:?}", resp);
@@ -808,7 +806,7 @@ impl TradeContext {
     ///     .build(|url| println!("Visit: {url}"))
     ///     .await?;
     /// let config = Arc::new(Config::from_oauth(oauth));
-    /// let (ctx, _) = TradeContext::try_new(config).await?;
+    /// let (ctx, _) = TradeContext::new(config);
     ///
     /// let resp = ctx
     ///     .estimate_max_purchase_quantity(EstimateMaxPurchaseQuantityOptions::new(
