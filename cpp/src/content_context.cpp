@@ -52,24 +52,15 @@ ContentContext::operator=(const ContentContext& ctx)
   return *this;
 }
 
-void
-ContentContext::create(const Config& config,
-                       AsyncCallback<ContentContext, void> callback)
+ContentContext
+ContentContext::create(const Config& config)
 {
-  lb_content_context_new(
-    config,
-    [](auto res) {
-      auto callback_ptr =
-        callback::get_async_callback<ContentContext, void>(res->userdata);
-      auto* ctx_ptr = (lb_content_context_t*)res->ctx;
-      ContentContext ctx(ctx_ptr);
-      if (ctx_ptr) {
-        lb_content_context_release(ctx_ptr);
-      }
-      (*callback_ptr)(
-        AsyncResult<ContentContext, void>(ctx, Status(res->error), nullptr));
-    },
-    new AsyncCallback<ContentContext, void>(callback));
+  auto* ctx_ptr = lb_content_context_new(config);
+  ContentContext ctx(ctx_ptr);
+  if (ctx_ptr) {
+    lb_content_context_release(ctx_ptr);
+  }
+  return ctx;
 }
 
 void

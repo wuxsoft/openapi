@@ -25,8 +25,7 @@ public:
 
   ContentContext& operator=(const ContentContext& ctx);
 
-  static void create(const Config& config,
-                     AsyncCallback<ContentContext, void> callback);
+  static ContentContext create(const Config& config);
 
   /// Get discussion topics list for a symbol
   void topics(const std::string& symbol,

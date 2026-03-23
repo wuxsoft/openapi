@@ -3,7 +3,7 @@ use std::{ffi::c_void, os::raw::c_char, sync::Arc};
 use longbridge::content::ContentContext;
 
 use crate::{
-    async_call::{CAsyncCallback, CAsyncResult, execute_async},
+    async_call::{CAsyncCallback, execute_async},
     config::CConfig,
     content_context::types::{CNewsItemOwned, CTopicItemOwned},
     types::{CVec, cstr_to_rust},
@@ -16,35 +16,13 @@ pub struct CContentContext {
 
 /// Create a new `ContentContext`
 ///
-/// @param config    Config object
-/// @param callback  Async callback
-/// @param userdata  User data passed to the callback
+/// @param config  Config object
+/// @return A new content context
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_content_context_new(
-    config: *const CConfig,
-    callback: CAsyncCallback,
-    userdata: *mut c_void,
-) {
+pub unsafe extern "C" fn lb_content_context_new(config: *const CConfig) -> *const CContentContext {
     let config = Arc::new((*config).0.clone());
-    let userdata_pointer = userdata as usize;
-
-    execute_async(
-        callback,
-        std::ptr::null_mut::<c_void>(),
-        userdata,
-        async move {
-            let ctx = ContentContext::new(config);
-            let arc_ctx = Arc::new(CContentContext { ctx });
-            let ctx = Arc::into_raw(arc_ctx);
-            Ok(CAsyncResult {
-                ctx: ctx as *const c_void,
-                error: std::ptr::null(),
-                data: std::ptr::null_mut(),
-                length: 0,
-                userdata: userdata_pointer as *mut c_void,
-            })
-        },
-    );
+    let ctx = ContentContext::new(config);
+    Arc::into_raw(Arc::new(CContentContext { ctx }))
 }
 
 /// Retain the content context (increment reference count)
