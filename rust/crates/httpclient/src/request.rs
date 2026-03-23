@@ -6,6 +6,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+use longbridge_geo::is_cn;
 use reqwest::{
     Method, StatusCode,
     header::{HeaderMap, HeaderName, HeaderValue},
@@ -13,7 +14,7 @@ use reqwest::{
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
 use crate::{
-    AuthConfig, HttpClient, HttpClientError, HttpClientResult, is_cn,
+    AuthConfig, HttpClient, HttpClientError, HttpClientResult,
     signature::{SignatureParams, signature},
     timestamp::Timestamp,
 };

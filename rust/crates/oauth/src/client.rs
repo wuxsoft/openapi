@@ -2,6 +2,7 @@
 
 use std::{fmt, sync::Arc};
 
+use longbridge_geo::is_cn;
 use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, CsrfToken, RedirectUrl, RefreshToken, RevocationUrl,
     Scope, TokenUrl, basic::BasicClient, reqwest::async_http_client,
@@ -15,6 +16,15 @@ use crate::{
 };
 
 const OAUTH_BASE_URL: &str = "https://openapi.longbridge.com/oauth2";
+const OAUTH_BASE_URL_CN: &str = "https://openapi.longbridge.cn/oauth2";
+
+async fn oauth_base_url() -> &'static str {
+    if is_cn().await {
+        OAUTH_BASE_URL_CN
+    } else {
+        OAUTH_BASE_URL
+    }
+}
 
 /// Default port for the local OAuth callback server.
 pub(crate) const DEFAULT_CALLBACK_PORT: u16 = 60355;
@@ -112,7 +122,8 @@ impl OAuth {
         let client = create_oauth_client(
             &self.0.client_id,
             &format!("http://localhost:{port}/callback"),
-        );
+        )
+        .await;
 
         let (auth_url, csrf_token) = client
             .authorize_url(CsrfToken::new_random)
@@ -159,7 +170,8 @@ impl OAuth {
         let client = create_oauth_client(
             &self.0.client_id,
             &format!("http://localhost:{}/callback", self.0.callback_port),
-        );
+        )
+        .await;
         let token_response = client
             .exchange_refresh_token(&RefreshToken::new(refresh_token_str.to_string()))
             .request_async(async_http_client)
@@ -185,13 +197,14 @@ impl OAuth {
 }
 
 /// Build the oauth2 BasicClient for Longbridge endpoints.
-fn create_oauth_client(client_id: &str, redirect_uri: &str) -> BasicClient {
+async fn create_oauth_client(client_id: &str, redirect_uri: &str) -> BasicClient {
+    let base = oauth_base_url().await;
     BasicClient::new(
         ClientId::new(client_id.to_string()),
         None,
-        AuthUrl::new(format!("{OAUTH_BASE_URL}/authorize")).unwrap(),
-        Some(TokenUrl::new(format!("{OAUTH_BASE_URL}/token")).unwrap()),
+        AuthUrl::new(format!("{base}/authorize")).unwrap(),
+        Some(TokenUrl::new(format!("{base}/token")).unwrap()),
     )
     .set_redirect_uri(RedirectUrl::new(redirect_uri.to_string()).unwrap())
-    .set_revocation_uri(RevocationUrl::new(format!("{OAUTH_BASE_URL}/revoke")).unwrap())
+    .set_revocation_uri(RevocationUrl::new(format!("{base}/revoke")).unwrap())
 }

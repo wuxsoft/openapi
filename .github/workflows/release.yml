@@ -573,6 +573,9 @@ jobs:
           - name: longbridge-proto
             registryName: longbridge-proto
             path: rust/crates/proto
+          - name: longbridge-geo
+            registryName: longbridge-geo
+            path: rust/crates/geo
           - name: longbridge-oauth
             registryName: longbridge-oauth
             path: rust/crates/oauth

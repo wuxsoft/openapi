@@ -10,6 +10,7 @@ edition = "2024"
 lto = true
 
 [workspace.dependencies]
+longbridge-geo = { path = "rust/crates/geo", version = "4.0.5" }
 longbridge-wscli = { path = "rust/crates/wsclient", version = "4.0.5" }
 longbridge-httpcli = { path = "rust/crates/httpclient", version = "4.0.5" }
 longbridge-proto = { path = "rust/crates/proto", version = "4.0.5" }

@@ -6,6 +6,7 @@ description = "Longbridge HTTP SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
+longbridge-geo.workspace = true
 longbridge-oauth.workspace = true
 futures-util.workspace = true
 hmac.workspace = true
