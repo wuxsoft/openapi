@@ -217,6 +217,7 @@ impl Core {
                 },
             )
             .await?;
+
         let member_id = resp.member_id;
         let quote_level = resp.quote_level.clone();
         let (quote_package_details, quote_package_details_by_market) = resp

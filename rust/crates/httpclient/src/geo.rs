@@ -1,49 +1,34 @@
-use std::{cell::RefCell, time::Duration};
+use std::{cell::Cell, time::Duration};
 
 // because we may call `is_cn` multi times in a short time, we cache the result
 thread_local! {
-    static REGION: RefCell<Option<String>> = const { RefCell::new(None) };
+    static IS_CN: Cell<Option<bool>> = const { Cell::new(None) };
 }
 
-async fn region() -> Option<String> {
+/// do the best to guess whether the access point is in China Mainland or not
+pub async fn is_cn() -> bool {
     // check user defined REGION (LONGBRIDGE_REGION takes precedence,
     // LONGPORT_REGION is the fallback)
     let user_region = std::env::var("LONGBRIDGE_REGION")
         .ok()
         .or_else(|| std::env::var("LONGPORT_REGION").ok());
     if let Some(region) = user_region {
-        return Some(region);
+        return region.eq_ignore_ascii_case("CN");
     }
 
-    // check network connectivity
-    // make sure block_on doesn't block the outer tokio runtime
-    ping().await
-}
-
-async fn ping() -> Option<String> {
-    if let Some(region) = REGION.with_borrow(Clone::clone) {
-        return Some(region.clone());
+    // return cached result if available
+    if let Some(cached) = IS_CN.get() {
+        return cached;
     }
 
-    let Ok(resp) = reqwest::Client::new()
-        .get("https://api.lbkrs.com/_ping")
-        .timeout(Duration::from_secs(1))
+    // probe: HTTP 200 means CN, anything else (error or non-200) means not CN
+    let result = reqwest::Client::new()
+        .get("https://geotest.lbkrs.com")
+        .timeout(Duration::from_secs(5))
         .send()
         .await
-    else {
-        return None;
-    };
-    let region = resp
-        .headers()
-        .get("X-Ip-Region")
-        .and_then(|v| v.to_str().ok())?;
-    REGION.set(Some(region.to_string()));
-    Some(region.to_string())
-}
+        .is_ok_and(|resp| resp.status().is_success());
 
-/// do the best to guess whether the access point is in China Mainland or not
-pub async fn is_cn() -> bool {
-    region()
-        .await
-        .is_some_and(|region| region.eq_ignore_ascii_case("CN"))
+    IS_CN.set(Some(result));
+    result
 }
