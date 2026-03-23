@@ -18,9 +18,6 @@ pub(crate) static TIME_LOCALDATE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_LOCALTIME_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_LOCALDATETIME_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_ZONE_ID: OnceLock<GlobalRef> = OnceLock::new();
-pub(crate) static QUOTE_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
-pub(crate) static TRADE_CONTEXT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
-
 pub(crate) static DERIVATIVE_TYPE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static OPENAPI_EXCEPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 
@@ -71,9 +68,7 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         (TIME_LOCALTIME_CLASS, "java/time/LocalTime"),
         (TIME_LOCALDATETIME_CLASS, "java/time/LocalDateTime"),
         (DERIVATIVE_TYPE_CLASS, "com/longbridge/quote/DerivativeType"),
-        (OPENAPI_EXCEPTION_CLASS, "com/longbridge/OpenApiException"),
-        (QUOTE_CONTEXT_CLASS, "com/longbridge/quote/QuoteContext"),
-        (TRADE_CONTEXT_CLASS, "com/longbridge/trade/TradeContext")
+        (OPENAPI_EXCEPTION_CLASS, "com/longbridge/OpenApiException")
     );
 
     init_timezone_id(&mut env);
