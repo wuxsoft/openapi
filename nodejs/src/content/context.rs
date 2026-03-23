@@ -19,11 +19,10 @@ pub struct ContentContext {
 impl ContentContext {
     /// Create a new `ContentContext`
     #[napi]
-    pub async fn new(config: &Config) -> napi::Result<ContentContext> {
-        Ok(Self {
-            ctx: longbridge::content::ContentContext::try_new(Arc::new(config.0.clone()))
-                .map_err(ErrorNewType)?,
-        })
+    pub fn new(config: &Config) -> ContentContext {
+        Self {
+            ctx: longbridge::content::ContentContext::new(Arc::new(config.0.clone())),
+        }
     }
 
     /// Get discussion topics list

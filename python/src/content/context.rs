@@ -19,7 +19,7 @@ impl ContentContext {
     #[new]
     fn new(config: &Config) -> PyResult<Self> {
         Ok(Self {
-            ctx: ContentContextSync::try_new(Arc::new(config.0.clone())).map_err(ErrorNewType)?,
+            ctx: ContentContextSync::new(Arc::new(config.0.clone())).map_err(ErrorNewType)?,
         })
     }
 

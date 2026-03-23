@@ -16,10 +16,10 @@ pub struct ContentContext(Arc<InnerContentContext>);
 
 impl ContentContext {
     /// Create a `ContentContext`
-    pub fn try_new(config: Arc<Config>) -> Result<Self> {
-        Ok(Self(Arc::new(InnerContentContext {
+    pub fn new(config: Arc<Config>) -> Self {
+        Self(Arc::new(InnerContentContext {
             http_cli: config.create_http_client(),
-        })))
+        }))
     }
 
     /// Get discussion topics list

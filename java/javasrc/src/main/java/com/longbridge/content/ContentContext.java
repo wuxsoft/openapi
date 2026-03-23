@@ -14,14 +14,12 @@ public class ContentContext implements AutoCloseable {
      * Create a ContentContext object
      *
      * @param config Config object
-     * @return A Future representing the result of the operation
-     * @throws OpenApiException If an error occurs
+     * @return A ContentContext object
      */
-    public static CompletableFuture<ContentContext> create(Config config)
-            throws OpenApiException {
-        return AsyncCallback.executeTask((callback) -> {
-            SdkNative.newContentContext(config.getRaw(), callback);
-        });
+    public static ContentContext create(Config config) {
+        ContentContext ctx = new ContentContext();
+        ctx.raw = SdkNative.newContentContext(config.getRaw());
+        return ctx;
     }
 
     @Override

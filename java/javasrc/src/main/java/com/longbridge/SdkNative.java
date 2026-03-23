@@ -57,7 +57,7 @@ public class SdkNative {
 
         public static native void freeOAuth(long oauth);
 
-        public static native void newContentContext(long config, AsyncCallback callback);
+        public static native long newContentContext(long config);
 
         public static native void freeContentContext(long context);
 

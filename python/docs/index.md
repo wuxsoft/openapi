@@ -30,7 +30,7 @@
 
 - [AsyncContentContext](reference_all.md#longbridge.openapi.AsyncContentContext)
 
-  Async content API for use with asyncio; create via `AsyncContentContext.create(config)` and await in asyncio.
+  Async content API for use with asyncio; create via `AsyncContentContext.create(config)` (synchronous, no await needed at construction).
 
 ## Quickstart
 
