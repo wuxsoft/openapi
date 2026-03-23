@@ -4108,13 +4108,10 @@ void lb_config_free(struct lb_config_t *config);
 /**
  * Create a new `ContentContext`
  *
- * @param config    Config object
- * @param callback  Async callback
- * @param userdata  User data passed to the callback
+ * @param config  Config object
+ * @return A new content context
  */
-void lb_content_context_new(const struct lb_config_t *config,
-                            lb_async_callback_t callback,
-                            void *userdata);
+const struct lb_content_context_t *lb_content_context_new(const struct lb_config_t *config);
 
 /**
  * Retain the content context (increment reference count)
