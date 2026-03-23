@@ -6,8 +6,8 @@
 
 use std::{
     sync::{
-        atomic::{AtomicBool, Ordering},
         OnceLock,
+        atomic::{AtomicBool, Ordering},
     },
     time::Duration,
 };
@@ -25,8 +25,8 @@ static IS_CN_PROBING: AtomicBool = AtomicBool::new(false);
 /// 1. `LONGBRIDGE_REGION` environment variable (takes precedence).
 /// 2. `LONGPORT_REGION` environment variable (fallback alias).
 /// 3. Process-wide cached result from a previous probe.
-/// 4. Live HTTP probe to `https://geotest.lbkrs.com` — HTTP 200 → CN,
-///    anything else (error or non-200) → not CN.
+/// 4. Live HTTP probe to `https://geotest.lbkrs.com` — HTTP 200 → CN, anything
+///    else (error or non-200) → not CN.
 pub async fn is_cn() -> bool {
     // 1 & 2: explicit region override
     let user_region = std::env::var("LONGBRIDGE_REGION")

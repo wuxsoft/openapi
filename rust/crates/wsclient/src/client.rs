@@ -7,8 +7,8 @@ use std::{
 };
 
 use futures_util::{
-    stream::{SplitSink, SplitStream},
     SinkExt, StreamExt, TryFutureExt,
+    stream::{SplitSink, SplitStream},
 };
 use leaky_bucket::RateLimiter;
 use longbridge_proto::control::{AuthRequest, AuthResponse, ReconnectRequest, ReconnectResponse};
@@ -19,13 +19,13 @@ use tokio::{
     sync::{mpsc, oneshot},
 };
 use tokio_tungstenite::{
-    tungstenite::{client::IntoClientRequest, http::Uri, Message},
     MaybeTlsStream, WebSocketStream,
+    tungstenite::{Message, client::IntoClientRequest, http::Uri},
 };
 use url::Url;
 
 use crate::{
-    codec::Packet, WsClientError, WsClientResult, WsCloseReason, WsEvent, WsResponseErrorDetail,
+    WsClientError, WsClientResult, WsCloseReason, WsEvent, WsResponseErrorDetail, codec::Packet,
 };
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
