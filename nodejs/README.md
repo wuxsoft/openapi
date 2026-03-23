@@ -147,7 +147,7 @@ async function main() {
     (_, url) => console.log("Open this URL to authorize: " + url)
   );
   const config = Config.fromOAuth(oauth);
-  const ctx = await QuoteContext.new(config);
+  const ctx = QuoteContext.new(config);
   const resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"]);
   for (let obj of resp) {
     console.log(obj.toString());
@@ -168,7 +168,7 @@ async function main() {
     (_, url) => console.log("Open this URL to authorize: " + url)
   );
   const config = Config.fromOAuth(oauth);
-  const ctx = await QuoteContext.new(config);
+  const ctx = QuoteContext.new(config);
   ctx.setOnQuote((_, event) => console.log(event.toString()));
   await ctx.subscribe(
     ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
@@ -198,7 +198,7 @@ async function main() {
     (_, url) => console.log("Open this URL to authorize: " + url)
   );
   const config = Config.fromOAuth(oauth);
-  const ctx = await TradeContext.new(config);
+  const ctx = TradeContext.new(config);
   const resp = await ctx.submitOrder({
     symbol: "700.HK",
     orderType: OrderType.LO,

@@ -148,7 +148,7 @@ class Main {
                 .build(url -> System.out.println("Open this URL to authorize: " + url))
                 .get();
              Config config = Config.fromOAuth(oauth);
-             QuoteContext ctx = QuoteContext.create(config).get()) {
+             QuoteContext ctx = QuoteContext.create(config)) {
             SecurityQuote[] resp = ctx.getQuote(
                     new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" }).get();
             for (SecurityQuote obj : resp) {
@@ -171,7 +171,7 @@ class Main {
                 .build(url -> System.out.println("Open this URL to authorize: " + url))
                 .get();
              Config config = Config.fromOAuth(oauth);
-             QuoteContext ctx = QuoteContext.create(config).get()) {
+             QuoteContext ctx = QuoteContext.create(config)) {
             ctx.setOnQuote((symbol, quote) -> System.out.printf("%s\t%s\n", symbol, quote));
             ctx.subscribe(
                     new String[] { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" },
@@ -195,7 +195,7 @@ class Main {
                 .build(url -> System.out.println("Open this URL to authorize: " + url))
                 .get();
              Config config = Config.fromOAuth(oauth);
-             TradeContext ctx = TradeContext.create(config).get()) {
+             TradeContext ctx = TradeContext.create(config)) {
             SubmitOrderOptions opts = new SubmitOrderOptions("700.HK",
                     OrderType.LO,
                     OrderSide.Buy,
