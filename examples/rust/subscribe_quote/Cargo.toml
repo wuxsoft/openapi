@@ -5,7 +5,4 @@ edition.workspace = true
 
 [dependencies]
 longbridge = { path = "../../../rust" }
-longbridge-geo = { path = "../../../rust/crates/geo" }
-longbridge-httpcli = { path = "../../../rust/crates/httpclient" }
 tokio = { version = "1.19", features = ["rt-multi-thread", "macros"] }
-tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
