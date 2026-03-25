@@ -42,12 +42,12 @@ impl ContentContext {
 
     /// Create a new topic
     #[napi]
-    pub async fn create_topic(&self, req: CreateTopicRequest) -> Result<OwnedTopic> {
-        self.ctx
+    pub async fn create_topic(&self, req: CreateTopicRequest) -> Result<String> {
+        Ok(self
+            .ctx
             .create_topic(req.into())
             .await
-            .map_err(ErrorNewType)?
-            .try_into()
+            .map_err(ErrorNewType)?)
     }
 
     /// Get discussion topics list
