@@ -3910,6 +3910,128 @@ typedef struct lb_filing_item_t {
 } lb_filing_item_t;
 
 /**
+ * Topic author
+ */
+typedef struct lb_topic_author_t {
+  /**
+   * Member ID
+   */
+  const char *member_id;
+  /**
+   * Display name
+   */
+  const char *name;
+  /**
+   * Avatar URL
+   */
+  const char *avatar;
+} lb_topic_author_t;
+
+/**
+ * Topic image
+ */
+typedef struct lb_topic_image_t {
+  /**
+   * Original image URL
+   */
+  const char *url;
+  /**
+   * Small thumbnail URL
+   */
+  const char *sm;
+  /**
+   * Large image URL
+   */
+  const char *lg;
+} lb_topic_image_t;
+
+/**
+ * My topic item (topic created by the current authenticated user)
+ */
+typedef struct lb_owned_topic_t {
+  /**
+   * Topic ID
+   */
+  const char *id;
+  /**
+   * Title
+   */
+  const char *title;
+  /**
+   * Plain text excerpt
+   */
+  const char *description;
+  /**
+   * Markdown body
+   */
+  const char *body;
+  /**
+   * Author
+   */
+  struct lb_topic_author_t author;
+  /**
+   * Related stock tickers
+   */
+  const char *const *tickers;
+  /**
+   * Number of tickers
+   */
+  uintptr_t num_tickers;
+  /**
+   * Hashtag names
+   */
+  const char *const *hashtags;
+  /**
+   * Number of hashtags
+   */
+  uintptr_t num_hashtags;
+  /**
+   * Images
+   */
+  const struct lb_topic_image_t *images;
+  /**
+   * Number of images
+   */
+  uintptr_t num_images;
+  /**
+   * Likes count
+   */
+  int32_t likes_count;
+  /**
+   * Comments count
+   */
+  int32_t comments_count;
+  /**
+   * Views count
+   */
+  int32_t views_count;
+  /**
+   * Shares count
+   */
+  int32_t shares_count;
+  /**
+   * Content type: "article" or "post"
+   */
+  const char *topic_type;
+  /**
+   * License: 0=none, 1=original, 2=non-original
+   */
+  int32_t license;
+  /**
+   * URL to the full topic page
+   */
+  const char *detail_url;
+  /**
+   * Created time (Unix timestamp)
+   */
+  int64_t created_at;
+  /**
+   * Updated time (Unix timestamp)
+   */
+  int64_t updated_at;
+} lb_owned_topic_t;
+
+/**
  * Topic item
  */
 typedef struct lb_topic_item_t {
@@ -4122,6 +4244,50 @@ void lb_content_context_retain(const struct lb_content_context_t *ctx);
  * Release the content context (decrement reference count)
  */
 void lb_content_context_release(const struct lb_content_context_t *ctx);
+
+/**
+ * Get topics created by the current authenticated user
+ *
+ * @param ctx         Content context
+ * @param page        Page number (0 = default 1)
+ * @param size        Records per page, range 1~500 (0 = default 50)
+ * @param topic_type  Filter by content type: "article" or "post" (NULL = all)
+ * @param callback    Async callback
+ * @param userdata    User data passed to the callback
+ */
+void lb_content_context_topics_mine(const struct lb_content_context_t *ctx,
+                                    int32_t page,
+                                    int32_t size,
+                                    const char *topic_type,
+                                    lb_async_callback_t callback,
+                                    void *userdata);
+
+/**
+ * Create a new topic
+ *
+ * @param ctx          Content context
+ * @param title        Topic title (required)
+ * @param body         Topic body in Markdown format (required)
+ * @param topic_type   Content type: "article" or "post" (NULL = default "post")
+ * @param tickers      Related stock tickers array (NULL = none)
+ * @param num_tickers  Number of tickers
+ * @param hashtags     Hashtag names array (NULL = none)
+ * @param num_hashtags Number of hashtags
+ * @param license      License: 0=none, 1=original, 2=non-original (-1 = not set, use default)
+ * @param callback     Async callback
+ * @param userdata     User data passed to the callback
+ */
+void lb_content_context_create_topic(const struct lb_content_context_t *ctx,
+                                     const char *title,
+                                     const char *body,
+                                     const char *topic_type,
+                                     const char *const *tickers,
+                                     uintptr_t num_tickers,
+                                     const char *const *hashtags,
+                                     uintptr_t num_hashtags,
+                                     int32_t license,
+                                     lb_async_callback_t callback,
+                                     void *userdata);
 
 /**
  * Get discussion topics list for a symbol

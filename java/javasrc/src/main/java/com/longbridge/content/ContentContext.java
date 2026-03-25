@@ -28,6 +28,34 @@ public class ContentContext implements AutoCloseable {
     }
 
     /**
+     * Get topics created by the current authenticated user
+     *
+     * @param opts Query options (page, size, topicType); may be null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<OwnedTopic[]> getTopicsMine(ListMyTopicsOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.contentContextTopicsMine(raw, opts, callback);
+        });
+    }
+
+    /**
+     * Create a new topic
+     *
+     * @param opts Create topic options
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public CompletableFuture<OwnedTopic> createTopic(CreateTopicOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.contentContextCreateTopic(raw, opts, callback);
+        });
+    }
+
+    /**
      * Get discussion topics list
      *
      * @param symbol Security symbol

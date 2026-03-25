@@ -4,4 +4,7 @@ mod context;
 mod types;
 
 pub use context::ContentContext;
-pub use types::{NewsItem, TopicItem};
+pub use types::{
+    CreateTopicOptions, ListMyTopicsOptions, OwnedTopic, NewsItem,
+    TopicAuthor, TopicImage, TopicItem,
+};

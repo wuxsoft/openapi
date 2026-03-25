@@ -3,9 +3,11 @@ use std::sync::Arc;
 use longbridge::blocking::ContentContextSync;
 use pyo3::prelude::*;
 
+use longbridge::content::{CreateTopicOptions, ListMyTopicsOptions};
+
 use crate::{
     config::Config,
-    content::types::{NewsItem, TopicItem},
+    content::types::{OwnedTopic, NewsItem, TopicItem},
     error::ErrorNewType,
 };
 
@@ -21,6 +23,50 @@ impl ContentContext {
         Ok(Self {
             ctx: ContentContextSync::new(Arc::new(config.0.clone())).map_err(ErrorNewType)?,
         })
+    }
+
+    /// Get topics created by the current authenticated user
+    #[pyo3(signature = (page = None, size = None, topic_type = None))]
+    pub fn topics_mine(
+        &self,
+        page: Option<i32>,
+        size: Option<i32>,
+        topic_type: Option<String>,
+    ) -> PyResult<Vec<OwnedTopic>> {
+        self.ctx
+            .topics_mine(ListMyTopicsOptions {
+                page,
+                size,
+                topic_type,
+            })
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
+    }
+
+    /// Create a new topic
+    #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None, license = None))]
+    pub fn create_topic(
+        &self,
+        title: String,
+        body: String,
+        topic_type: Option<String>,
+        tickers: Option<Vec<String>>,
+        hashtags: Option<Vec<String>>,
+        license: Option<i32>,
+    ) -> PyResult<OwnedTopic> {
+        self.ctx
+            .create_topic(CreateTopicOptions {
+                title,
+                body,
+                topic_type,
+                tickers,
+                hashtags,
+                license,
+            })
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Get discussion topics list

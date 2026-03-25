@@ -4,12 +4,15 @@ use jni::{
     JNIEnv,
     objects::{JClass, JObject},
 };
-use longbridge::{Config, content::ContentContext};
+use longbridge::{
+    Config,
+    content::{ContentContext, CreateTopicOptions, ListMyTopicsOptions},
+};
 
 use crate::{
     async_util,
     error::jni_result,
-    types::{FromJValue, ObjectArray},
+    types::{FromJValue, JavaInteger, ObjectArray, get_field},
 };
 
 struct ContextObj {
@@ -36,6 +39,68 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeContentContext(
     ctx: i64,
 ) {
     let _ = Box::from_raw(ctx as *mut ContextObj);
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextTopicsMine(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
+        let size: Option<JavaInteger> = get_field(env, &opts, "size")?;
+        let topic_type: Option<String> = get_field(env, &opts, "topicType")?;
+        async_util::execute(env, callback, async move {
+            Ok(ObjectArray(
+                context
+                    .ctx
+                    .topics_mine(ListMyTopicsOptions {
+                        page: page.map(i32::from),
+                        size: size.map(i32::from),
+                        topic_type,
+                    })
+                    .await?,
+            ))
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextCreateTopic(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let title: String = get_field(env, &opts, "title")?;
+        let body: String = get_field(env, &opts, "body")?;
+        let topic_type: Option<String> = get_field(env, &opts, "topicType")?;
+        let tickers: Option<ObjectArray<String>> = get_field(env, &opts, "tickers")?;
+        let hashtags: Option<ObjectArray<String>> = get_field(env, &opts, "hashtags")?;
+        let license: Option<JavaInteger> = get_field(env, &opts, "license")?;
+        async_util::execute(env, callback, async move {
+            Ok(context
+                .ctx
+                .create_topic(CreateTopicOptions {
+                    title,
+                    body,
+                    topic_type,
+                    tickers: tickers.map(|a| a.0),
+                    hashtags: hashtags.map(|a| a.0),
+                    license: license.map(i32::from),
+                })
+                .await?)
+        })?;
+        Ok(())
+    })
 }
 
 #[unsafe(no_mangle)]

@@ -104,7 +104,10 @@ using longbridge::trade::TimeInForceType;
 using longbridge::trade::TopicType;
 using longbridge::trade::TriggerStatus;
 using longbridge::quote::FilingItem;
+using longbridge::content::OwnedTopic;
 using longbridge::content::NewsItem;
+using longbridge::content::TopicAuthor;
+using longbridge::content::TopicImage;
 using longbridge::content::TopicItem;
 
 inline lb_language_t
@@ -2240,6 +2243,49 @@ convert(const lb_news_item_t* item)
                    item->comments_count,
                    item->likes_count,
                    item->shares_count };
+}
+
+inline TopicAuthor
+convert(const lb_topic_author_t* a)
+{
+  return TopicAuthor{ a->member_id, a->name, a->avatar };
+}
+
+inline TopicImage
+convert(const lb_topic_image_t* img)
+{
+  return TopicImage{ img->url, img->sm, img->lg };
+}
+
+inline OwnedTopic
+convert(const lb_owned_topic_t* item)
+{
+  std::vector<std::string> tickers(item->tickers,
+                                   item->tickers + item->num_tickers);
+  std::vector<std::string> hashtags(item->hashtags,
+                                    item->hashtags + item->num_hashtags);
+  std::vector<TopicImage> images;
+  std::transform(item->images,
+                 item->images + item->num_images,
+                 std::back_inserter(images),
+                 [](const lb_topic_image_t& img) { return convert(&img); });
+  return OwnedTopic{ item->id,
+                      item->title,
+                      item->description,
+                      item->body,
+                      convert(&item->author),
+                      std::move(tickers),
+                      std::move(hashtags),
+                      std::move(images),
+                      item->likes_count,
+                      item->comments_count,
+                      item->views_count,
+                      item->shares_count,
+                      item->topic_type,
+                      item->license,
+                      item->detail_url,
+                      item->created_at,
+                      item->updated_at };
 }
 
 } // namespace convert

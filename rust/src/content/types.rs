@@ -3,6 +3,124 @@ use time::OffsetDateTime;
 
 use crate::serde_utils;
 
+/// Topic author
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TopicAuthor {
+    /// Member ID
+    #[serde(default)]
+    pub member_id: String,
+    /// Display name
+    #[serde(default)]
+    pub name: String,
+    /// Avatar URL
+    #[serde(default)]
+    pub avatar: String,
+}
+
+/// Topic image
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TopicImage {
+    /// Original image URL
+    #[serde(default)]
+    pub url: String,
+    /// Small thumbnail URL
+    #[serde(default)]
+    pub sm: String,
+    /// Large image URL
+    #[serde(default)]
+    pub lg: String,
+}
+
+/// My topic item (topic created by the current authenticated user)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OwnedTopic {
+    /// Topic ID
+    pub id: String,
+    /// Title
+    #[serde(default)]
+    pub title: String,
+    /// Plain text excerpt
+    #[serde(default)]
+    pub description: String,
+    /// Markdown body
+    #[serde(default)]
+    pub body: String,
+    /// Author
+    pub author: TopicAuthor,
+    /// Related stock tickers, format: {symbol}.{market}
+    #[serde(default)]
+    pub tickers: Vec<String>,
+    /// Hashtag names
+    #[serde(default)]
+    pub hashtags: Vec<String>,
+    /// Images
+    #[serde(default)]
+    pub images: Vec<TopicImage>,
+    /// Likes count
+    pub likes_count: i32,
+    /// Comments count
+    pub comments_count: i32,
+    /// Views count
+    pub views_count: i32,
+    /// Shares count
+    pub shares_count: i32,
+    /// Content type: "article" or "post"
+    #[serde(default)]
+    pub topic_type: String,
+    /// License: 0=none, 1=original, 2=non-original
+    pub license: i32,
+    /// URL to the full topic page
+    #[serde(default)]
+    pub detail_url: String,
+    /// Created time
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
+    pub created_at: OffsetDateTime,
+    /// Updated time
+    #[serde(
+        serialize_with = "time::serde::rfc3339::serialize",
+        deserialize_with = "serde_utils::timestamp::deserialize"
+    )]
+    pub updated_at: OffsetDateTime,
+}
+
+/// Options for listing topics created by the current authenticated user
+#[derive(Debug, Default, Clone, Serialize)]
+pub struct ListMyTopicsOptions {
+    /// Page number (default 1)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page: Option<i32>,
+    /// Records per page, range 1~500 (default 50)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<i32>,
+    /// Filter by topic type: "article" or "post"; empty returns all
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub topic_type: Option<String>,
+}
+
+/// Options for creating a topic
+#[derive(Debug, Clone, Serialize)]
+pub struct CreateTopicOptions {
+    /// Topic title (required)
+    pub title: String,
+    /// Topic body in Markdown format (required)
+    pub body: String,
+    /// Content type: "article" (long-form) or "post" (short post, default)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub topic_type: Option<String>,
+    /// Related stock tickers, format: {symbol}.{market}, max 10
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tickers: Option<Vec<String>>,
+    /// Hashtag names, max 5
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hashtags: Option<Vec<String>>,
+    /// License: 0=none (default), 1=original, 2=non-original
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub license: Option<i32>,
+}
+
 /// Topic item
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TopicItem {

@@ -27,6 +27,14 @@ public:
 
   static ContentContext create(const Config& config);
 
+  /// Get topics created by the current authenticated user
+  void topics_mine(const ListMyTopicsOptions& opts,
+                   AsyncCallback<ContentContext, std::vector<OwnedTopic>> callback) const;
+
+  /// Create a new topic
+  void create_topic(const CreateTopicOptions& opts,
+                    AsyncCallback<ContentContext, OwnedTopic> callback) const;
+
   /// Get discussion topics list for a symbol
   void topics(const std::string& symbol,
               AsyncCallback<ContentContext, std::vector<TopicItem>> callback) const;
