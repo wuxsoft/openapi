@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [4.0.6]
+
+## Added
+
+- **All bindings:** `ContentContext` adds two new methods (Rust, Go, C, C++, Java, Python, Node.js):
+  - `topics_mine(opts)` — get topics created by the current authenticated user, with optional page/size/topic_type filtering.
+  - `create_topic(opts)` — create a new topic; returns the full `OwnedTopic` on success.
+- **All bindings:** New types `OwnedTopic`, `ListMyTopicsOptions`, and `CreateTopicOptions` to support the above methods.
+
 # [4.0.5]
 
 ## Changed

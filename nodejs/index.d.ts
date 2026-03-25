@@ -221,6 +221,10 @@ export declare class Config {
 export declare class ContentContext {
   /** Create a new `ContentContext` */
   static new(config: Config): ContentContext
+  /** Get topics created by the current authenticated user */
+  topicsMine(req?: ListMyTopicsRequest | undefined | null): Promise<Array<OwnedTopic>>
+  /** Create a new topic */
+  createTopic(req: CreateTopicRequest): Promise<OwnedTopic>
   /** Get discussion topics list */
   topics(symbol: string): Promise<Array<TopicItem>>
   /** Get news list */
@@ -949,6 +953,46 @@ export declare class OrderHistoryDetail {
   get msg(): string
   /** Occurrence time */
   get time(): Date
+}
+
+/** My topic item (topic created by the current authenticated user) */
+export declare class OwnedTopic {
+  toString(): string
+  toJSON(): any
+  /** Topic ID */
+  get id(): string
+  /** Title */
+  get title(): string
+  /** Plain text excerpt */
+  get description(): string
+  /** Markdown body */
+  get body(): string
+  /** Author */
+  get author(): TopicAuthor
+  /** Related stock tickers */
+  get tickers(): Array<string>
+  /** Hashtag names */
+  get hashtags(): Array<string>
+  /** Images */
+  get images(): Array<TopicImage>
+  /** Likes count */
+  get likesCount(): number
+  /** Comments count */
+  get commentsCount(): number
+  /** Views count */
+  get viewsCount(): number
+  /** Shares count */
+  get sharesCount(): number
+  /** Content type: "article" or "post" */
+  get topicType(): string
+  /** License: 0=none, 1=original, 2=non-original */
+  get license(): number
+  /** URL to the full topic page */
+  get detailUrl(): string
+  /** Created time */
+  get createdAt(): Date
+  /** Updated time */
+  get updatedAt(): Date
 }
 
 /** Participant info */
@@ -2046,6 +2090,30 @@ export declare class Time {
   toJSON(): any
 }
 
+/** Topic author */
+export declare class TopicAuthor {
+  toString(): string
+  toJSON(): any
+  /** Member ID */
+  get memberId(): string
+  /** Display name */
+  get name(): string
+  /** Avatar URL */
+  get avatar(): string
+}
+
+/** Topic image */
+export declare class TopicImage {
+  toString(): string
+  toJSON(): any
+  /** Original image URL */
+  get url(): string
+  /** Small thumbnail URL */
+  get sm(): string
+  /** Large image URL */
+  get lg(): string
+}
+
 /** Topic item */
 export declare class TopicItem {
   toString(): string
@@ -2685,6 +2753,22 @@ export declare const enum CommissionFreeStatus {
   Ready = 4
 }
 
+/** Options for creating a topic */
+export interface CreateTopicRequest {
+  /** Topic title (required) */
+  title: string
+  /** Topic body in Markdown format (required) */
+  body: string
+  /** Content type: "article" (long-form) or "post" (short post, default) */
+  topicType?: string
+  /** Related stock tickers, format: {symbol}.{market}, max 10 */
+  tickers?: Array<string>
+  /** Hashtag names, max 5 */
+  hashtags?: Array<string>
+  /** License: 0=none (default), 1=original, 2=non-original */
+  license?: number
+}
+
 /** An request to create a watchlist group */
 export interface CreateWatchlistGroup {
   /** Group name */
@@ -2869,6 +2953,16 @@ export declare const enum Language {
   ZH_HK = 1,
   /** en */
   EN = 2
+}
+
+/** Options for listing topics created by the current authenticated user */
+export interface ListMyTopicsRequest {
+  /** Page number (default 1) */
+  page?: number
+  /** Records per page, range 1~500 (default 50) */
+  size?: number
+  /** Filter by topic type: "article" or "post"; empty returns all */
+  topicType?: string
 }
 
 export declare const enum Market {

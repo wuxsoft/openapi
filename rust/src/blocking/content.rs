@@ -5,7 +5,9 @@ use tokio::sync::mpsc;
 use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
-    content::{ContentContext, NewsItem, TopicItem},
+    content::{
+        ContentContext, CreateTopicOptions, ListMyTopicsOptions, NewsItem, OwnedTopic, TopicItem,
+    },
 };
 
 /// Blocking content context
@@ -26,6 +28,18 @@ impl ContentContextSync {
             |_: std::convert::Infallible| {},
         )?;
         Ok(Self { rt })
+    }
+
+    /// Get topics created by the current authenticated user
+    pub fn topics_mine(&self, opts: ListMyTopicsOptions) -> Result<Vec<OwnedTopic>> {
+        self.rt
+            .call(move |ctx| async move { ctx.topics_mine(opts).await })
+    }
+
+    /// Create a new topic
+    pub fn create_topic(&self, opts: CreateTopicOptions) -> Result<OwnedTopic> {
+        self.rt
+            .call(move |ctx| async move { ctx.create_topic(opts).await })
     }
 
     /// Get discussion topics list

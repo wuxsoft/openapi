@@ -177,6 +177,9 @@ pub extern "system" fn Java_com_longbridge_SdkNative_init<'a>(
         longbridge::trade::OrderDetail,
         longbridge::trade::EstimateMaxPurchaseQuantityResponse,
         longbridge::content::TopicItem,
-        longbridge::content::NewsItem
+        longbridge::content::NewsItem,
+        longbridge::content::TopicAuthor,
+        longbridge::content::TopicImage,
+        longbridge::content::OwnedTopic
     );
 }

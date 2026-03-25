@@ -2127,6 +2127,95 @@ struct NewsItem
   int32_t shares_count;
 };
 
+/// Topic author
+struct TopicAuthor
+{
+  /// Member ID
+  std::string member_id;
+  /// Display name
+  std::string name;
+  /// Avatar URL
+  std::string avatar;
+};
+
+/// Topic image
+struct TopicImage
+{
+  /// Original image URL
+  std::string url;
+  /// Small thumbnail URL
+  std::string sm;
+  /// Large image URL
+  std::string lg;
+};
+
+/// My topic item (created by the current authenticated user)
+struct OwnedTopic
+{
+  /// Topic ID
+  std::string id;
+  /// Title
+  std::string title;
+  /// Plain text excerpt
+  std::string description;
+  /// Markdown body
+  std::string body;
+  /// Author
+  TopicAuthor author;
+  /// Related stock tickers
+  std::vector<std::string> tickers;
+  /// Hashtag names
+  std::vector<std::string> hashtags;
+  /// Images
+  std::vector<TopicImage> images;
+  /// Likes count
+  int32_t likes_count;
+  /// Comments count
+  int32_t comments_count;
+  /// Views count
+  int32_t views_count;
+  /// Shares count
+  int32_t shares_count;
+  /// Content type: "article" or "post"
+  std::string topic_type;
+  /// License: 0=none, 1=original, 2=non-original
+  int32_t license;
+  /// URL to the full topic page
+  std::string detail_url;
+  /// Created time (Unix timestamp)
+  int64_t created_at;
+  /// Updated time (Unix timestamp)
+  int64_t updated_at;
+};
+
+/// Options for listing topics created by the current authenticated user
+struct ListMyTopicsOptions
+{
+  /// Page number (0 = default 1)
+  int32_t page = 0;
+  /// Records per page, range 1~500 (0 = default 50)
+  int32_t size = 0;
+  /// Filter by content type: "article" or "post" (empty = all)
+  std::string topic_type;
+};
+
+/// Options for creating a topic
+struct CreateTopicOptions
+{
+  /// Topic title (required)
+  std::string title;
+  /// Topic body in Markdown format (required)
+  std::string body;
+  /// Content type: "article" or "post" (empty = default "post")
+  std::string topic_type;
+  /// Related stock tickers, format: {symbol}.{market}, max 10
+  std::vector<std::string> tickers;
+  /// Hashtag names, max 5
+  std::vector<std::string> hashtags;
+  /// License: 0=none (default), 1=original, 2=non-original (-1 = not set)
+  int32_t license = -1;
+};
+
 } // namespace content
 
 } // namespace longbridge

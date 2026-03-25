@@ -4,7 +4,10 @@ use napi::Result;
 
 use crate::{
     config::Config,
-    content::types::{NewsItem, TopicItem},
+    content::{
+        requests::{CreateTopicRequest, ListMyTopicsRequest},
+        types::{NewsItem, OwnedTopic, TopicItem},
+    },
     error::ErrorNewType,
 };
 
@@ -23,6 +26,28 @@ impl ContentContext {
         Self {
             ctx: longbridge::content::ContentContext::new(Arc::new(config.0.clone())),
         }
+    }
+
+    /// Get topics created by the current authenticated user
+    #[napi]
+    pub async fn topics_mine(&self, req: Option<ListMyTopicsRequest>) -> Result<Vec<OwnedTopic>> {
+        self.ctx
+            .topics_mine(req.unwrap_or_default().into())
+            .await
+            .map_err(ErrorNewType)?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
+    }
+
+    /// Create a new topic
+    #[napi]
+    pub async fn create_topic(&self, req: CreateTopicRequest) -> Result<OwnedTopic> {
+        self.ctx
+            .create_topic(req.into())
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
     }
 
     /// Get discussion topics list

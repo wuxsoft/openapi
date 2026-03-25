@@ -61,6 +61,10 @@ public class SdkNative {
 
         public static native void freeContentContext(long context);
 
+        public static native void contentContextTopicsMine(long context, Object opts, AsyncCallback callback);
+
+        public static native void contentContextCreateTopic(long context, Object opts, AsyncCallback callback);
+
         public static native void contentContextTopics(long context, String symbol, AsyncCallback callback);
 
         public static native void contentContextNews(long context, String symbol, AsyncCallback callback);

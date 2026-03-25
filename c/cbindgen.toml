@@ -130,6 +130,9 @@ cpp_compat = true
 "CMarketTemperature" = "lb_market_temperature_t"
 "CHistoryMarketTemperatureResponse" = "lb_history_market_temperature_response_t"
 "CFilingItem" = "lb_filing_item_t"
+"CTopicAuthor" = "lb_topic_author_t"
+"CTopicImage" = "lb_topic_image_t"
+"COwnedTopic" = "lb_owned_topic_t"
 "CTopicItem" = "lb_topic_item_t"
 "CNewsItem" = "lb_news_item_t"
 "CContentContext" = "lb_content_context_t"
@@ -174,6 +177,9 @@ include = [
     "CMarketTemperature",
     "CHistoryMarketTemperatureResponse",
     "CFilingItem",
+    "CTopicAuthor",
+    "CTopicImage",
+    "COwnedTopic",
     "CTopicItem",
     "CNewsItem",
     "COAuth",

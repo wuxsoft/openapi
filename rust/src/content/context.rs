@@ -3,7 +3,7 @@ use std::sync::Arc;
 use longbridge_httpcli::{HttpClient, Json, Method};
 use serde::Deserialize;
 
-use super::types::{NewsItem, TopicItem};
+use super::types::{CreateTopicOptions, ListMyTopicsOptions, NewsItem, OwnedTopic, TopicItem};
 use crate::{Config, Result};
 
 struct InnerContentContext {
@@ -20,6 +20,48 @@ impl ContentContext {
         Self(Arc::new(InnerContentContext {
             http_cli: config.create_http_client(),
         }))
+    }
+
+    /// Get topics created by the current authenticated user
+    ///
+    /// Path: GET /v1/content/topics/mine
+    pub async fn topics_mine(&self, opts: ListMyTopicsOptions) -> Result<Vec<OwnedTopic>> {
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            items: Vec<OwnedTopic>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/content/topics/mine")
+            .query_params(opts)
+            .response::<Json<Response>>()
+            .send()
+            .await?
+            .0
+            .items)
+    }
+
+    /// Create a new topic
+    ///
+    /// Path: POST /v1/content/topics
+    pub async fn create_topic(&self, opts: CreateTopicOptions) -> Result<OwnedTopic> {
+        #[derive(Debug, Deserialize)]
+        struct Response {
+            item: OwnedTopic,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/content/topics")
+            .body(Json(opts))
+            .response::<Json<Response>>()
+            .send()
+            .await?
+            .0
+            .item)
     }
 
     /// Get discussion topics list

@@ -1009,3 +1009,42 @@ impl_java_class!(
         shares_count
     ]
 );
+
+impl_java_class!(
+    "com/longbridge/content/TopicAuthor",
+    longbridge::content::TopicAuthor,
+    [member_id, name, avatar]
+);
+
+impl_java_class!(
+    "com/longbridge/content/TopicImage",
+    longbridge::content::TopicImage,
+    [url, sm, lg]
+);
+
+impl_java_class!(
+    "com/longbridge/content/OwnedTopic",
+    longbridge::content::OwnedTopic,
+    [
+        id,
+        title,
+        description,
+        body,
+        author,
+        #[java(objarray)]
+        tickers,
+        #[java(objarray)]
+        hashtags,
+        #[java(objarray)]
+        images,
+        likes_count,
+        comments_count,
+        views_count,
+        shares_count,
+        topic_type,
+        license,
+        detail_url,
+        created_at,
+        updated_at
+    ]
+);
