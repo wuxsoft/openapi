@@ -6,8 +6,7 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     content::{
-        ContentContext, CreateTopicOptions, ListMyTopicsOptions, OwnedTopic,
-        NewsItem, TopicItem,
+        ContentContext, CreateTopicOptions, ListMyTopicsOptions, NewsItem, OwnedTopic, TopicItem,
     },
 };
 

@@ -6,7 +6,7 @@ use crate::{
     config::Config,
     content::{
         requests::{CreateTopicRequest, ListMyTopicsRequest},
-        types::{OwnedTopic, NewsItem, TopicItem},
+        types::{NewsItem, OwnedTopic, TopicItem},
     },
     error::ErrorNewType,
 };
@@ -30,10 +30,7 @@ impl ContentContext {
 
     /// Get topics created by the current authenticated user
     #[napi]
-    pub async fn topics_mine(
-        &self,
-        req: Option<ListMyTopicsRequest>,
-    ) -> Result<Vec<OwnedTopic>> {
+    pub async fn topics_mine(&self, req: Option<ListMyTopicsRequest>) -> Result<Vec<OwnedTopic>> {
         self.ctx
             .topics_mine(req.unwrap_or_default().into())
             .await

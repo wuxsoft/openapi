@@ -1048,4 +1048,3 @@ impl_java_class!(
         updated_at
     ]
 );
-

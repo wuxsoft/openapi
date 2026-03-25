@@ -1,13 +1,14 @@
 use std::sync::Arc;
 
-use longbridge::blocking::ContentContextSync;
+use longbridge::{
+    blocking::ContentContextSync,
+    content::{CreateTopicOptions, ListMyTopicsOptions},
+};
 use pyo3::prelude::*;
-
-use longbridge::content::{CreateTopicOptions, ListMyTopicsOptions};
 
 use crate::{
     config::Config,
-    content::types::{OwnedTopic, NewsItem, TopicItem},
+    content::types::{NewsItem, OwnedTopic, TopicItem},
     error::ErrorNewType,
 };
 

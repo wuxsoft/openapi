@@ -5,9 +5,7 @@ use longbridge::content::{ContentContext, CreateTopicOptions, ListMyTopicsOption
 use crate::{
     async_call::{CAsyncCallback, execute_async},
     config::CConfig,
-    content_context::types::{
-        COwnedTopicOwned, CNewsItemOwned, CTopicItemOwned,
-    },
+    content_context::types::{CNewsItemOwned, COwnedTopicOwned, CTopicItemOwned},
     types::{CVec, cstr_array_to_rust, cstr_to_rust},
 };
 
@@ -80,12 +78,12 @@ pub unsafe extern "C" fn lb_content_context_topics_mine(
 /// @param ctx          Content context
 /// @param title        Topic title (required)
 /// @param body         Topic body in Markdown format (required)
-/// @param topic_type   Content type: "article" or "post" (NULL = default "post")
+/// @param topic_type   Type: "article" or "post" (NULL = "post")
 /// @param tickers      Related stock tickers array (NULL = none)
 /// @param num_tickers  Number of tickers
 /// @param hashtags     Hashtag names array (NULL = none)
 /// @param num_hashtags Number of hashtags
-/// @param license      License: 0=none, 1=original, 2=non-original (-1 = not set, use default)
+/// @param license      0=none, 1=original, 2=non-original (-1 = default)
 /// @param callback     Async callback
 /// @param userdata     User data passed to the callback
 #[unsafe(no_mangle)]

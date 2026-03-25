@@ -1,8 +1,6 @@
 use std::os::raw::c_char;
 
-use longbridge::content::{
-    OwnedTopic, NewsItem, TopicAuthor, TopicImage, TopicItem,
-};
+use longbridge::content::{NewsItem, OwnedTopic, TopicAuthor, TopicImage, TopicItem};
 
 use crate::{
     async_call::CAsyncResult,
