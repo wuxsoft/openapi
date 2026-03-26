@@ -4251,12 +4251,12 @@ void lb_content_context_release(const struct lb_content_context_t *ctx);
  * @param callback    Async callback
  * @param userdata    User data passed to the callback
  */
-void lb_content_context_topics_mine(const struct lb_content_context_t *ctx,
-                                    int32_t page,
-                                    int32_t size,
-                                    const char *topic_type,
-                                    lb_async_callback_t callback,
-                                    void *userdata);
+void lb_content_context_my_topics(const struct lb_content_context_t *ctx,
+                                  int32_t page,
+                                  int32_t size,
+                                  const char *topic_type,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
 
 /**
  * Create a new topic
