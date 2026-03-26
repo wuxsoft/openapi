@@ -3,7 +3,7 @@ use std::sync::Arc;
 use longbridge_httpcli::{HttpClient, Json, Method};
 use serde::Deserialize;
 
-use super::types::{CreateTopicOptions, ListMyTopicsOptions, NewsItem, OwnedTopic, TopicItem};
+use super::types::{CreateTopicOptions, MyTopicsOptions, NewsItem, OwnedTopic, TopicItem};
 use crate::{Config, Result};
 
 struct InnerContentContext {
@@ -25,7 +25,7 @@ impl ContentContext {
     /// Get topics created by the current authenticated user
     ///
     /// Path: GET /v1/content/topics/mine
-    pub async fn topics_mine(&self, opts: ListMyTopicsOptions) -> Result<Vec<OwnedTopic>> {
+    pub async fn my_topics(&self, opts: MyTopicsOptions) -> Result<Vec<OwnedTopic>> {
         #[derive(Debug, Deserialize)]
         struct Response {
             items: Vec<OwnedTopic>,

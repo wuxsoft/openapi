@@ -1,6 +1,6 @@
 use std::{ffi::c_void, os::raw::c_char, sync::Arc};
 
-use longbridge::content::{ContentContext, CreateTopicOptions, ListMyTopicsOptions};
+use longbridge::content::{ContentContext, CreateTopicOptions, MyTopicsOptions};
 
 use crate::{
     async_call::{CAsyncCallback, execute_async},
@@ -46,7 +46,7 @@ pub unsafe extern "C" fn lb_content_context_release(ctx: *const CContentContext)
 /// @param callback    Async callback
 /// @param userdata    User data passed to the callback
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn lb_content_context_topics_mine(
+pub unsafe extern "C" fn lb_content_context_my_topics(
     ctx: *const CContentContext,
     page: i32,
     size: i32,
@@ -62,7 +62,7 @@ pub unsafe extern "C" fn lb_content_context_topics_mine(
     };
     execute_async(callback, ctx, userdata, async move {
         let rows: CVec<COwnedTopicOwned> = ctx_inner
-            .topics_mine(ListMyTopicsOptions {
+            .my_topics(MyTopicsOptions {
                 page: if page > 0 { Some(page) } else { None },
                 size: if size > 0 { Some(size) } else { None },
                 topic_type,
@@ -83,7 +83,6 @@ pub unsafe extern "C" fn lb_content_context_topics_mine(
 /// @param num_tickers  Number of tickers
 /// @param hashtags     Hashtag names array (NULL = none)
 /// @param num_hashtags Number of hashtags
-/// @param license      0=none, 1=original, 2=non-original (-1 = default)
 /// @param callback     Async callback
 /// @param userdata     User data passed to the callback
 #[unsafe(no_mangle)]
@@ -96,7 +95,6 @@ pub unsafe extern "C" fn lb_content_context_create_topic(
     num_tickers: usize,
     hashtags: *const *const c_char,
     num_hashtags: usize,
-    license: i32,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -118,7 +116,6 @@ pub unsafe extern "C" fn lb_content_context_create_topic(
     } else {
         Some(cstr_array_to_rust(hashtags, num_hashtags))
     };
-    let license = if license >= 0 { Some(license) } else { None };
     execute_async(callback, ctx, userdata, async move {
         let id = ctx_inner
             .create_topic(CreateTopicOptions {
@@ -127,7 +124,6 @@ pub unsafe extern "C" fn lb_content_context_create_topic(
                 topic_type,
                 tickers,
                 hashtags,
-                license,
             })
             .await?;
         Ok(CString::from(id))

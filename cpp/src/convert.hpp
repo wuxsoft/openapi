@@ -2282,7 +2282,6 @@ convert(const lb_owned_topic_t* item)
                       item->views_count,
                       item->shares_count,
                       item->topic_type,
-                      item->license,
                       item->detail_url,
                       item->created_at,
                       item->updated_at };

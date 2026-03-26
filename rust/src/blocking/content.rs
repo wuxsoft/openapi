@@ -6,7 +6,7 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     content::{
-        ContentContext, CreateTopicOptions, ListMyTopicsOptions, NewsItem, OwnedTopic, TopicItem,
+        ContentContext, CreateTopicOptions, MyTopicsOptions, NewsItem, OwnedTopic, TopicItem,
     },
 };
 
@@ -31,9 +31,9 @@ impl ContentContextSync {
     }
 
     /// Get topics created by the current authenticated user
-    pub fn topics_mine(&self, opts: ListMyTopicsOptions) -> Result<Vec<OwnedTopic>> {
+    pub fn my_topics(&self, opts: MyTopicsOptions) -> Result<Vec<OwnedTopic>> {
         self.rt
-            .call(move |ctx| async move { ctx.topics_mine(opts).await })
+            .call(move |ctx| async move { ctx.my_topics(opts).await })
     }
 
     /// Create a new topic

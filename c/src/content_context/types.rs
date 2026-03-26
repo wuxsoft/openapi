@@ -117,8 +117,6 @@ pub struct COwnedTopic {
     pub shares_count: i32,
     /// Content type: "article" or "post"
     pub topic_type: *const c_char,
-    /// License: 0=none, 1=original, 2=non-original
-    pub license: i32,
     /// URL to the full topic page
     pub detail_url: *const c_char,
     /// Created time (Unix timestamp)
@@ -142,7 +140,6 @@ pub(crate) struct COwnedTopicOwned {
     views_count: i32,
     shares_count: i32,
     topic_type: CString,
-    license: i32,
     detail_url: CString,
     created_at: i64,
     updated_at: i64,
@@ -164,7 +161,6 @@ impl From<OwnedTopic> for COwnedTopicOwned {
             views_count: item.views_count,
             shares_count: item.shares_count,
             topic_type: item.topic_type.into(),
-            license: item.license,
             detail_url: item.detail_url.into(),
             created_at: item.created_at.unix_timestamp(),
             updated_at: item.updated_at.unix_timestamp(),
@@ -192,7 +188,6 @@ impl ToFFI for COwnedTopicOwned {
             views_count: self.views_count,
             shares_count: self.shares_count,
             topic_type: self.topic_type.to_ffi_type(),
-            license: self.license,
             detail_url: self.detail_url.to_ffi_type(),
             created_at: self.created_at,
             updated_at: self.updated_at,

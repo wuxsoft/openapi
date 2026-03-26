@@ -4014,10 +4014,6 @@ typedef struct lb_owned_topic_t {
    */
   const char *topic_type;
   /**
-   * License: 0=none, 1=original, 2=non-original
-   */
-  int32_t license;
-  /**
    * URL to the full topic page
    */
   const char *detail_url;
@@ -4255,12 +4251,12 @@ void lb_content_context_release(const struct lb_content_context_t *ctx);
  * @param callback    Async callback
  * @param userdata    User data passed to the callback
  */
-void lb_content_context_topics_mine(const struct lb_content_context_t *ctx,
-                                    int32_t page,
-                                    int32_t size,
-                                    const char *topic_type,
-                                    lb_async_callback_t callback,
-                                    void *userdata);
+void lb_content_context_my_topics(const struct lb_content_context_t *ctx,
+                                  int32_t page,
+                                  int32_t size,
+                                  const char *topic_type,
+                                  lb_async_callback_t callback,
+                                  void *userdata);
 
 /**
  * Create a new topic
@@ -4273,7 +4269,6 @@ void lb_content_context_topics_mine(const struct lb_content_context_t *ctx,
  * @param num_tickers  Number of tickers
  * @param hashtags     Hashtag names array (NULL = none)
  * @param num_hashtags Number of hashtags
- * @param license      0=none, 1=original, 2=non-original (-1 = default)
  * @param callback     Async callback
  * @param userdata     User data passed to the callback
  */
@@ -4285,7 +4280,6 @@ void lb_content_context_create_topic(const struct lb_content_context_t *ctx,
                                      uintptr_t num_tickers,
                                      const char *const *hashtags,
                                      uintptr_t num_hashtags,
-                                     int32_t license,
                                      lb_async_callback_t callback,
                                      void *userdata);
 

@@ -34,10 +34,10 @@ public class ContentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OwnedTopic[]> getTopicsMine(ListMyTopicsOptions opts)
+    public CompletableFuture<OwnedTopic[]> getMyTopics(MyTopicsOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.contentContextTopicsMine(raw, opts, callback);
+            SdkNative.contentContextMyTopics(raw, opts, callback);
         });
     }
 
@@ -48,7 +48,7 @@ public class ContentContext implements AutoCloseable {
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<OwnedTopic> createTopic(CreateTopicOptions opts)
+    public CompletableFuture<String> createTopic(CreateTopicOptions opts)
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.contentContextCreateTopic(raw, opts, callback);

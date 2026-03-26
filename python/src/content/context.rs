@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use longbridge::{
     blocking::ContentContextSync,
-    content::{CreateTopicOptions, ListMyTopicsOptions},
+    content::{CreateTopicOptions, MyTopicsOptions},
 };
 use pyo3::prelude::*;
 
@@ -28,14 +28,14 @@ impl ContentContext {
 
     /// Get topics created by the current authenticated user
     #[pyo3(signature = (page = None, size = None, topic_type = None))]
-    pub fn topics_mine(
+    pub fn my_topics(
         &self,
         page: Option<i32>,
         size: Option<i32>,
         topic_type: Option<String>,
     ) -> PyResult<Vec<OwnedTopic>> {
         self.ctx
-            .topics_mine(ListMyTopicsOptions {
+            .my_topics(MyTopicsOptions {
                 page,
                 size,
                 topic_type,
@@ -47,7 +47,7 @@ impl ContentContext {
     }
 
     /// Create a new topic
-    #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None, license = None))]
+    #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None))]
     pub fn create_topic(
         &self,
         title: String,
@@ -55,7 +55,6 @@ impl ContentContext {
         topic_type: Option<String>,
         tickers: Option<Vec<String>>,
         hashtags: Option<Vec<String>>,
-        license: Option<i32>,
     ) -> PyResult<String> {
         Ok(self
             .ctx
@@ -65,7 +64,6 @@ impl ContentContext {
                 topic_type,
                 tickers,
                 hashtags,
-                license,
             })
             .map_err(ErrorNewType)?)
     }

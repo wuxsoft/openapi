@@ -4,7 +4,7 @@ package com.longbridge.content;
  * Options for listing topics created by the current authenticated user
  */
 @SuppressWarnings("unused")
-public class ListMyTopicsOptions {
+public class MyTopicsOptions {
     private Integer page;
     private Integer size;
     private String topicType;
@@ -15,7 +15,7 @@ public class ListMyTopicsOptions {
      * @param page page number
      * @return this instance for chaining
      */
-    public ListMyTopicsOptions setPage(int page) {
+    public MyTopicsOptions setPage(int page) {
         this.page = page;
         return this;
     }
@@ -26,7 +26,7 @@ public class ListMyTopicsOptions {
      * @param size records per page
      * @return this instance for chaining
      */
-    public ListMyTopicsOptions setSize(int size) {
+    public MyTopicsOptions setSize(int size) {
         this.size = size;
         return this;
     }
@@ -37,7 +37,7 @@ public class ListMyTopicsOptions {
      * @param topicType topic type filter
      * @return this instance for chaining
      */
-    public ListMyTopicsOptions setTopicType(String topicType) {
+    public MyTopicsOptions setTopicType(String topicType) {
         this.topicType = topicType;
         return this;
     }

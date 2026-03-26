@@ -57,18 +57,20 @@ pub struct OwnedTopic {
     #[serde(default)]
     pub images: Vec<TopicImage>,
     /// Likes count
+    #[serde(default)]
     pub likes_count: i32,
     /// Comments count
+    #[serde(default)]
     pub comments_count: i32,
     /// Views count
+    #[serde(default)]
     pub views_count: i32,
     /// Shares count
+    #[serde(default)]
     pub shares_count: i32,
     /// Content type: "article" or "post"
     #[serde(default)]
     pub topic_type: String,
-    /// License: 0=none, 1=original, 2=non-original
-    pub license: i32,
     /// URL to the full topic page
     #[serde(default)]
     pub detail_url: String,
@@ -88,7 +90,7 @@ pub struct OwnedTopic {
 
 /// Options for listing topics created by the current authenticated user
 #[derive(Debug, Default, Clone, Serialize)]
-pub struct ListMyTopicsOptions {
+pub struct MyTopicsOptions {
     /// Page number (default 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i32>,
@@ -116,9 +118,6 @@ pub struct CreateTopicOptions {
     /// Hashtag names, max 5
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hashtags: Option<Vec<String>>,
-    /// License: 0=none (default), 1=original, 2=non-original
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub license: Option<i32>,
 }
 
 /// Topic item

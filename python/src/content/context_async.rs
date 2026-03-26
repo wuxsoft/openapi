@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longbridge::content::{ContentContext, CreateTopicOptions, ListMyTopicsOptions};
+use longbridge::content::{ContentContext, CreateTopicOptions, MyTopicsOptions};
 use pyo3::{prelude::*, types::PyType};
 
 use crate::{
@@ -27,7 +27,7 @@ impl AsyncContentContext {
 
     /// Get topics created by the current authenticated user. Returns awaitable.
     #[pyo3(signature = (page = None, size = None, topic_type = None))]
-    fn topics_mine(
+    fn my_topics(
         &self,
         py: Python<'_>,
         page: Option<i32>,
@@ -37,7 +37,7 @@ impl AsyncContentContext {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let v = ctx
-                .topics_mine(ListMyTopicsOptions {
+                .my_topics(MyTopicsOptions {
                     page,
                     size,
                     topic_type,
@@ -52,7 +52,7 @@ impl AsyncContentContext {
     }
 
     /// Create a new topic. Returns awaitable.
-    #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None, license = None))]
+    #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None))]
     fn create_topic(
         &self,
         py: Python<'_>,
@@ -61,7 +61,6 @@ impl AsyncContentContext {
         topic_type: Option<String>,
         tickers: Option<Vec<String>>,
         hashtags: Option<Vec<String>>,
-        license: Option<i32>,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
@@ -72,7 +71,6 @@ impl AsyncContentContext {
                     topic_type,
                     tickers,
                     hashtags,
-                    license,
                 })
                 .await
                 .map_err(ErrorNewType)?)

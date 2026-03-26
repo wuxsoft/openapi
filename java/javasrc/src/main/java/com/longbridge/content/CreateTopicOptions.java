@@ -10,7 +10,6 @@ public class CreateTopicOptions {
     private String topicType;
     private String[] tickers;
     private String[] hashtags;
-    private Integer license;
 
     /**
      * Constructs a create-topic request.
@@ -56,14 +55,4 @@ public class CreateTopicOptions {
         return this;
     }
 
-    /**
-     * Sets the license: 0=none (default), 1=original, 2=non-original.
-     *
-     * @param license license value
-     * @return this instance for chaining
-     */
-    public CreateTopicOptions setLicense(int license) {
-        this.license = license;
-        return this;
-    }
 }
