@@ -5,7 +5,7 @@ use napi::Result;
 use crate::{
     config::Config,
     content::{
-        requests::{CreateTopicRequest, ListMyTopicsRequest},
+        requests::{CreateTopicRequest, MyTopicsRequest},
         types::{NewsItem, OwnedTopic, TopicItem},
     },
     error::ErrorNewType,
@@ -30,9 +30,9 @@ impl ContentContext {
 
     /// Get topics created by the current authenticated user
     #[napi]
-    pub async fn topics_mine(&self, req: Option<ListMyTopicsRequest>) -> Result<Vec<OwnedTopic>> {
+    pub async fn my_topics(&self, req: Option<MyTopicsRequest>) -> Result<Vec<OwnedTopic>> {
         self.ctx
-            .topics_mine(req.unwrap_or_default().into())
+            .my_topics(req.unwrap_or_default().into())
             .await
             .map_err(ErrorNewType)?
             .into_iter()

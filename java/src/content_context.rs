@@ -6,7 +6,7 @@ use jni::{
 };
 use longbridge::{
     Config,
-    content::{ContentContext, CreateTopicOptions, ListMyTopicsOptions},
+    content::{ContentContext, CreateTopicOptions, MyTopicsOptions},
 };
 
 use crate::{
@@ -42,7 +42,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_freeContentContext(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextTopicsMine(
+pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextMyTopics(
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
@@ -58,7 +58,7 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextTopics
             Ok(ObjectArray(
                 context
                     .ctx
-                    .topics_mine(ListMyTopicsOptions {
+                    .my_topics(MyTopicsOptions {
                         page: page.map(i32::from),
                         size: size.map(i32::from),
                         topic_type,
@@ -85,7 +85,6 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextCreate
         let topic_type: Option<String> = get_field(env, &opts, "topicType")?;
         let tickers: Option<ObjectArray<String>> = get_field(env, &opts, "tickers")?;
         let hashtags: Option<ObjectArray<String>> = get_field(env, &opts, "hashtags")?;
-        let license: Option<JavaInteger> = get_field(env, &opts, "license")?;
         async_util::execute(env, callback, async move {
             Ok(context
                 .ctx
@@ -95,7 +94,6 @@ pub unsafe extern "system" fn Java_com_longbridge_SdkNative_contentContextCreate
                     topic_type,
                     tickers: tickers.map(|a| a.0),
                     hashtags: hashtags.map(|a| a.0),
-                    license: license.map(i32::from),
                 })
                 .await?)
         })?;

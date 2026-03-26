@@ -28,7 +28,7 @@ public:
   static ContentContext create(const Config& config);
 
   /// Get topics created by the current authenticated user
-  void topics_mine(const ListMyTopicsOptions& opts,
+  void my_topics(const MyTopicsOptions& opts,
                    AsyncCallback<ContentContext, std::vector<OwnedTopic>> callback) const;
 
   /// Create a new topic

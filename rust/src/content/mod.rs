@@ -5,6 +5,6 @@ mod types;
 
 pub use context::ContentContext;
 pub use types::{
-    CreateTopicOptions, ListMyTopicsOptions, NewsItem, OwnedTopic, TopicAuthor, TopicImage,
+    CreateTopicOptions, MyTopicsOptions, NewsItem, OwnedTopic, TopicAuthor, TopicImage,
     TopicItem,
 };

@@ -63,8 +63,6 @@ pub(crate) struct OwnedTopic {
     shares_count: i32,
     /// Content type: "article" or "post"
     topic_type: String,
-    /// License: 0=none, 1=original, 2=non-original
-    license: i32,
     /// URL to the full topic page
     detail_url: String,
     /// Created time

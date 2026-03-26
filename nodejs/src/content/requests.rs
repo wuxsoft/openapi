@@ -1,9 +1,9 @@
-use longbridge::content::{CreateTopicOptions, ListMyTopicsOptions};
+use longbridge::content::{CreateTopicOptions, MyTopicsOptions};
 
 /// Options for listing topics created by the current authenticated user
 #[napi_derive::napi(object)]
 #[derive(Debug, Default)]
-pub struct ListMyTopicsRequest {
+pub struct MyTopicsRequest {
     /// Page number (default 1)
     pub page: Option<i32>,
     /// Records per page, range 1~500 (default 50)
@@ -12,13 +12,13 @@ pub struct ListMyTopicsRequest {
     pub topic_type: Option<String>,
 }
 
-impl From<ListMyTopicsRequest> for ListMyTopicsOptions {
+impl From<MyTopicsRequest> for MyTopicsOptions {
     fn from(
-        ListMyTopicsRequest {
+        MyTopicsRequest {
             page,
             size,
             topic_type,
-        }: ListMyTopicsRequest,
+        }: MyTopicsRequest,
     ) -> Self {
         Self {
             page,
@@ -42,8 +42,6 @@ pub struct CreateTopicRequest {
     pub tickers: Option<Vec<String>>,
     /// Hashtag names, max 5
     pub hashtags: Option<Vec<String>>,
-    /// License: 0=none (default), 1=original, 2=non-original
-    pub license: Option<i32>,
 }
 
 impl From<CreateTopicRequest> for CreateTopicOptions {
@@ -54,7 +52,6 @@ impl From<CreateTopicRequest> for CreateTopicOptions {
             topic_type,
             tickers,
             hashtags,
-            license,
         }: CreateTopicRequest,
     ) -> Self {
         Self {
@@ -63,7 +60,6 @@ impl From<CreateTopicRequest> for CreateTopicOptions {
             topic_type,
             tickers,
             hashtags,
-            license,
         }
     }
 }

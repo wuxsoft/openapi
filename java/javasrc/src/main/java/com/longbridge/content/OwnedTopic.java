@@ -19,7 +19,6 @@ public class OwnedTopic {
     private int viewsCount;
     private int sharesCount;
     private String topicType;
-    private int license;
     private String detailUrl;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -62,9 +61,6 @@ public class OwnedTopic {
 
     /** Returns the content type: "article" or "post". */
     public String getTopicType() { return topicType; }
-
-    /** Returns the license: 0=none, 1=original, 2=non-original. */
-    public int getLicense() { return license; }
 
     /** Returns the URL to the full topic page. */
     public String getDetailUrl() { return detailUrl; }

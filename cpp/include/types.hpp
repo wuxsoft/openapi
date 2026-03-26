@@ -2178,8 +2178,6 @@ struct OwnedTopic
   int32_t shares_count;
   /// Content type: "article" or "post"
   std::string topic_type;
-  /// License: 0=none, 1=original, 2=non-original
-  int32_t license;
   /// URL to the full topic page
   std::string detail_url;
   /// Created time (Unix timestamp)
@@ -2189,7 +2187,7 @@ struct OwnedTopic
 };
 
 /// Options for listing topics created by the current authenticated user
-struct ListMyTopicsOptions
+struct MyTopicsOptions
 {
   /// Page number (0 = default 1)
   int32_t page = 0;
@@ -2212,8 +2210,6 @@ struct CreateTopicOptions
   std::vector<std::string> tickers;
   /// Hashtag names, max 5
   std::vector<std::string> hashtags;
-  /// License: 0=none (default), 1=original, 2=non-original (-1 = not set)
-  int32_t license = -1;
 };
 
 } // namespace content

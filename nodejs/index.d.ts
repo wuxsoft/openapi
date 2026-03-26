@@ -222,9 +222,9 @@ export declare class ContentContext {
   /** Create a new `ContentContext` */
   static new(config: Config): ContentContext
   /** Get topics created by the current authenticated user */
-  topicsMine(req?: ListMyTopicsRequest | undefined | null): Promise<Array<OwnedTopic>>
+  myTopics(req?: MyTopicsRequest | undefined | null): Promise<Array<OwnedTopic>>
   /** Create a new topic */
-  createTopic(req: CreateTopicRequest): Promise<OwnedTopic>
+  createTopic(req: CreateTopicRequest): Promise<string>
   /** Get discussion topics list */
   topics(symbol: string): Promise<Array<TopicItem>>
   /** Get news list */
@@ -985,8 +985,6 @@ export declare class OwnedTopic {
   get sharesCount(): number
   /** Content type: "article" or "post" */
   get topicType(): string
-  /** License: 0=none, 1=original, 2=non-original */
-  get license(): number
   /** URL to the full topic page */
   get detailUrl(): string
   /** Created time */
@@ -2765,8 +2763,6 @@ export interface CreateTopicRequest {
   tickers?: Array<string>
   /** Hashtag names, max 5 */
   hashtags?: Array<string>
-  /** License: 0=none (default), 1=original, 2=non-original */
-  license?: number
 }
 
 /** An request to create a watchlist group */
@@ -2955,16 +2951,6 @@ export declare const enum Language {
   EN = 2
 }
 
-/** Options for listing topics created by the current authenticated user */
-export interface ListMyTopicsRequest {
-  /** Page number (default 1) */
-  page?: number
-  /** Records per page, range 1~500 (default 50) */
-  size?: number
-  /** Filter by topic type: "article" or "post"; empty returns all */
-  topicType?: string
-}
-
 export declare const enum Market {
   /** Unknown */
   Unknown = 0,
@@ -2978,6 +2964,16 @@ export declare const enum Market {
   SG = 4,
   /** Crypto market */
   Crypto = 5
+}
+
+/** Options for listing topics created by the current authenticated user */
+export interface MyTopicsRequest {
+  /** Page number (default 1) */
+  page?: number
+  /** Records per page, range 1~500 (default 50) */
+  size?: number
+  /** Filter by topic type: "article" or "post"; empty returns all */
+  topicType?: string
 }
 
 /** Option direction */

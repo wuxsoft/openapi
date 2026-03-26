@@ -1042,7 +1042,6 @@ impl_java_class!(
         views_count,
         shares_count,
         topic_type,
-        license,
         detail_url,
         created_at,
         updated_at

@@ -64,13 +64,13 @@ ContentContext::create(const Config& config)
 }
 
 void
-ContentContext::topics_mine(
-  const ListMyTopicsOptions& opts,
+ContentContext::my_topics(
+  const MyTopicsOptions& opts,
   AsyncCallback<ContentContext, std::vector<OwnedTopic>> callback) const
 {
   const char* topic_type =
     opts.topic_type.empty() ? nullptr : opts.topic_type.c_str();
-  lb_content_context_topics_mine(
+  lb_content_context_my_topics(
     ctx_,
     opts.page,
     opts.size,
@@ -126,7 +126,6 @@ ContentContext::create_topic(
     tickers_cstr.size(),
     hashtags_cstr.empty() ? nullptr : hashtags_cstr.data(),
     hashtags_cstr.size(),
-    opts.license,
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<ContentContext, OwnedTopic>(
