@@ -38,6 +38,18 @@ cargo make protoc
 The generated `*.rs` files under `rust/crates/proto/src/` are **auto-generated** — never edit
 them by hand.
 
+## After modifying the Python SDK API (`python/`)
+
+`python/pysrc/longbridge/openapi.pyi` is a **manually maintained** type-stub
+file that provides type hints and docstrings for the native Rust/PyO3 extension
+module. IDEs and type checkers (mypy/pyright) rely on it for autocompletion and
+static analysis.
+
+When you add, remove, or change any `#[pyclass]`/`#[pymethods]` definitions in
+`python/src/`, you **must** update `openapi.pyi` accordingly — keeping
+signatures, type annotations, and docstrings in sync with the Rust
+implementation.
+
 ## After modifying the C SDK (`c/`)
 
 `c/csrc/include/longbridge.h` is **auto-generated** by `cbindgen` during the
@@ -46,3 +58,10 @@ build — never edit it by hand. Rebuild the C crate to update it:
 ```bash
 cargo build -p longbridge-c
 ```
+
+## After any change
+
+Update `CHANGELOG.md` in the workspace root to document notable changes. The
+format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Add an
+entry under the appropriate section (`Added`, `Changed`, `Fixed`, `Breaking
+changes`, etc.) in the current (top-most) version block.
