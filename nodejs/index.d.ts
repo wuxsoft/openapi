@@ -1997,7 +1997,7 @@ export declare class SecurityStaticInfo {
   get epsTtm(): Decimal
   /** Net assets per share */
   get bps(): Decimal
-  /** Dividend yield */
+  /** Dividend (per share), **not** the dividend yield (ratio). */
   get dividendYield(): Decimal
   /** Types of supported derivatives */
   get stockDerivatives(): Array<DerivativeType>

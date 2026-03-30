@@ -63,5 +63,7 @@ cargo build -p longbridge-c
 
 Update `CHANGELOG.md` in the workspace root to document notable changes. The
 format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Add an
-entry under the appropriate section (`Added`, `Changed`, `Fixed`, `Breaking
-changes`, etc.) in the current (top-most) version block.
+entry under the `[Unreleased]` section in the appropriate subsection (`Added`,
+`Changed`, `Fixed`, `Breaking changes`, etc.). If the `[Unreleased]` section
+does not yet exist, create it at the top of the changelog (above the latest
+versioned block).

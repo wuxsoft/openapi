@@ -2196,7 +2196,7 @@ typedef struct lb_security_static_info_t {
    */
   const struct lb_decimal_t *bps;
   /**
-   * Dividend yield
+   * Dividend (per share), **not** the dividend yield (ratio).
    */
   const struct lb_decimal_t *dividend_yield;
   /**

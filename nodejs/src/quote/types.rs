@@ -392,7 +392,7 @@ pub struct SecurityStaticInfo {
     eps_ttm: Decimal,
     /// Net assets per share
     bps: Decimal,
-    /// Dividend yield
+    /// Dividend (per share), **not** the dividend yield (ratio).
     dividend_yield: Decimal,
     /// Types of supported derivatives
     #[js(derivative_types)]

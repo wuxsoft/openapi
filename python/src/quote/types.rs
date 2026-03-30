@@ -365,7 +365,7 @@ pub(crate) struct SecurityStaticInfo {
     eps_ttm: PyDecimal,
     /// Net assets per share
     bps: PyDecimal,
-    /// Dividend yield
+    /// Dividend (per share), **not** the dividend yield (ratio).
     dividend_yield: PyDecimal,
     /// Types of supported derivatives
     #[py(derivative_types)]

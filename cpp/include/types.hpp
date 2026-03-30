@@ -365,7 +365,7 @@ struct SecurityStaticInfo
   Decimal eps_ttm;
   /// Net assets per share
   Decimal bps;
-  /// Dividend yield
+  /// Dividend (per share), **not** the dividend yield (ratio).
   Decimal dividend_yield;
   /// Types of supported derivatives
   DerivativeType stock_derivatives;

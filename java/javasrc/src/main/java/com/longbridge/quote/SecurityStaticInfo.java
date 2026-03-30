@@ -142,9 +142,9 @@ public class SecurityStaticInfo {
     }
 
     /**
-     * Returns the dividend yield.
+     * Returns the dividend (per share), <b>not</b> the dividend yield (ratio).
      *
-     * @return the dividend yield
+     * @return the dividend (per share)
      */
     public BigDecimal getDividendYield() {
         return dividendYield;

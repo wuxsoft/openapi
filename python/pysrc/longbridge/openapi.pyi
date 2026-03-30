@@ -873,7 +873,7 @@ class SecurityStaticInfo:
 
     dividend_yield: Decimal
     """
-    Dividend yield
+    Dividend (per share), **not** the dividend yield (ratio).
     """
 
     stock_derivatives: List[Type[DerivativeType]]

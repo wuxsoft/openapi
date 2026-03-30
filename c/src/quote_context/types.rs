@@ -677,7 +677,7 @@ pub struct CSecurityStaticInfo {
     pub eps_ttm: *const CDecimal,
     /// Net assets per share
     pub bps: *const CDecimal,
-    /// Dividend yield
+    /// Dividend (per share), **not** the dividend yield (ratio).
     pub dividend_yield: *const CDecimal,
     /// Types of supported derivatives
     pub stock_derivatives: u8,
