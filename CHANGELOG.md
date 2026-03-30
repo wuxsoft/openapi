@@ -6,9 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [Unreleased]
 
+## Added
+
+- **Rust, Python:** `ContentContext` adds three new methods:
+  - `topic_detail(topic_id)` — get detail of a single topic.
+  - `list_topic_replies(opts)` — list replies for a topic, with optional page/size filtering.
+  - `create_topic_reply(opts)` — create a reply under a topic.
+- **Rust, Python:** New types `ListTopicRepliesOptions`, `CreateReplyOptions`, and `TopicReply` to support the above methods.
+
 ## Fixed
 
 - **All bindings:** Correct `SecurityStaticInfo.dividend_yield` doc comment from "Dividend yield" (ratio) to "Dividend" (per share amount) across all language SDKs (Rust, Python, Node.js, Java, C, C++).
+- **All bindings:** `create_topic` now returns the topic ID (`String`) instead of `OwnedTopic` to avoid deserialization errors when the API response omits optional fields.
+
+## Changed
+
+- **All bindings:** `ContentContext.topics_mine` renamed to `my_topics`; `ListMyTopicsOptions` renamed to `MyTopicsOptions`.
+- **All bindings:** `license` field removed from `OwnedTopic` and `CreateTopicOptions`.
 
 # [4.0.6]
 
