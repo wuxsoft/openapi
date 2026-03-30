@@ -7840,191 +7840,6 @@ class AsyncTradeContext:
         """
         ...
 
-class TopicAuthor:
-    """Topic author"""
-
-    member_id: str
-    """Member ID"""
-    name: str
-    """Display name"""
-    avatar: str
-    """Avatar URL"""
-
-class TopicImage:
-    """Topic image"""
-
-    url: str
-    """Original image URL"""
-    sm: str
-    """Small thumbnail URL"""
-    lg: str
-    """Large image URL"""
-
-class OwnedTopic:
-    """Topic created by the current authenticated user"""
-
-    id: str
-    """Topic ID"""
-    title: str
-    """Title"""
-    description: str
-    """Plain text excerpt"""
-    body: str
-    """Markdown body"""
-    author: TopicAuthor
-    """Author"""
-    tickers: list[str]
-    """Related stock tickers"""
-    hashtags: list[str]
-    """Hashtag names"""
-    images: list[TopicImage]
-    """Images"""
-    likes_count: int
-    """Likes count"""
-    comments_count: int
-    """Comments count"""
-    views_count: int
-    """Views count"""
-    shares_count: int
-    """Shares count"""
-    topic_type: str
-    """Content type: "article" or "post" """
-    detail_url: str
-    """URL to the full topic page"""
-    created_at: datetime
-    """Created time"""
-    updated_at: datetime
-    """Updated time"""
-
-class TopicReply:
-    """A reply on a topic"""
-
-    id: str
-    """Reply ID"""
-    topic_id: str
-    """Topic ID this reply belongs to"""
-    body: str
-    """Reply body (plain text)"""
-    reply_to_id: str
-    """ID of the parent reply ("0" means top-level)"""
-    author: TopicAuthor
-    """Author info"""
-    images: list[TopicImage]
-    """Attached images"""
-    likes_count: int
-    """Likes count"""
-    comments_count: int
-    """Nested replies count"""
-    created_at: datetime
-    """Created time"""
-
-class ContentContext:
-    """Content context for Longbridge community APIs"""
-
-    def __init__(self, config: Config) -> None: ...
-    def my_topics(
-        self,
-        page: Optional[int] = None,
-        size: Optional[int] = None,
-        topic_type: Optional[str] = None,
-    ) -> list[OwnedTopic]:
-        """Get topics created by the current authenticated user"""
-        ...
-
-    def create_topic(
-        self,
-        title: str,
-        body: str,
-        topic_type: Optional[str] = None,
-        tickers: Optional[list[str]] = None,
-        hashtags: Optional[list[str]] = None,
-    ) -> str:
-        """Create a new community topic, returns the topic ID"""
-        ...
-
-    def topics(self, symbol: str) -> list[TopicItem]:
-        """Get discussion topics list for a symbol"""
-        ...
-
-    def news(self, symbol: str) -> list[NewsItem]:
-        """Get news list for a symbol"""
-        ...
-
-    def topic_detail(self, id: str) -> OwnedTopic:
-        """Get full details of a topic by its ID"""
-        ...
-
-    def list_topic_replies(
-        self,
-        topic_id: str,
-        page: Optional[int] = None,
-        size: Optional[int] = None,
-    ) -> list[TopicReply]:
-        """List replies on a topic"""
-        ...
-
-    def create_topic_reply(
-        self,
-        topic_id: str,
-        body: str,
-        reply_to_id: Optional[str] = None,
-    ) -> TopicReply:
-        """Post a reply to a community topic"""
-        ...
-
-class AsyncContentContext:
-    """Async content context for Longbridge community APIs"""
-
-    def __init__(self, config: Config) -> None: ...
-    async def my_topics(
-        self,
-        page: Optional[int] = None,
-        size: Optional[int] = None,
-        topic_type: Optional[str] = None,
-    ) -> list[OwnedTopic]:
-        """Get topics created by the current authenticated user"""
-        ...
-
-    async def create_topic(
-        self,
-        title: str,
-        body: str,
-        topic_type: Optional[str] = None,
-        tickers: Optional[list[str]] = None,
-        hashtags: Optional[list[str]] = None,
-    ) -> str:
-        """Create a new community topic, returns the topic ID"""
-        ...
-
-    async def topics(self, symbol: str) -> list[TopicItem]:
-        """Get discussion topics list for a symbol"""
-        ...
-
-    async def news(self, symbol: str) -> list[NewsItem]:
-        """Get news list for a symbol"""
-        ...
-
-    async def topic_detail(self, id: str) -> OwnedTopic:
-        """Get full details of a topic by its ID"""
-        ...
-
-    async def list_topic_replies(
-        self,
-        topic_id: str,
-        page: Optional[int] = None,
-        size: Optional[int] = None,
-    ) -> list[TopicReply]:
-        """List replies on a topic"""
-        ...
-
-    async def create_topic_reply(
-        self,
-        topic_id: str,
-        body: str,
-        reply_to_id: Optional[str] = None,
-    ) -> TopicReply:
-        """Post a reply to a community topic"""
-
 class StatementType:
     """
     Statement type
@@ -8240,6 +8055,631 @@ class AsyncAssetContext:
                     if resp.list:
                         url_resp = await ctx.statement_download_url(resp.list[0].file_key)
                         print(url_resp.url)
+
+                asyncio.run(main())
+        """
+        ...
+
+class TopicAuthor:
+    """
+    Topic author
+    """
+
+    member_id: str
+    """
+    Member ID
+    """
+    name: str
+    """
+    Display name
+    """
+    avatar: str
+    """
+    Avatar URL
+    """
+
+class TopicImage:
+    """
+    Topic image
+    """
+
+    url: str
+    """
+    Original image URL
+    """
+    sm: str
+    """
+    Small thumbnail URL
+    """
+    lg: str
+    """
+    Large image URL
+    """
+
+class OwnedTopic:
+    """
+    Topic created by the current authenticated user
+    """
+
+    id: str
+    """
+    Topic ID
+    """
+    title: str
+    """
+    Title
+    """
+    description: str
+    """
+    Plain text excerpt
+    """
+    body: str
+    """
+    Markdown body
+    """
+    author: TopicAuthor
+    """
+    Author
+    """
+    tickers: List[str]
+    """
+    Related stock tickers
+    """
+    hashtags: List[str]
+    """
+    Hashtag names
+    """
+    images: List[TopicImage]
+    """
+    Images
+    """
+    likes_count: int
+    """
+    Likes count
+    """
+    comments_count: int
+    """
+    Comments count
+    """
+    views_count: int
+    """
+    Views count
+    """
+    shares_count: int
+    """
+    Shares count
+    """
+    topic_type: str
+    """
+    Content type: "article" or "post"
+    """
+    detail_url: str
+    """
+    URL to the full topic page
+    """
+    created_at: datetime
+    """
+    Created time
+    """
+    updated_at: datetime
+    """
+    Updated time
+    """
+
+class TopicReply:
+    """
+    A reply on a topic
+    """
+
+    id: str
+    """
+    Reply ID
+    """
+    topic_id: str
+    """
+    Topic ID this reply belongs to
+    """
+    body: str
+    """
+    Reply body (plain text)
+    """
+    reply_to_id: str
+    """
+    ID of the parent reply ("0" means top-level)
+    """
+    author: TopicAuthor
+    """
+    Author info
+    """
+    images: List[TopicImage]
+    """
+    Attached images
+    """
+    likes_count: int
+    """
+    Likes count
+    """
+    comments_count: int
+    """
+    Nested replies count
+    """
+    created_at: datetime
+    """
+    Created time
+    """
+
+class ContentContext:
+    """
+    Content context
+
+    Args:
+        config: Configuration object
+    """
+
+    def __init__(self, config: Config) -> None: ...
+    def my_topics(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        topic_type: Optional[str] = None,
+    ) -> List[OwnedTopic]:
+        """
+        Get topics created by the current authenticated user
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 50, range 1-500)
+            topic_type: Filter by type: "article" or "post"; empty returns all
+
+        Returns:
+            List of owned topics
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topics = ctx.my_topics(size=20)
+                for t in topics:
+                    print(t.id, t.title)
+        """
+        ...
+
+    def create_topic(
+        self,
+        title: str,
+        body: str,
+        topic_type: Optional[str] = None,
+        tickers: Optional[List[str]] = None,
+        hashtags: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Create a new community topic
+
+        Args:
+            title: Topic title (required for "article"; optional for "post")
+            body: Topic body (plain text for "post", Markdown for "article")
+            topic_type: "post" (default) or "article"
+            tickers: Associated stock symbols, e.g. ["700.HK"], max 10
+            hashtags: Hashtag names, max 5
+
+        Returns:
+            The new topic ID
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topic_id = ctx.create_topic(
+                    title="My Article",
+                    body="Hello world",
+                    topic_type="article",
+                    tickers=["700.HK"],
+                )
+                print(topic_id)
+        """
+        ...
+
+    def topics(self, symbol: str) -> List[TopicItem]:
+        """
+        Get discussion topics list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of topic items
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topics = ctx.topics("700.HK")
+                for t in topics:
+                    print(t.id, t.title)
+        """
+        ...
+
+    def news(self, symbol: str) -> List[NewsItem]:
+        """
+        Get news list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of news items
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                news = ctx.news("700.HK")
+                for n in news:
+                    print(n.id, n.title)
+        """
+        ...
+
+    def topic_detail(self, id: str) -> OwnedTopic:
+        """
+        Get full details of a topic by its ID
+
+        Args:
+            id: Topic ID
+
+        Returns:
+            Full topic detail
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topic = ctx.topic_detail("123456")
+                print(topic.title, topic.body)
+        """
+        ...
+
+    def list_topic_replies(
+        self,
+        topic_id: str,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[TopicReply]:
+        """
+        List replies on a topic
+
+        Args:
+            topic_id: Topic ID
+            page: Page number (default 1)
+            size: Page size (default 20, range 1-50)
+
+        Returns:
+            List of topic replies
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                replies = ctx.list_topic_replies("123456")
+                for r in replies:
+                    print(r.id, r.body)
+        """
+        ...
+
+    def create_topic_reply(
+        self,
+        topic_id: str,
+        body: str,
+        reply_to_id: Optional[str] = None,
+    ) -> TopicReply:
+        """
+        Post a reply to a community topic
+
+        Args:
+            topic_id: Topic ID
+            body: Reply body (plain text only)
+            reply_to_id: ID of the parent reply to nest under; empty or "0" for top-level
+
+        Returns:
+            The created reply
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                reply = ctx.create_topic_reply("123456", "Great post!")
+                print(reply.id)
+        """
+        ...
+
+class AsyncContentContext:
+    """
+    Async content context. Create via ``AsyncContentContext.create(config)`` and
+    await inside asyncio. All I/O methods return awaitables.
+    """
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncContentContext: ...
+    async def my_topics(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        topic_type: Optional[str] = None,
+    ) -> List[OwnedTopic]:
+        """
+        Get topics created by the current authenticated user
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 50, range 1-500)
+            topic_type: Filter by type: "article" or "post"; empty returns all
+
+        Returns:
+            List of owned topics
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    topics = await ctx.my_topics(size=20)
+                    for t in topics:
+                        print(t.id, t.title)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def create_topic(
+        self,
+        title: str,
+        body: str,
+        topic_type: Optional[str] = None,
+        tickers: Optional[List[str]] = None,
+        hashtags: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Create a new community topic
+
+        Args:
+            title: Topic title (required for "article"; optional for "post")
+            body: Topic body (plain text for "post", Markdown for "article")
+            topic_type: "post" (default) or "article"
+            tickers: Associated stock symbols, e.g. ["700.HK"], max 10
+            hashtags: Hashtag names, max 5
+
+        Returns:
+            The new topic ID
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    topic_id = await ctx.create_topic(
+                        title="My Article",
+                        body="Hello world",
+                        topic_type="article",
+                        tickers=["700.HK"],
+                    )
+                    print(topic_id)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def topics(self, symbol: str) -> List[TopicItem]:
+        """
+        Get discussion topics list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of topic items
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    topics = await ctx.topics("700.HK")
+                    for t in topics:
+                        print(t.id, t.title)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def news(self, symbol: str) -> List[NewsItem]:
+        """
+        Get news list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of news items
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    news = await ctx.news("700.HK")
+                    for n in news:
+                        print(n.id, n.title)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def topic_detail(self, id: str) -> OwnedTopic:
+        """
+        Get full details of a topic by its ID
+
+        Args:
+            id: Topic ID
+
+        Returns:
+            Full topic detail
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    topic = await ctx.topic_detail("123456")
+                    print(topic.title, topic.body)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def list_topic_replies(
+        self,
+        topic_id: str,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[TopicReply]:
+        """
+        List replies on a topic
+
+        Args:
+            topic_id: Topic ID
+            page: Page number (default 1)
+            size: Page size (default 20, range 1-50)
+
+        Returns:
+            List of topic replies
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    replies = await ctx.list_topic_replies("123456")
+                    for r in replies:
+                        print(r.id, r.body)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def create_topic_reply(
+        self,
+        topic_id: str,
+        body: str,
+        reply_to_id: Optional[str] = None,
+    ) -> TopicReply:
+        """
+        Post a reply to a community topic
+
+        Args:
+            topic_id: Topic ID
+            body: Reply body (plain text only)
+            reply_to_id: ID of the parent reply to nest under; empty or "0" for top-level
+
+        Returns:
+            The created reply
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    reply = await ctx.create_topic_reply("123456", "Great post!")
+                    print(reply.id)
 
                 asyncio.run(main())
         """
