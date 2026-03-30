@@ -20,10 +20,12 @@ mod types;
 pub mod blocking;
 
 pub use longbridge_oauth as oauth;
+pub mod asset;
 pub mod content;
 pub mod quote;
 pub mod trade;
 
+pub use asset::AssetContext;
 pub use config::{Config, Language, PushCandlestickMode};
 pub use content::ContentContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
