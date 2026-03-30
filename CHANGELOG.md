@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Added
 
 - **All bindings:** `ContentContext` adds two new methods (Rust, Go, C, C++, Java, Python, Node.js):
-  - `topics_mine(opts)` — get topics created by the current authenticated user, with optional page/size/topic_type filtering.
-  - `create_topic(opts)` — create a new topic; returns the full `OwnedTopic` on success.
-- **All bindings:** New types `OwnedTopic`, `ListMyTopicsOptions`, and `CreateTopicOptions` to support the above methods.
+  - `my_topics(opts)` — get topics created by the current authenticated user, with optional page/size/topic_type filtering.
+  - `create_topic(opts)` — create a new topic; returns the topic ID (`String`) on success.
+- **All bindings:** New types `OwnedTopic`, `MyTopicsOptions`, and `CreateTopicOptions` to support the above methods.
+- **Python:** Added type stubs (`openapi.pyi`) for `ContentContext`, `AsyncContentContext`, `OwnedTopic`, `TopicReply`, `TopicAuthor`, and `TopicImage`.
+
+## Fixed
+
+- **C++:** `create_topic` callback now correctly yields `std::string` (topic ID) instead of `OwnedTopic`.
 
 # [4.0.5]
 

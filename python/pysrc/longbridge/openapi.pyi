@@ -7672,3 +7672,189 @@ class AsyncTradeContext:
                 asyncio.run(main())
         """
         ...
+
+class TopicAuthor:
+    """Topic author"""
+
+    member_id: str
+    """Member ID"""
+    name: str
+    """Display name"""
+    avatar: str
+    """Avatar URL"""
+
+class TopicImage:
+    """Topic image"""
+
+    url: str
+    """Original image URL"""
+    sm: str
+    """Small thumbnail URL"""
+    lg: str
+    """Large image URL"""
+
+class OwnedTopic:
+    """Topic created by the current authenticated user"""
+
+    id: str
+    """Topic ID"""
+    title: str
+    """Title"""
+    description: str
+    """Plain text excerpt"""
+    body: str
+    """Markdown body"""
+    author: TopicAuthor
+    """Author"""
+    tickers: list[str]
+    """Related stock tickers"""
+    hashtags: list[str]
+    """Hashtag names"""
+    images: list[TopicImage]
+    """Images"""
+    likes_count: int
+    """Likes count"""
+    comments_count: int
+    """Comments count"""
+    views_count: int
+    """Views count"""
+    shares_count: int
+    """Shares count"""
+    topic_type: str
+    """Content type: "article" or "post" """
+    detail_url: str
+    """URL to the full topic page"""
+    created_at: datetime
+    """Created time"""
+    updated_at: datetime
+    """Updated time"""
+
+class TopicReply:
+    """A reply on a topic"""
+
+    id: str
+    """Reply ID"""
+    topic_id: str
+    """Topic ID this reply belongs to"""
+    body: str
+    """Reply body (plain text)"""
+    reply_to_id: str
+    """ID of the parent reply ("0" means top-level)"""
+    author: TopicAuthor
+    """Author info"""
+    images: list[TopicImage]
+    """Attached images"""
+    likes_count: int
+    """Likes count"""
+    comments_count: int
+    """Nested replies count"""
+    created_at: datetime
+    """Created time"""
+
+class ContentContext:
+    """Content context for Longbridge community APIs"""
+
+    def __init__(self, config: Config) -> None: ...
+    def my_topics(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        topic_type: Optional[str] = None,
+    ) -> list[OwnedTopic]:
+        """Get topics created by the current authenticated user"""
+        ...
+
+    def create_topic(
+        self,
+        title: str,
+        body: str,
+        topic_type: Optional[str] = None,
+        tickers: Optional[list[str]] = None,
+        hashtags: Optional[list[str]] = None,
+    ) -> str:
+        """Create a new community topic, returns the topic ID"""
+        ...
+
+    def topics(self, symbol: str) -> list[TopicItem]:
+        """Get discussion topics list for a symbol"""
+        ...
+
+    def news(self, symbol: str) -> list[NewsItem]:
+        """Get news list for a symbol"""
+        ...
+
+    def topic_detail(self, id: str) -> OwnedTopic:
+        """Get full details of a topic by its ID"""
+        ...
+
+    def list_topic_replies(
+        self,
+        topic_id: str,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> list[TopicReply]:
+        """List replies on a topic"""
+        ...
+
+    def create_topic_reply(
+        self,
+        topic_id: str,
+        body: str,
+        reply_to_id: Optional[str] = None,
+    ) -> TopicReply:
+        """Post a reply to a community topic"""
+        ...
+
+class AsyncContentContext:
+    """Async content context for Longbridge community APIs"""
+
+    def __init__(self, config: Config) -> None: ...
+    async def my_topics(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        topic_type: Optional[str] = None,
+    ) -> list[OwnedTopic]:
+        """Get topics created by the current authenticated user"""
+        ...
+
+    async def create_topic(
+        self,
+        title: str,
+        body: str,
+        topic_type: Optional[str] = None,
+        tickers: Optional[list[str]] = None,
+        hashtags: Optional[list[str]] = None,
+    ) -> str:
+        """Create a new community topic, returns the topic ID"""
+        ...
+
+    async def topics(self, symbol: str) -> list[TopicItem]:
+        """Get discussion topics list for a symbol"""
+        ...
+
+    async def news(self, symbol: str) -> list[NewsItem]:
+        """Get news list for a symbol"""
+        ...
+
+    async def topic_detail(self, id: str) -> OwnedTopic:
+        """Get full details of a topic by its ID"""
+        ...
+
+    async def list_topic_replies(
+        self,
+        topic_id: str,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> list[TopicReply]:
+        """List replies on a topic"""
+        ...
+
+    async def create_topic_reply(
+        self,
+        topic_id: str,
+        body: str,
+        reply_to_id: Optional[str] = None,
+    ) -> TopicReply:
+        """Post a reply to a community topic"""
+        ...
