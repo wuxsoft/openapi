@@ -1279,6 +1279,11 @@ typedef enum lb_granularity_t {
 } lb_granularity_t;
 
 /**
+ * Asset context
+ */
+typedef struct CAssetContext CAssetContext;
+
+/**
  * Configuration options for Longbridge SDK
  */
 typedef struct lb_config_t lb_config_t;
@@ -4106,6 +4111,54 @@ typedef struct lb_news_item_t {
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+
+/**
+ * Create a new `AssetContext`
+ *
+ * @param config  Config object
+ * @return A new asset context
+ */
+const struct CAssetContext *lb_asset_context_new(const struct lb_config_t *config);
+
+/**
+ * Retain the asset context (increment reference count)
+ */
+void lb_asset_context_retain(const struct CAssetContext *ctx);
+
+/**
+ * Release the asset context (decrement reference count)
+ */
+void lb_asset_context_release(const struct CAssetContext *ctx);
+
+/**
+ * Get statement data list
+ *
+ * @param ctx             Asset context
+ * @param statement_type  1 = daily, 2 = monthly
+ * @param start_date      Start date for pagination (0 = default)
+ * @param limit           Number of results (0 = default 20)
+ * @param callback        Async callback
+ * @param userdata        User data passed to the callback
+ */
+void lb_asset_context_statements(const struct CAssetContext *ctx,
+                                 int32_t statement_type,
+                                 int32_t start_date,
+                                 int32_t limit,
+                                 lb_async_callback_t callback,
+                                 void *userdata);
+
+/**
+ * Get statement data download URL
+ *
+ * @param ctx       Asset context
+ * @param file_key  File key from the list response
+ * @param callback  Async callback
+ * @param userdata  User data passed to the callback
+ */
+void lb_asset_context_download_url(const struct CAssetContext *ctx,
+                                   const char *file_key,
+                                   lb_async_callback_t callback,
+                                   void *userdata);
 
 /**
  * Create a new `Config` using API Key authentication
