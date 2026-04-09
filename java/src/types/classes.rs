@@ -518,7 +518,7 @@ impl_java_class!(
 impl_java_class!(
     "com/longbridge/quote/WatchlistSecurity",
     longbridge::quote::WatchlistSecurity,
-    [symbol, market, name, watched_price, watched_at]
+    [symbol, market, name, watched_price, watched_at, is_pinned]
 );
 
 pub(crate) struct CreateWatchlistGroupResponse {

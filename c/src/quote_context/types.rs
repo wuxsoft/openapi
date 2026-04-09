@@ -2051,6 +2051,7 @@ impl From<WatchlistSecurity> for CWatchlistSecurityOwned {
             name,
             watched_price,
             watched_at,
+            ..
         } = resp;
         CWatchlistSecurityOwned {
             symbol: symbol.into(),

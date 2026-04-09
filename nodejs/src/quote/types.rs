@@ -1103,6 +1103,8 @@ pub struct WatchlistSecurity {
     /// Watched time
     #[js(datetime)]
     watched_at: DateTime<Utc>,
+    /// Whether the security is pinned to the top of the group
+    is_pinned: bool,
 }
 
 /// Securities update mode

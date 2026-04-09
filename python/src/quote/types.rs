@@ -1065,6 +1065,8 @@ pub(crate) struct WatchlistSecurity {
     watched_price: Option<PyDecimal>,
     /// Watched time
     watched_at: PyOffsetDateTimeWrapper,
+    /// Whether the security is pinned to the top of the group
+    is_pinned: bool,
 }
 
 /// Securities update mode

@@ -1404,6 +1404,9 @@ pub struct WatchlistSecurity {
         deserialize_with = "serde_utils::timestamp::deserialize"
     )]
     pub watched_at: OffsetDateTime,
+    /// Whether the security is pinned to the top of the group
+    #[serde(default)]
+    pub is_pinned: bool,
 }
 
 /// Watchlist group
