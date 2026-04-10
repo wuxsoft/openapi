@@ -1,7 +1,6 @@
-from datetime import datetime, date, time
+from datetime import date, datetime, time
 from decimal import Decimal
 from typing import Any, Awaitable, Callable, Coroutine, List, Optional, Type
-
 
 class ErrorKind:
     """
@@ -23,7 +22,6 @@ class ErrorKind:
         Other error
         """
 
-
 class OpenApiException(Exception):
     """
     OpenAPI exception
@@ -44,9 +42,7 @@ class OpenApiException(Exception):
     Error message
     """
 
-    def __init__(self, code: int, message: str) -> None:
-        ...
-
+    def __init__(self, code: int, message: str) -> None: ...
 
 class HttpClient:
     """
@@ -109,7 +105,13 @@ class HttpClient:
                 ``https://openapi.longbridge.com``)
         """
 
-    def request(self, method: str, path: str, headers: Optional[dict[str, str]] = None, body: Optional[Any] = None) -> Any:
+    def request(
+        self,
+        method: str,
+        path: str,
+        headers: Optional[dict[str, str]] = None,
+        body: Optional[Any] = None,
+    ) -> Any:
         """
         Performs a HTTP reqest
 
@@ -130,7 +132,13 @@ class HttpClient:
         """
         ...
 
-    def request_async(self, method: str, path: str, headers: Optional[dict[str, str]] = None, body: Optional[Any] = None) -> Awaitable[Any]:
+    def request_async(
+        self,
+        method: str,
+        path: str,
+        headers: Optional[dict[str, str]] = None,
+        body: Optional[Any] = None,
+    ) -> Awaitable[Any]:
         """
         Performs an async HTTP request. Returns an awaitable; must be awaited inside asyncio.
 
@@ -164,7 +172,6 @@ class HttpClient:
         """
         ...
 
-
 class PushCandlestickMode:
     """
     Push candlestick mode
@@ -180,7 +187,6 @@ class PushCandlestickMode:
         Confirmed
         """
 
-
 class OAuth:
     """
     OAuth 2.0 client handle for Longbridge OpenAPI.
@@ -189,7 +195,6 @@ class OAuth:
     :meth:`AsyncOAuthBuilder.build` (async).  Pass it to
     :meth:`Config.from_oauth` or :meth:`HttpClient.from_oauth`.
     """
-
 
 class OAuthBuilder:
     """
@@ -223,9 +228,7 @@ class OAuthBuilder:
         asyncio.run(main())
     """
 
-    def __init__(self, client_id: str,
-                 callback_port: Optional[int] = None) -> None: ...
-
+    def __init__(self, client_id: str, callback_port: Optional[int] = None) -> None: ...
     def build(self, on_open_url: Callable[[str], None]) -> OAuth:
         """
         Build an OAuth 2.0 client (blocking).
@@ -259,7 +262,6 @@ class OAuthBuilder:
         Returns:
             Awaitable resolving to an :class:`OAuth` handle
         """
-
 
 class Config:
     """
@@ -398,7 +400,6 @@ class Config:
             Config object
         """
 
-
 class Language:
     """
     Language identifier
@@ -418,7 +419,6 @@ class Language:
         """
         en
         """
-
 
 class Market:
     """
@@ -454,7 +454,6 @@ class Market:
         """
         Crypto market
         """
-
 
 class PushQuote:
     """
@@ -516,7 +515,6 @@ class PushQuote:
     Increase turnover between pushes
     """
 
-
 class PushDepth:
     """
     Depth message
@@ -531,7 +529,6 @@ class PushDepth:
     """
     Bid depth
     """
-
 
 class PushBrokers:
     """
@@ -548,7 +545,6 @@ class PushBrokers:
     Bid brokers
     """
 
-
 class PushTrades:
     """
     Trades message
@@ -558,7 +554,6 @@ class PushTrades:
     """
     Trades data
     """
-
 
 class PushCandlestick:
     """
@@ -579,7 +574,6 @@ class PushCandlestick:
     """
     Is confirmed
     """
-
 
 class SubType:
     """
@@ -606,7 +600,6 @@ class SubType:
         Trade
         """
 
-
 class DerivativeType:
     """
     Derivative type
@@ -621,7 +614,6 @@ class DerivativeType:
         """
         HK warrants
         """
-
 
 class SecurityBoard:
     """
@@ -763,7 +755,6 @@ class SecurityBoard:
         CBOE Volatility Index
         """
 
-
 class Security:
     """
     Security
@@ -789,7 +780,6 @@ class Security:
     Security name (zh-HK)
     """
 
-
 class SecurityListCategory:
     """
     Security list category
@@ -799,7 +789,6 @@ class SecurityListCategory:
         """
         Overnight
         """
-
 
 class SecurityStaticInfo:
     """
@@ -886,7 +875,6 @@ class SecurityStaticInfo:
     Board
     """
 
-
 class TradeStatus:
     """
     Security Status
@@ -947,7 +935,6 @@ class TradeStatus:
         Suspend
         """
 
-
 class PrePostQuote:
     """
     Quote of US pre/post market
@@ -987,7 +974,6 @@ class PrePostQuote:
     """
     Close of the last trade session
     """
-
 
 class SecurityQuote:
     """
@@ -1059,7 +1045,6 @@ class SecurityQuote:
     Quote of US overnight market
     """
 
-
 class OptionType:
     """
     Option type
@@ -1080,7 +1065,6 @@ class OptionType:
         Europe
         """
 
-
 class OptionDirection:
     """
     Option direction
@@ -1100,7 +1084,6 @@ class OptionDirection:
         """
         Call
         """
-
 
 class OptionQuote:
     """
@@ -1207,7 +1190,6 @@ class OptionQuote:
     Underlying security symbol of the option
     """
 
-
 class WarrantType:
     """
     Warrant type
@@ -1242,7 +1224,6 @@ class WarrantType:
         """
         Inline
         """
-
 
 class WarrantQuote:
     """
@@ -1359,7 +1340,6 @@ class WarrantQuote:
     Underlying security symbol of the warrant
     """
 
-
 class Depth:
     """
     Depth
@@ -1385,7 +1365,6 @@ class Depth:
     Number of orders
     """
 
-
 class SecurityDepth:
     """
     Security depth
@@ -1400,7 +1379,6 @@ class SecurityDepth:
     """
     Bid depth
     """
-
 
 class Brokers:
     """
@@ -1417,7 +1395,6 @@ class Brokers:
     Broker IDs
     """
 
-
 class SecurityBrokers:
     """
     Security brokers
@@ -1432,7 +1409,6 @@ class SecurityBrokers:
     """
     Bid brokers
     """
-
 
 class ParticipantInfo:
     """
@@ -1459,7 +1435,6 @@ class ParticipantInfo:
     Participant name (zh-HK)
     """
 
-
 class TradeDirection:
     """
     Trade direction
@@ -1479,7 +1454,6 @@ class TradeDirection:
         """
         Up
         """
-
 
 class TradeSession:
     """
@@ -1505,7 +1479,6 @@ class TradeSession:
         """
         Overnight
         """
-
 
 class Trade:
     """
@@ -1573,7 +1546,6 @@ class Trade:
     Trade session
     """
 
-
 class IntradayLine:
     """
     Intraday line
@@ -1603,7 +1575,6 @@ class IntradayLine:
     """
     Average price
     """
-
 
 class Candlestick:
     """
@@ -1650,7 +1621,6 @@ class Candlestick:
     Trade session
     """
 
-
 class AdjustType:
     """
     Candlestick adjustment type
@@ -1665,7 +1635,6 @@ class AdjustType:
         """
         Adjust forward
         """
-
 
 class Period:
     """
@@ -1767,7 +1736,6 @@ class Period:
         Yearly
         """
 
-
 class StrikePriceInfo:
     """
     Strike price info
@@ -1792,7 +1760,6 @@ class StrikePriceInfo:
     """
     Is standard
     """
-
 
 class IssuerInfo:
     """
@@ -1819,7 +1786,6 @@ class IssuerInfo:
     Issuer name (zh-HK)
     """
 
-
 class WarrantStatus:
     """
     Warrant status
@@ -1840,7 +1806,6 @@ class WarrantStatus:
         Normal
         """
 
-
 class SortOrderType:
     """
     Sort order type
@@ -1855,7 +1820,6 @@ class SortOrderType:
         """
         Descending
         """
-
 
 class WarrantSortBy:
     """
@@ -1972,7 +1936,6 @@ class WarrantSortBy:
         Status
         """
 
-
 class FilterWarrantExpiryDate:
     """
     Filter warrant expiry date type
@@ -1998,7 +1961,6 @@ class FilterWarrantExpiryDate:
         Greater than 12 months
         """
 
-
 class FilterWarrantInOutBoundsType:
     """
     Filter warrant in/out of the bounds type
@@ -2013,7 +1975,6 @@ class FilterWarrantInOutBoundsType:
         """
         Out bounds
         """
-
 
 class WarrantInfo:
     """
@@ -2145,7 +2106,6 @@ class WarrantInfo:
     Status
     """
 
-
 class TradingSessionInfo:
     """
     The information of trading session
@@ -2166,7 +2126,6 @@ class TradingSessionInfo:
     Trading sessions
     """
 
-
 class MarketTradingSession:
     """
     Market trading session
@@ -2182,11 +2141,9 @@ class MarketTradingSession:
     Trading session
     """
 
-
 class MarketTradingDays:
     trading_days: List[date]
     half_trading_days: List[date]
-
 
 class CapitalFlowLine:
     """
@@ -2202,7 +2159,6 @@ class CapitalFlowLine:
     """
     Time
     """
-
 
 class CapitalDistribution:
     """
@@ -2224,7 +2180,6 @@ class CapitalDistribution:
     Small order
     """
 
-
 class CapitalDistributionResponse:
     """
     Capital distribution response
@@ -2244,7 +2199,6 @@ class CapitalDistributionResponse:
     """
     Outflow capital data
     """
-
 
 class WatchlistSecurity:
     """
@@ -2276,7 +2230,6 @@ class WatchlistSecurity:
     Watched time
     """
 
-
 class WatchlistGroup:
     id: int
     """
@@ -2292,7 +2245,6 @@ class WatchlistGroup:
     """
     Securities
     """
-
 
 class SecuritiesUpdateMode:
     """
@@ -2313,7 +2265,6 @@ class SecuritiesUpdateMode:
         """
         Replace securities
         """
-
 
 class RealtimeQuote:
     """
@@ -2365,7 +2316,6 @@ class RealtimeQuote:
     Security trading status
     """
 
-
 class Subscription:
     """
     Subscription
@@ -2385,7 +2335,6 @@ class Subscription:
     """
     Candlesticks
     """
-
 
 class CalcIndex:
     """
@@ -2591,7 +2540,6 @@ class CalcIndex:
         """
         Rho
         """
-
 
 class SecurityCalcIndex:
     """
@@ -2803,7 +2751,6 @@ class SecurityCalcIndex:
     Rho
     """
 
-
 class QuotePackageDetail:
     """
     Quote package detail
@@ -2834,7 +2781,6 @@ class QuotePackageDetail:
     End time
     """
 
-
 class TradeSessions:
     """
     Trade sessions
@@ -2849,7 +2795,6 @@ class TradeSessions:
         """
         All
         """
-
 
 class MarketTemperature:
     """
@@ -2881,7 +2826,6 @@ class MarketTemperature:
     Time
     """
 
-
 class Granularity:
     """
     Data granularity
@@ -2907,7 +2851,6 @@ class Granularity:
         Monthly
         """
 
-
 class HistoryMarketTemperatureResponse:
     """
     History market temperature response
@@ -2923,7 +2866,6 @@ class HistoryMarketTemperatureResponse:
     Records
     """
 
-
 class QuoteContext:
     """
     Quote context
@@ -2933,7 +2875,6 @@ class QuoteContext:
     """
 
     def __init__(self, config: Config) -> None: ...
-
     def member_id(self) -> int:
         """
         Returns the member ID
@@ -2969,7 +2910,9 @@ class QuoteContext:
         Set trades callback, after receiving the trades data push, it will call back to this function.
         """
 
-    def set_on_candlestick(self, callback: Callable[[str, PushCandlestick], None]) -> None:
+    def set_on_candlestick(
+        self, callback: Callable[[str, PushCandlestick], None]
+    ) -> None:
         """
         Set candlestick callback, after receiving the candlestick updated event, it will call back to this function.
         """
@@ -3024,7 +2967,12 @@ class QuoteContext:
                 ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
         """
 
-    def subscribe_candlesticks(self, symbol: str, period: Type[Period], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
+    def subscribe_candlesticks(
+        self,
+        symbol: str,
+        period: Type[Period],
+        trade_sessions: Type[TradeSessions] = TradeSessions.Intraday,
+    ) -> List[Candlestick]:
         """
         Subscribe security candlesticks
 
@@ -3278,7 +3226,9 @@ class QuoteContext:
                 print(resp)
         """
 
-    def intraday(self, symbol: str, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[IntradayLine]:
+    def intraday(
+        self, symbol: str, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday
+    ) -> List[IntradayLine]:
         """
         Get security intraday lines
 
@@ -3304,7 +3254,14 @@ class QuoteContext:
                 print(resp)
         """
 
-    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
+    def candlesticks(
+        self,
+        symbol: str,
+        period: Type[Period],
+        count: int,
+        adjust_type: Type[AdjustType],
+        trade_sessions: Type[TradeSessions] = TradeSessions.Intraday,
+    ) -> List[Candlestick]:
         """
         Get security candlesticks
 
@@ -3334,7 +3291,16 @@ class QuoteContext:
                 print(resp)
         """
 
-    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int, time: Optional[datetime] = None, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
+    def history_candlesticks_by_offset(
+        self,
+        symbol: str,
+        period: Type[Period],
+        adjust_type: Type[AdjustType],
+        forward: bool,
+        count: int,
+        time: Optional[datetime] = None,
+        trade_sessions: Type[TradeSessions] = TradeSessions.Intraday,
+    ) -> List[Candlestick]:
         """
         Get security history candlesticks by offset
 
@@ -3348,7 +3314,15 @@ class QuoteContext:
             trade_sessions: Trade sessions
         """
 
-    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date], end: Optional[date], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> List[Candlestick]:
+    def history_candlesticks_by_date(
+        self,
+        symbol: str,
+        period: Type[Period],
+        adjust_type: Type[AdjustType],
+        start: Optional[date],
+        end: Optional[date],
+        trade_sessions: Type[TradeSessions] = TradeSessions.Intraday,
+    ) -> List[Candlestick]:
         """
         Get security history candlesticks by date
 
@@ -3386,7 +3360,9 @@ class QuoteContext:
                 print(resp)
         """
 
-    def option_chain_info_by_date(self, symbol: str, expiry_date: date) -> List[StrikePriceInfo]:
+    def option_chain_info_by_date(
+        self, symbol: str, expiry_date: date
+    ) -> List[StrikePriceInfo]:
         """
         Get option chain info by date
 
@@ -3436,7 +3412,17 @@ class QuoteContext:
                 print(resp)
         """
 
-    def warrant_list(self, symbol: str, sort_by: Type[WarrantSortBy], sort_order: Type[SortOrderType], warrant_type: Optional[List[Type[WarrantType]]] = None, issuer: Optional[List[int]] = None, expiry_date: Optional[List[Type[FilterWarrantExpiryDate]]] = None, price_type: Optional[List[Type[FilterWarrantInOutBoundsType]]] = None, status: Optional[List[Type[WarrantStatus]]] = None) -> List[WarrantInfo]:
+    def warrant_list(
+        self,
+        symbol: str,
+        sort_by: Type[WarrantSortBy],
+        sort_order: Type[SortOrderType],
+        warrant_type: Optional[List[Type[WarrantType]]] = None,
+        issuer: Optional[List[int]] = None,
+        expiry_date: Optional[List[Type[FilterWarrantExpiryDate]]] = None,
+        price_type: Optional[List[Type[FilterWarrantInOutBoundsType]]] = None,
+        status: Optional[List[Type[WarrantStatus]]] = None,
+    ) -> List[WarrantInfo]:
         """
         Get warrant list
 
@@ -3490,7 +3476,9 @@ class QuoteContext:
                 print(resp)
         """
 
-    def trading_days(self, market: Type[Market], begin: date, end: date) -> MarketTradingDays:
+    def trading_days(
+        self, market: Type[Market], begin: date, end: date
+    ) -> MarketTradingDays:
         """
         Get trading session of the day
 
@@ -3571,7 +3559,9 @@ class QuoteContext:
                 print(resp)
         """
 
-    def calc_indexes(self, symbols: List[str], indexes: List[Type[CalcIndex]]) -> List[SecurityCalcIndex]:
+    def calc_indexes(
+        self, symbols: List[str], indexes: List[Type[CalcIndex]]
+    ) -> List[SecurityCalcIndex]:
         """
         Get calc indexes
 
@@ -3619,7 +3609,9 @@ class QuoteContext:
                 print(resp)
         """
 
-    def create_watchlist_group(self, name: str, securities: Optional[List[str]] = None) -> int:
+    def create_watchlist_group(
+        self, name: str, securities: Optional[List[str]] = None
+    ) -> int:
         """
         Create watchlist group
 
@@ -3665,7 +3657,13 @@ class QuoteContext:
                 ctx.delete_watchlist_group(10086)
         """
 
-    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]] = None, mode: Optional[Type[SecuritiesUpdateMode]] = None):
+    def update_watchlist_group(
+        self,
+        id: int,
+        name: Optional[str] = None,
+        securities: Optional[List[str]] = None,
+        mode: Optional[Type[SecuritiesUpdateMode]] = None,
+    ):
         """
         Update watchlist group
 
@@ -3687,7 +3685,11 @@ class QuoteContext:
                 ctx.update_watchlist_group(10086, name = "Watchlist2", securities = ["700.HK", "AAPL.US"], SecuritiesUpdateMode.Replace)
         """
 
-    def security_list(self, market: Type[Market], category: Optional[Type[SecurityListCategory]] = None) -> List[Security]:
+    def security_list(
+        self,
+        market: Type[Market],
+        category: Optional[Type[SecurityListCategory]] = None,
+    ) -> List[Security]:
         """
         Get security list
 
@@ -3738,7 +3740,9 @@ class QuoteContext:
                 print(resp)
         """
 
-    def history_market_temperature(self, market: Type[Market], start_date: date, end_date: date) -> HistoryMarketTemperatureResponse:
+    def history_market_temperature(
+        self, market: Type[Market], start_date: date, end_date: date
+    ) -> HistoryMarketTemperatureResponse:
         """
         Get historical market temperature
 
@@ -3887,7 +3891,9 @@ class QuoteContext:
                 print(resp)
         """
 
-    def realtime_candlesticks(self, symbol: str, period: Type[Period], count: int = 500) -> List[Candlestick]:
+    def realtime_candlesticks(
+        self, symbol: str, period: Type[Period], count: int = 500
+    ) -> List[Candlestick]:
         """
         Get real-time candlesticks
 
@@ -3919,7 +3925,6 @@ class QuoteContext:
                 print(resp)
         """
 
-
 class AsyncQuoteContext:
     """
     Async quote context for use with asyncio. Create via `AsyncQuoteContext.create(config)` and await inside asyncio.
@@ -3927,9 +3932,9 @@ class AsyncQuoteContext:
     """
 
     @classmethod
-    def create(cls: Type["AsyncQuoteContext"],
-               config: Config,
-               loop_: Optional[Any] = None) -> "AsyncQuoteContext":
+    def create(
+        cls: Type[AsyncQuoteContext], config: Config, loop_: Optional[Any] = None
+    ) -> AsyncQuoteContext:
         """
         Create an async quote context.
 
@@ -3972,32 +3977,48 @@ class AsyncQuoteContext:
         ...
 
     def set_on_quote(
-            self, callback: Callable[[str, PushQuote], None] | Callable[[str, PushQuote], Coroutine[Any, Any, None]]) -> None:
+        self,
+        callback: Callable[[str, PushQuote], None]
+        | Callable[[str, PushQuote], Coroutine[Any, Any, None]],
+    ) -> None:
         """Set quote callback; called when quote push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def set_on_depth(
-            self, callback: Callable[[str, PushDepth], None] | Callable[[str, PushDepth], Coroutine[Any, Any, None]]) -> None:
+        self,
+        callback: Callable[[str, PushDepth], None]
+        | Callable[[str, PushDepth], Coroutine[Any, Any, None]],
+    ) -> None:
         """Set depth callback; called when depth push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def set_on_brokers(
-            self, callback: Callable[[str, PushBrokers], None] | Callable[[str, PushBrokers], Coroutine[Any, Any, None]]) -> None:
+        self,
+        callback: Callable[[str, PushBrokers], None]
+        | Callable[[str, PushBrokers], Coroutine[Any, Any, None]],
+    ) -> None:
         """Set brokers callback; called when brokers push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def set_on_trades(
-            self, callback: Callable[[str, PushTrades], None] | Callable[[str, PushTrades], Coroutine[Any, Any, None]]) -> None:
+        self,
+        callback: Callable[[str, PushTrades], None]
+        | Callable[[str, PushTrades], Coroutine[Any, Any, None]],
+    ) -> None:
         """Set trades callback; called when trades push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def set_on_candlestick(
-            self, callback: Callable[[str, PushCandlestick], None] | Callable[[str, PushCandlestick], Coroutine[Any, Any, None]]) -> None:
+        self,
+        callback: Callable[[str, PushCandlestick], None]
+        | Callable[[str, PushCandlestick], Coroutine[Any, Any, None]],
+    ) -> None:
         """Set candlestick callback; called when candlestick push is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
     def subscribe(
-            self, symbols: List[str], sub_types: List[Type[SubType]]) -> Awaitable[None]:
+        self, symbols: List[str], sub_types: List[Type[SubType]]
+    ) -> Awaitable[None]:
         """
         Subscribe to symbols and sub types. Returns an awaitable; must be awaited in asyncio.
 
@@ -4029,7 +4050,8 @@ class AsyncQuoteContext:
         ...
 
     def unsubscribe(
-            self, symbols: List[str], sub_types: List[Type[SubType]]) -> Awaitable[None]:
+        self, symbols: List[str], sub_types: List[Type[SubType]]
+    ) -> Awaitable[None]:
         """
         Unsubscribe from symbols and sub types. Returns an awaitable.
 
@@ -4057,7 +4079,11 @@ class AsyncQuoteContext:
         ...
 
     def subscribe_candlesticks(
-            self, symbol: str, period: Type[Period], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        self,
+        symbol: str,
+        period: Type[Period],
+        trade_sessions: Type[TradeSessions] = TradeSessions.Intraday,
+    ) -> Awaitable[List[Candlestick]]:
         """
         Subscribe security candlesticks. Returns an awaitable that resolves to initial candlesticks.
 
@@ -4100,7 +4126,8 @@ class AsyncQuoteContext:
         ...
 
     def unsubscribe_candlesticks(
-            self, symbol: str, period: Type[Period]) -> Awaitable[None]:
+        self, symbol: str, period: Type[Period]
+    ) -> Awaitable[None]:
         """
         Unsubscribe security candlesticks. Returns an awaitable.
 
@@ -4160,8 +4187,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def static_info(
-            self, symbols: List[str]) -> Awaitable[List[SecurityStaticInfo]]:
+    def static_info(self, symbols: List[str]) -> Awaitable[List[SecurityStaticInfo]]:
         """
         Get basic information of securities. Returns an awaitable that resolves to security info list.
 
@@ -4215,8 +4241,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def option_quote(self, symbols: List[str]
-                     ) -> Awaitable[List[OptionQuote]]:
+    def option_quote(self, symbols: List[str]) -> Awaitable[List[OptionQuote]]:
         """
         Get quote of option securities. Returns an awaitable that resolves to option quote list.
 
@@ -4242,8 +4267,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def warrant_quote(
-            self, symbols: List[str]) -> Awaitable[List[WarrantQuote]]:
+    def warrant_quote(self, symbols: List[str]) -> Awaitable[List[WarrantQuote]]:
         """
         Get quote of warrant securities. Returns an awaitable that resolves to warrant quote list.
 
@@ -4371,8 +4395,9 @@ class AsyncQuoteContext:
         """
         ...
 
-    def intraday(self, symbol: str, trade_sessions: Type[TradeSessions]
-                 = TradeSessions.Intraday) -> Awaitable[List[IntradayLine]]:
+    def intraday(
+        self, symbol: str, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday
+    ) -> Awaitable[List[IntradayLine]]:
         """
         Get security intraday lines. Returns an awaitable that resolves to intraday line list.
 
@@ -4399,8 +4424,14 @@ class AsyncQuoteContext:
         """
         ...
 
-    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType],
-                     trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+    def candlesticks(
+        self,
+        symbol: str,
+        period: Type[Period],
+        count: int,
+        adjust_type: Type[AdjustType],
+        trade_sessions: Type[TradeSessions] = TradeSessions.Intraday,
+    ) -> Awaitable[List[Candlestick]]:
         """
         Get security candlesticks. Returns an awaitable that resolves to candlesticks list (max count 1000).
 
@@ -4442,8 +4473,16 @@ class AsyncQuoteContext:
         """
         ...
 
-    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int,
-                                       time: Optional[datetime] = None, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+    def history_candlesticks_by_offset(
+        self,
+        symbol: str,
+        period: Type[Period],
+        adjust_type: Type[AdjustType],
+        forward: bool,
+        count: int,
+        time: Optional[datetime] = None,
+        trade_sessions: Type[TradeSessions] = TradeSessions.Intraday,
+    ) -> Awaitable[List[Candlestick]]:
         """
         Get security history candlesticks by offset. Returns an awaitable that resolves to candlesticks list.
 
@@ -4490,8 +4529,15 @@ class AsyncQuoteContext:
         """
         ...
 
-    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date],
-                                     end: Optional[date], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+    def history_candlesticks_by_date(
+        self,
+        symbol: str,
+        period: Type[Period],
+        adjust_type: Type[AdjustType],
+        start: Optional[date],
+        end: Optional[date],
+        trade_sessions: Type[TradeSessions] = TradeSessions.Intraday,
+    ) -> Awaitable[List[Candlestick]]:
         """
         Get security history candlesticks by date. Returns an awaitable that resolves to candlesticks list.
 
@@ -4536,8 +4582,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def option_chain_expiry_date_list(
-            self, symbol: str) -> Awaitable[List[date]]:
+    def option_chain_expiry_date_list(self, symbol: str) -> Awaitable[List[date]]:
         """
         Get option chain expiry date list. Returns an awaitable that resolves to date list.
 
@@ -4564,7 +4609,8 @@ class AsyncQuoteContext:
         ...
 
     def option_chain_info_by_date(
-            self, symbol: str, expiry_date: date) -> Awaitable[List[StrikePriceInfo]]:
+        self, symbol: str, expiry_date: date
+    ) -> Awaitable[List[StrikePriceInfo]]:
         """
         Get option chain info by date. Returns an awaitable that resolves to strike price info list.
 
@@ -4618,8 +4664,17 @@ class AsyncQuoteContext:
         """
         ...
 
-    def warrant_list(self, symbol: str, sort_by: Type[WarrantSortBy], sort_order: Type[SortOrderType], warrant_type: Optional[List[Type[WarrantType]]] = None, issuer: Optional[List[int]] = None, expiry_date: Optional[
-                     List[Type[FilterWarrantExpiryDate]]] = None, price_type: Optional[List[Type[FilterWarrantInOutBoundsType]]] = None, status: Optional[List[Type[WarrantStatus]]] = None) -> Awaitable[List[WarrantInfo]]:
+    def warrant_list(
+        self,
+        symbol: str,
+        sort_by: Type[WarrantSortBy],
+        sort_order: Type[SortOrderType],
+        warrant_type: Optional[List[Type[WarrantType]]] = None,
+        issuer: Optional[List[int]] = None,
+        expiry_date: Optional[List[Type[FilterWarrantExpiryDate]]] = None,
+        price_type: Optional[List[Type[FilterWarrantInOutBoundsType]]] = None,
+        status: Optional[List[Type[WarrantStatus]]] = None,
+    ) -> Awaitable[List[WarrantInfo]]:
         """
         Get warrant list with optional filters. Returns an awaitable that resolves to warrant info list.
 
@@ -4684,8 +4739,9 @@ class AsyncQuoteContext:
         """
         ...
 
-    def trading_days(self, market: Type[Market], begin: date,
-                     end: date) -> Awaitable[MarketTradingDays]:
+    def trading_days(
+        self, market: Type[Market], begin: date, end: date
+    ) -> Awaitable[MarketTradingDays]:
         """
         Get trading days in the given market and date range. Returns an awaitable (interval must be less than one month).
 
@@ -4718,8 +4774,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def capital_flow(
-            self, symbol: str) -> Awaitable[List[CapitalFlowLine]]:
+    def capital_flow(self, symbol: str) -> Awaitable[List[CapitalFlowLine]]:
         """
         Get capital flow intraday. Returns an awaitable that resolves to capital flow line list.
 
@@ -4746,7 +4801,8 @@ class AsyncQuoteContext:
         ...
 
     def capital_distribution(
-            self, symbol: str) -> Awaitable[CapitalDistributionResponse]:
+        self, symbol: str
+    ) -> Awaitable[CapitalDistributionResponse]:
         """
         Get capital distribution. Returns an awaitable that resolves to capital distribution response.
 
@@ -4773,7 +4829,8 @@ class AsyncQuoteContext:
         ...
 
     def calc_indexes(
-            self, symbols: List[str], indexes: List[Type[CalcIndex]]) -> Awaitable[List[SecurityCalcIndex]]:
+        self, symbols: List[str], indexes: List[Type[CalcIndex]]
+    ) -> Awaitable[List[SecurityCalcIndex]]:
         """
         Get calc indexes for symbols. Returns an awaitable that resolves to security calc index list.
 
@@ -4827,7 +4884,8 @@ class AsyncQuoteContext:
         ...
 
     def create_watchlist_group(
-            self, name: str, securities: Optional[List[str]] = None) -> Awaitable[int]:
+        self, name: str, securities: Optional[List[str]] = None
+    ) -> Awaitable[int]:
         """
         Create watchlist group. Returns an awaitable that resolves to group ID.
 
@@ -4857,8 +4915,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def delete_watchlist_group(
-            self, id: int, purge: bool = False) -> Awaitable[None]:
+    def delete_watchlist_group(self, id: int, purge: bool = False) -> Awaitable[None]:
         """
         Delete watchlist group. Returns an awaitable.
 
@@ -4884,8 +4941,13 @@ class AsyncQuoteContext:
         """
         ...
 
-    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]]
-                               = None, mode: Optional[Type[SecuritiesUpdateMode]] = None) -> Awaitable[None]:
+    def update_watchlist_group(
+        self,
+        id: int,
+        name: Optional[str] = None,
+        securities: Optional[List[str]] = None,
+        mode: Optional[Type[SecuritiesUpdateMode]] = None,
+    ) -> Awaitable[None]:
         """
         Update watchlist group. Returns an awaitable.
 
@@ -4919,7 +4981,10 @@ class AsyncQuoteContext:
         ...
 
     def security_list(
-            self, market: Type[Market], category: Optional[Type[SecurityListCategory]] = None) -> Awaitable[List[Security]]:
+        self,
+        market: Type[Market],
+        category: Optional[Type[SecurityListCategory]] = None,
+    ) -> Awaitable[List[Security]]:
         """
         Get security list. Returns an awaitable that resolves to security list.
 
@@ -4949,8 +5014,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def market_temperature(
-            self, market: Type[Market]) -> Awaitable[MarketTemperature]:
+    def market_temperature(self, market: Type[Market]) -> Awaitable[MarketTemperature]:
         """
         Get current market temperature. Returns an awaitable that resolves to market temperature.
 
@@ -4977,7 +5041,8 @@ class AsyncQuoteContext:
         ...
 
     def history_market_temperature(
-            self, market: Type[Market], start_date: date, end_date: date) -> Awaitable[HistoryMarketTemperatureResponse]:
+        self, market: Type[Market], start_date: date, end_date: date
+    ) -> Awaitable[HistoryMarketTemperatureResponse]:
         """
         Get historical market temperature. Returns an awaitable that resolves to history market temperature response.
 
@@ -5010,8 +5075,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def realtime_quote(
-            self, symbols: List[str]) -> Awaitable[List[RealtimeQuote]]:
+    def realtime_quote(self, symbols: List[str]) -> Awaitable[List[RealtimeQuote]]:
         """
         Get real-time quote of subscribed symbols from local storage. Returns an awaitable that resolves to realtime quote list.
 
@@ -5095,8 +5159,7 @@ class AsyncQuoteContext:
         """
         ...
 
-    def realtime_trades(self, symbol: str,
-                        count: int = 500) -> Awaitable[List[Trade]]:
+    def realtime_trades(self, symbol: str, count: int = 500) -> Awaitable[List[Trade]]:
         """
         Get real-time trades of subscribed symbol from local storage. Returns an awaitable that resolves to trade list.
 
@@ -5126,7 +5189,8 @@ class AsyncQuoteContext:
         ...
 
     def realtime_candlesticks(
-            self, symbol: str, period: Type[Period], count: int = 500) -> Awaitable[List[Candlestick]]:
+        self, symbol: str, period: Type[Period], count: int = 500
+    ) -> Awaitable[List[Candlestick]]:
         """
         Get real-time candlesticks of subscribed symbol from local storage. Returns an awaitable that resolves to candlestick list.
 
@@ -5163,7 +5227,6 @@ class AsyncQuoteContext:
         """
         ...
 
-
 class OrderSide:
     """
     Order side
@@ -5183,7 +5246,6 @@ class OrderSide:
         """
         Sell
         """
-
 
 class OrderType:
     """
@@ -5259,7 +5321,6 @@ class OrderType:
         """
         Special Limit Order
         """
-
 
 class OrderStatus:
     """
@@ -5356,7 +5417,6 @@ class OrderStatus:
         PartialWithdrawal
         """
 
-
 class OrderTag:
     """
     Order tag
@@ -5412,7 +5472,6 @@ class OrderTag:
         Trade Allocation
         """
 
-
 class TriggerStatus:
     """
     Trigger status
@@ -5437,7 +5496,6 @@ class TriggerStatus:
         """
         Released
         """
-
 
 class Execution:
     """
@@ -5473,7 +5531,6 @@ class Execution:
     """
     Executed price
     """
-
 
 class PushOrderChanged:
     """
@@ -5605,7 +5662,6 @@ class PushOrderChanged:
     Remark message
     """
 
-
 class TimeInForceType:
     """
     Time in force type
@@ -5631,7 +5687,6 @@ class TimeInForceType:
         Good Til Date Order
         """
 
-
 class OutsideRTH:
     """
     Enable or disable outside regular trading hours
@@ -5656,7 +5711,6 @@ class OutsideRTH:
         """
         Overnight
         """
-
 
 class Order:
     """
@@ -5808,7 +5862,6 @@ class Order:
     Remark
     """
 
-
 class CommissionFreeStatus:
     """
     Commission-free Status
@@ -5838,7 +5891,6 @@ class CommissionFreeStatus:
         """
         Commission-free applied
         """
-
 
 class DeductionStatus:
     """
@@ -5870,7 +5922,6 @@ class DeductionStatus:
         Settled and distributed
         """
 
-
 class ChargeCategoryCode:
     """
     Charge category code
@@ -5890,7 +5941,6 @@ class ChargeCategoryCode:
         """
         Third
         """
-
 
 class OrderHistoryDetail:
     """
@@ -5922,7 +5972,6 @@ class OrderHistoryDetail:
     Occurrence time
     """
 
-
 class OrderChargeFee:
     """
     Order charge fee
@@ -5948,7 +5997,6 @@ class OrderChargeFee:
     Charge currency
     """
 
-
 class OrderChargeItem:
     """
     Order charge item
@@ -5969,7 +6017,6 @@ class OrderChargeItem:
     Charge details
     """
 
-
 class OrderChargeDetail:
     """
     Order charge detail
@@ -5989,7 +6036,6 @@ class OrderChargeDetail:
     """
     Order charge items
     """
-
 
 class OrderDetail:
     """
@@ -6196,7 +6242,6 @@ class OrderDetail:
     Order charges
     """
 
-
 class SubmitOrderResponse:
     """
     Response for submit order request
@@ -6206,7 +6251,6 @@ class SubmitOrderResponse:
     """
     Order id
     """
-
 
 class CashInfo:
     """
@@ -6234,7 +6278,6 @@ class CashInfo:
     Currency
     """
 
-
 class FrozenTransactionFee:
     currency: str
     """
@@ -6245,7 +6288,6 @@ class FrozenTransactionFee:
     """
     Frozen transaction fee
     """
-
 
 class AccountBalance:
     """
@@ -6306,20 +6348,11 @@ class AccountBalance:
     Frozen transaction fees
     """
 
-
 class BalanceType:
-    class Unknown(BalanceType):
-        ...
-
-    class Cash(BalanceType):
-        ...
-
-    class Stock(BalanceType):
-        ...
-
-    class Fund(BalanceType):
-        ...
-
+    class Unknown(BalanceType): ...
+    class Cash(BalanceType): ...
+    class Stock(BalanceType): ...
+    class Fund(BalanceType): ...
 
 class CashFlowDirection:
     """
@@ -6330,20 +6363,22 @@ class CashFlowDirection:
         """
         Unknown
         """
+
         ...
 
     class Out(CashFlowDirection):
         """
         Out
         """
+
         ...
 
     class In(CashFlowDirection):
         """
         In
         """
-        ...
 
+        ...
 
 class CashFlow:
     """
@@ -6390,7 +6425,6 @@ class CashFlow:
     Cash flow description
     """
 
-
 class FundPosition:
     """
     Fund position
@@ -6431,7 +6465,6 @@ class FundPosition:
     Holding units
     """
 
-
 class FundPositionChannel:
     """
     Fund position channel
@@ -6447,7 +6480,6 @@ class FundPositionChannel:
     Fund positions
     """
 
-
 class FundPositionsResponse:
     """
     Fund positions response
@@ -6457,7 +6489,6 @@ class FundPositionsResponse:
     """
     Channels
     """
-
 
 class StockPosition:
     """
@@ -6504,7 +6535,6 @@ class StockPosition:
     Initial position before market opening
     """
 
-
 class StockPositionChannel:
     """
     Stock position channel
@@ -6520,7 +6550,6 @@ class StockPositionChannel:
     Stock positions
     """
 
-
 class StockPositionsResponse:
     """
     Stock positions response
@@ -6531,7 +6560,6 @@ class StockPositionsResponse:
     Channels
     """
 
-
 class TopicType:
     """
     Topic type
@@ -6541,8 +6569,8 @@ class TopicType:
         """
         Private notification for trade
         """
-        ...
 
+        ...
 
 class MarginRatio:
     """
@@ -6564,7 +6592,6 @@ class MarginRatio:
     Forced close-out margin ratio
     """
 
-
 class EstimateMaxPurchaseQuantityResponse:
     """
     Response for estimate maximum purchase quantity
@@ -6580,7 +6607,6 @@ class EstimateMaxPurchaseQuantityResponse:
     Margin available quantity
     """
 
-
 class TradeContext:
     """
     Trade context
@@ -6590,8 +6616,9 @@ class TradeContext:
     """
 
     def __init__(self, config: Config) -> None: ...
-
-    def set_on_order_changed(self, callback: Callable[[PushOrderChanged], None]) -> None:
+    def set_on_order_changed(
+        self, callback: Callable[[PushOrderChanged], None]
+    ) -> None:
         """
         Set order changed callback, after receiving the order changed event, it will call back to this function.
         """
@@ -6644,7 +6671,12 @@ class TradeContext:
             topics: Topic list
         """
 
-    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> List[Execution]:
+    def history_executions(
+        self,
+        symbol: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+    ) -> List[Execution]:
         """
         Get history executions
 
@@ -6676,7 +6708,9 @@ class TradeContext:
                 print(resp)
         """
 
-    def today_executions(self, symbol: Optional[str] = None, order_id: Optional[str] = None) -> List[Execution]:
+    def today_executions(
+        self, symbol: Optional[str] = None, order_id: Optional[str] = None
+    ) -> List[Execution]:
         """
         Get today executions
 
@@ -6702,7 +6736,15 @@ class TradeContext:
                 print(resp)
         """
 
-    def history_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> List[Order]:
+    def history_orders(
+        self,
+        symbol: Optional[str] = None,
+        status: Optional[List[Type[OrderStatus]]] = None,
+        side: Optional[Type[OrderSide]] = None,
+        market: Optional[Type[Market]] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+    ) -> List[Order]:
         """
         Get history orders
 
@@ -6740,7 +6782,14 @@ class TradeContext:
                 print(resp)
         """
 
-    def today_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None, market: Optional[Type[Market]] = None, order_id: Optional[str] = None) -> List[Order]:
+    def today_orders(
+        self,
+        symbol: Optional[str] = None,
+        status: Optional[List[Type[OrderStatus]]] = None,
+        side: Optional[Type[OrderSide]] = None,
+        market: Optional[Type[Market]] = None,
+        order_id: Optional[str] = None,
+    ) -> List[Order]:
         """
         Get today orders
 
@@ -6774,7 +6823,20 @@ class TradeContext:
                 print(resp)
         """
 
-    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> None:
+    def replace_order(
+        self,
+        order_id: str,
+        quantity: Decimal,
+        price: Optional[Decimal] = None,
+        trigger_price: Optional[Decimal] = None,
+        limit_offset: Optional[Decimal] = None,
+        trailing_amount: Optional[Decimal] = None,
+        trailing_percent: Optional[Decimal] = None,
+        limit_depth_level: Optional[int] = None,
+        trigger_count: Optional[int] = None,
+        monitor_price: Optional[Decimal] = None,
+        remark: Optional[str] = None,
+    ) -> None:
         """
         Replace order
 
@@ -6809,7 +6871,25 @@ class TradeContext:
                 )
         """
 
-    def submit_order(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None,  trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None,  outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> SubmitOrderResponse:
+    def submit_order(
+        self,
+        symbol: str,
+        order_type: Type[OrderType],
+        side: Type[OrderSide],
+        submitted_quantity: Decimal,
+        time_in_force: Type[TimeInForceType],
+        submitted_price: Optional[Decimal] = None,
+        trigger_price: Optional[Decimal] = None,
+        limit_offset: Optional[Decimal] = None,
+        trailing_amount: Optional[Decimal] = None,
+        trailing_percent: Optional[Decimal] = None,
+        expire_date: Optional[date] = None,
+        outside_rth: Optional[Type[OutsideRTH]] = None,
+        limit_depth_level: Optional[int] = None,
+        trigger_count: Optional[int] = None,
+        monitor_price: Optional[Decimal] = None,
+        remark: Optional[str] = None,
+    ) -> SubmitOrderResponse:
         """
         Submit order
 
@@ -6904,7 +6984,15 @@ class TradeContext:
                 print(resp)
         """
 
-    def cash_flow(self, start_at: datetime, end_at: datetime, business_type: Optional[Type[BalanceType]] = None, symbol: Optional[str] = None, page: Optional[int] = None, size: Optional[int] = None) -> List[CashFlow]:
+    def cash_flow(
+        self,
+        start_at: datetime,
+        end_at: datetime,
+        business_type: Optional[Type[BalanceType]] = None,
+        symbol: Optional[str] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[CashFlow]:
         """
         Get cash flow
 
@@ -6938,7 +7026,9 @@ class TradeContext:
                 print(resp)
         """
 
-    def fund_positions(self, symbols: Optional[List[str]] = None) -> FundPositionsResponse:
+    def fund_positions(
+        self, symbols: Optional[List[str]] = None
+    ) -> FundPositionsResponse:
         """
         Get fund positions
 
@@ -6963,7 +7053,9 @@ class TradeContext:
                 print(resp)
         """
 
-    def stock_positions(self, symbols: Optional[List[str]] = None) -> StockPositionsResponse:
+    def stock_positions(
+        self, symbols: Optional[List[str]] = None
+    ) -> StockPositionsResponse:
         """
         Get stock positions
 
@@ -7038,7 +7130,16 @@ class TradeContext:
                 print(resp)
         """
 
-    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal] = None, currency: Optional[str] = None, order_id: Optional[str] = None, fractional_shares: bool = False) -> EstimateMaxPurchaseQuantityResponse:
+    def estimate_max_purchase_quantity(
+        self,
+        symbol: str,
+        order_type: Type[OrderType],
+        side: Type[OrderSide],
+        price: Optional[Decimal] = None,
+        currency: Optional[str] = None,
+        order_id: Optional[str] = None,
+        fractional_shares: bool = False,
+    ) -> EstimateMaxPurchaseQuantityResponse:
         """
         Estimating the maximum purchase quantity for Hong Kong and US stocks, warrants, and options
 
@@ -7073,7 +7174,6 @@ class TradeContext:
                 print(resp)
         """
 
-
 class AsyncTradeContext:
     """
     Async trade context for use with asyncio. Create via `AsyncTradeContext.create(config)` and await inside asyncio.
@@ -7081,9 +7181,9 @@ class AsyncTradeContext:
     """
 
     @classmethod
-    def create(cls: Type["AsyncTradeContext"],
-               config: Config,
-               loop_: Optional[Any] = None) -> "AsyncTradeContext":
+    def create(
+        cls: Type[AsyncTradeContext], config: Config, loop_: Optional[Any] = None
+    ) -> AsyncTradeContext:
         """
         Create an async trade context.
 
@@ -7114,7 +7214,10 @@ class AsyncTradeContext:
         ...
 
     def set_on_order_changed(
-            self, callback: Callable[[PushOrderChanged], None] | Callable[[PushOrderChanged], Coroutine[Any, Any, None]]) -> None:
+        self,
+        callback: Callable[[PushOrderChanged], None]
+        | Callable[[PushOrderChanged], Coroutine[Any, Any, None]],
+    ) -> None:
         """Set order changed callback; called when order changed event is received. Callback may be sync or async (async is scheduled on the event loop)."""
         ...
 
@@ -7167,8 +7270,7 @@ class AsyncTradeContext:
         """
         ...
 
-    def unsubscribe(
-            self, topics: List[Type[TopicType]]) -> Awaitable[None]:
+    def unsubscribe(self, topics: List[Type[TopicType]]) -> Awaitable[None]:
         """
         Unsubscribe from topics. Returns an awaitable.
 
@@ -7194,8 +7296,12 @@ class AsyncTradeContext:
         """
         ...
 
-    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[datetime]
-                           = None, end_at: Optional[datetime] = None) -> Awaitable[List[Execution]]:
+    def history_executions(
+        self,
+        symbol: Optional[str] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+    ) -> Awaitable[List[Execution]]:
         """
         Get history executions. Optional filters: symbol, start_at, end_at. Returns an awaitable that resolves to execution list.
 
@@ -7229,7 +7335,8 @@ class AsyncTradeContext:
         ...
 
     def today_executions(
-            self, symbol: Optional[str] = None, order_id: Optional[str] = None) -> Awaitable[List[Execution]]:
+        self, symbol: Optional[str] = None, order_id: Optional[str] = None
+    ) -> Awaitable[List[Execution]]:
         """
         Get today executions. Optional filters: symbol, order_id. Returns an awaitable that resolves to execution list.
 
@@ -7256,8 +7363,15 @@ class AsyncTradeContext:
         """
         ...
 
-    def history_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None,
-                       market: Optional[Type[Market]] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> Awaitable[List[Order]]:
+    def history_orders(
+        self,
+        symbol: Optional[str] = None,
+        status: Optional[List[Type[OrderStatus]]] = None,
+        side: Optional[Type[OrderSide]] = None,
+        market: Optional[Type[Market]] = None,
+        start_at: Optional[datetime] = None,
+        end_at: Optional[datetime] = None,
+    ) -> Awaitable[List[Order]]:
         """
         Get history orders with optional filters. Returns an awaitable that resolves to order list.
 
@@ -7302,8 +7416,14 @@ class AsyncTradeContext:
         """
         ...
 
-    def today_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]]
-                     = None, market: Optional[Type[Market]] = None, order_id: Optional[str] = None) -> Awaitable[List[Order]]:
+    def today_orders(
+        self,
+        symbol: Optional[str] = None,
+        status: Optional[List[Type[OrderStatus]]] = None,
+        side: Optional[Type[OrderSide]] = None,
+        market: Optional[Type[Market]] = None,
+        order_id: Optional[str] = None,
+    ) -> Awaitable[List[Order]]:
         """
         Get today orders with optional filters. Returns an awaitable that resolves to order list.
 
@@ -7344,8 +7464,20 @@ class AsyncTradeContext:
         """
         ...
 
-    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None,
-                      trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> Awaitable[None]:
+    def replace_order(
+        self,
+        order_id: str,
+        quantity: Decimal,
+        price: Optional[Decimal] = None,
+        trigger_price: Optional[Decimal] = None,
+        limit_offset: Optional[Decimal] = None,
+        trailing_amount: Optional[Decimal] = None,
+        trailing_percent: Optional[Decimal] = None,
+        limit_depth_level: Optional[int] = None,
+        trigger_count: Optional[int] = None,
+        monitor_price: Optional[Decimal] = None,
+        remark: Optional[str] = None,
+    ) -> Awaitable[None]:
         """
         Replace order. Returns an awaitable. Same parameters as sync TradeContext.replace_order.
 
@@ -7385,8 +7517,25 @@ class AsyncTradeContext:
         """
         ...
 
-    def submit_order(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None,
-                     trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None, outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> Awaitable[SubmitOrderResponse]:
+    def submit_order(
+        self,
+        symbol: str,
+        order_type: Type[OrderType],
+        side: Type[OrderSide],
+        submitted_quantity: Decimal,
+        time_in_force: Type[TimeInForceType],
+        submitted_price: Optional[Decimal] = None,
+        trigger_price: Optional[Decimal] = None,
+        limit_offset: Optional[Decimal] = None,
+        trailing_amount: Optional[Decimal] = None,
+        trailing_percent: Optional[Decimal] = None,
+        expire_date: Optional[date] = None,
+        outside_rth: Optional[Type[OutsideRTH]] = None,
+        limit_depth_level: Optional[int] = None,
+        trigger_count: Optional[int] = None,
+        monitor_price: Optional[Decimal] = None,
+        remark: Optional[str] = None,
+    ) -> Awaitable[SubmitOrderResponse]:
         """
         Submit order. Returns an awaitable that resolves to SubmitOrderResponse. Same parameters as sync TradeContext.submit_order.
 
@@ -7468,7 +7617,8 @@ class AsyncTradeContext:
         ...
 
     def account_balance(
-            self, currency: Optional[str] = None) -> Awaitable[List[AccountBalance]]:
+        self, currency: Optional[str] = None
+    ) -> Awaitable[List[AccountBalance]]:
         """
         Get account balance. Optional currency filter. Returns an awaitable that resolves to account balance list.
 
@@ -7494,8 +7644,15 @@ class AsyncTradeContext:
         """
         ...
 
-    def cash_flow(self, start_at: datetime, end_at: datetime, business_type: Optional[Type[BalanceType]] = None, symbol: Optional[
-                  str] = None, page: Optional[int] = None, size: Optional[int] = None) -> Awaitable[List[CashFlow]]:
+    def cash_flow(
+        self,
+        start_at: datetime,
+        end_at: datetime,
+        business_type: Optional[Type[BalanceType]] = None,
+        symbol: Optional[str] = None,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> Awaitable[List[CashFlow]]:
         """
         Get cash flow. Required: start_at, end_at. Optional: business_type, symbol, page, size. Returns an awaitable that resolves to cash flow list.
 
@@ -7531,7 +7688,8 @@ class AsyncTradeContext:
         ...
 
     def fund_positions(
-            self, symbols: Optional[List[str]] = None) -> Awaitable[FundPositionsResponse]:
+        self, symbols: Optional[List[str]] = None
+    ) -> Awaitable[FundPositionsResponse]:
         """
         Get fund positions. Optional filter: symbols. Returns an awaitable that resolves to fund positions response.
 
@@ -7558,7 +7716,8 @@ class AsyncTradeContext:
         ...
 
     def stock_positions(
-            self, symbols: Optional[List[str]] = None) -> Awaitable[StockPositionsResponse]:
+        self, symbols: Optional[List[str]] = None
+    ) -> Awaitable[StockPositionsResponse]:
         """
         Get stock positions. Optional filter: symbols. Returns an awaitable that resolves to stock positions response.
 
@@ -7636,8 +7795,16 @@ class AsyncTradeContext:
         """
         ...
 
-    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal] = None, currency: Optional[
-                                       str] = None, order_id: Optional[str] = None, fractional_shares: bool = False) -> Awaitable[EstimateMaxPurchaseQuantityResponse]:
+    def estimate_max_purchase_quantity(
+        self,
+        symbol: str,
+        order_type: Type[OrderType],
+        side: Type[OrderSide],
+        price: Optional[Decimal] = None,
+        currency: Optional[str] = None,
+        order_id: Optional[str] = None,
+        fractional_shares: bool = False,
+    ) -> Awaitable[EstimateMaxPurchaseQuantityResponse]:
         """
         Estimate maximum purchase quantity. Returns an awaitable that resolves to estimate response. order_id required when estimating for replace order.
 
@@ -7673,7 +7840,6 @@ class AsyncTradeContext:
         """
         ...
 
-
 class StatementType:
     """
     Statement type
@@ -7688,7 +7854,6 @@ class StatementType:
         """
         Monthly statement
         """
-
 
 class StatementItem:
     """
@@ -7705,7 +7870,6 @@ class StatementItem:
     File key used to request the download URL
     """
 
-
 class GetStatementListResponse:
     """
     Response for get statement list
@@ -7715,7 +7879,6 @@ class GetStatementListResponse:
     """
     List of statement items
     """
-
 
 class GetStatementResponse:
     """
@@ -7727,7 +7890,6 @@ class GetStatementResponse:
     Presigned download URL
     """
 
-
 class AssetContext:
     """
     Asset context
@@ -7737,8 +7899,9 @@ class AssetContext:
     """
 
     def __init__(self, config: Config) -> None: ...
-
-    def statements(self, statement_type: Type[StatementType], start_date: int = 1, limit: int = 20) -> GetStatementListResponse:
+    def statements(
+        self, statement_type: Type[StatementType], start_date: int = 1, limit: int = 20
+    ) -> GetStatementListResponse:
         """
         Get statement data list
 
@@ -7795,7 +7958,6 @@ class AssetContext:
         """
         ...
 
-
 class AsyncAssetContext:
     """
     Async asset context for use with asyncio. Create via `AsyncAssetContext.create(config)` and await inside asyncio.
@@ -7803,7 +7965,7 @@ class AsyncAssetContext:
     """
 
     @classmethod
-    def create(cls: Type["AsyncAssetContext"], config: Config) -> "AsyncAssetContext":
+    def create(cls: Type[AsyncAssetContext], config: Config) -> AsyncAssetContext:
         """
         Create an async asset context.
 
@@ -7833,7 +7995,9 @@ class AsyncAssetContext:
         """
         ...
 
-    def statements(self, statement_type: Type[StatementType], start_date: int = 1, limit: int = 20) -> Awaitable[GetStatementListResponse]:
+    def statements(
+        self, statement_type: Type[StatementType], start_date: int = 1, limit: int = 20
+    ) -> Awaitable[GetStatementListResponse]:
         """
         Get statement data list. Returns an awaitable.
 
@@ -7891,6 +8055,631 @@ class AsyncAssetContext:
                     if resp.list:
                         url_resp = await ctx.statement_download_url(resp.list[0].file_key)
                         print(url_resp.url)
+
+                asyncio.run(main())
+        """
+        ...
+
+class TopicAuthor:
+    """
+    Topic author
+    """
+
+    member_id: str
+    """
+    Member ID
+    """
+    name: str
+    """
+    Display name
+    """
+    avatar: str
+    """
+    Avatar URL
+    """
+
+class TopicImage:
+    """
+    Topic image
+    """
+
+    url: str
+    """
+    Original image URL
+    """
+    sm: str
+    """
+    Small thumbnail URL
+    """
+    lg: str
+    """
+    Large image URL
+    """
+
+class OwnedTopic:
+    """
+    Topic created by the current authenticated user
+    """
+
+    id: str
+    """
+    Topic ID
+    """
+    title: str
+    """
+    Title
+    """
+    description: str
+    """
+    Plain text excerpt
+    """
+    body: str
+    """
+    Markdown body
+    """
+    author: TopicAuthor
+    """
+    Author
+    """
+    tickers: List[str]
+    """
+    Related stock tickers
+    """
+    hashtags: List[str]
+    """
+    Hashtag names
+    """
+    images: List[TopicImage]
+    """
+    Images
+    """
+    likes_count: int
+    """
+    Likes count
+    """
+    comments_count: int
+    """
+    Comments count
+    """
+    views_count: int
+    """
+    Views count
+    """
+    shares_count: int
+    """
+    Shares count
+    """
+    topic_type: str
+    """
+    Content type: "article" or "post"
+    """
+    detail_url: str
+    """
+    URL to the full topic page
+    """
+    created_at: datetime
+    """
+    Created time
+    """
+    updated_at: datetime
+    """
+    Updated time
+    """
+
+class TopicReply:
+    """
+    A reply on a topic
+    """
+
+    id: str
+    """
+    Reply ID
+    """
+    topic_id: str
+    """
+    Topic ID this reply belongs to
+    """
+    body: str
+    """
+    Reply body (plain text)
+    """
+    reply_to_id: str
+    """
+    ID of the parent reply ("0" means top-level)
+    """
+    author: TopicAuthor
+    """
+    Author info
+    """
+    images: List[TopicImage]
+    """
+    Attached images
+    """
+    likes_count: int
+    """
+    Likes count
+    """
+    comments_count: int
+    """
+    Nested replies count
+    """
+    created_at: datetime
+    """
+    Created time
+    """
+
+class ContentContext:
+    """
+    Content context
+
+    Args:
+        config: Configuration object
+    """
+
+    def __init__(self, config: Config) -> None: ...
+    def my_topics(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        topic_type: Optional[str] = None,
+    ) -> List[OwnedTopic]:
+        """
+        Get topics created by the current authenticated user
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 50, range 1-500)
+            topic_type: Filter by type: "article" or "post"; empty returns all
+
+        Returns:
+            List of owned topics
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topics = ctx.my_topics(size=20)
+                for t in topics:
+                    print(t.id, t.title)
+        """
+        ...
+
+    def create_topic(
+        self,
+        title: str,
+        body: str,
+        topic_type: Optional[str] = None,
+        tickers: Optional[List[str]] = None,
+        hashtags: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Create a new community topic
+
+        Args:
+            title: Topic title (required for "article"; optional for "post")
+            body: Topic body (plain text for "post", Markdown for "article")
+            topic_type: "post" (default) or "article"
+            tickers: Associated stock symbols, e.g. ["700.HK"], max 10
+            hashtags: Hashtag names, max 5
+
+        Returns:
+            The new topic ID
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topic_id = ctx.create_topic(
+                    title="My Article",
+                    body="Hello world",
+                    topic_type="article",
+                    tickers=["700.HK"],
+                )
+                print(topic_id)
+        """
+        ...
+
+    def topics(self, symbol: str) -> List[TopicItem]:
+        """
+        Get discussion topics list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of topic items
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topics = ctx.topics("700.HK")
+                for t in topics:
+                    print(t.id, t.title)
+        """
+        ...
+
+    def news(self, symbol: str) -> List[NewsItem]:
+        """
+        Get news list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of news items
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                news = ctx.news("700.HK")
+                for n in news:
+                    print(n.id, n.title)
+        """
+        ...
+
+    def topic_detail(self, id: str) -> OwnedTopic:
+        """
+        Get full details of a topic by its ID
+
+        Args:
+            id: Topic ID
+
+        Returns:
+            Full topic detail
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                topic = ctx.topic_detail("123456")
+                print(topic.title, topic.body)
+        """
+        ...
+
+    def list_topic_replies(
+        self,
+        topic_id: str,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[TopicReply]:
+        """
+        List replies on a topic
+
+        Args:
+            topic_id: Topic ID
+            page: Page number (default 1)
+            size: Page size (default 20, range 1-50)
+
+        Returns:
+            List of topic replies
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                replies = ctx.list_topic_replies("123456")
+                for r in replies:
+                    print(r.id, r.body)
+        """
+        ...
+
+    def create_topic_reply(
+        self,
+        topic_id: str,
+        body: str,
+        reply_to_id: Optional[str] = None,
+    ) -> TopicReply:
+        """
+        Post a reply to a community topic
+
+        Args:
+            topic_id: Topic ID
+            body: Reply body (plain text only)
+            reply_to_id: ID of the parent reply to nest under; empty or "0" for top-level
+
+        Returns:
+            The created reply
+
+        Examples:
+            ::
+
+                from longbridge.openapi import OAuthBuilder, ContentContext, Config
+
+                oauth = OAuthBuilder("your-client-id").build(
+                    lambda url: print("Visit:", url)
+                )
+                config = Config.from_oauth(oauth)
+                ctx = ContentContext(config)
+                reply = ctx.create_topic_reply("123456", "Great post!")
+                print(reply.id)
+        """
+        ...
+
+class AsyncContentContext:
+    """
+    Async content context. Create via ``AsyncContentContext.create(config)`` and
+    await inside asyncio. All I/O methods return awaitables.
+    """
+
+    @classmethod
+    def create(cls, config: Config) -> AsyncContentContext: ...
+    async def my_topics(
+        self,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+        topic_type: Optional[str] = None,
+    ) -> List[OwnedTopic]:
+        """
+        Get topics created by the current authenticated user
+
+        Args:
+            page: Page number (default 1)
+            size: Page size (default 50, range 1-500)
+            topic_type: Filter by type: "article" or "post"; empty returns all
+
+        Returns:
+            List of owned topics
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    topics = await ctx.my_topics(size=20)
+                    for t in topics:
+                        print(t.id, t.title)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def create_topic(
+        self,
+        title: str,
+        body: str,
+        topic_type: Optional[str] = None,
+        tickers: Optional[List[str]] = None,
+        hashtags: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Create a new community topic
+
+        Args:
+            title: Topic title (required for "article"; optional for "post")
+            body: Topic body (plain text for "post", Markdown for "article")
+            topic_type: "post" (default) or "article"
+            tickers: Associated stock symbols, e.g. ["700.HK"], max 10
+            hashtags: Hashtag names, max 5
+
+        Returns:
+            The new topic ID
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    topic_id = await ctx.create_topic(
+                        title="My Article",
+                        body="Hello world",
+                        topic_type="article",
+                        tickers=["700.HK"],
+                    )
+                    print(topic_id)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def topics(self, symbol: str) -> List[TopicItem]:
+        """
+        Get discussion topics list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of topic items
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    topics = await ctx.topics("700.HK")
+                    for t in topics:
+                        print(t.id, t.title)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def news(self, symbol: str) -> List[NewsItem]:
+        """
+        Get news list for a symbol
+
+        Args:
+            symbol: Security symbol, e.g. "700.HK"
+
+        Returns:
+            List of news items
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    news = await ctx.news("700.HK")
+                    for n in news:
+                        print(n.id, n.title)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def topic_detail(self, id: str) -> OwnedTopic:
+        """
+        Get full details of a topic by its ID
+
+        Args:
+            id: Topic ID
+
+        Returns:
+            Full topic detail
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    topic = await ctx.topic_detail("123456")
+                    print(topic.title, topic.body)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def list_topic_replies(
+        self,
+        topic_id: str,
+        page: Optional[int] = None,
+        size: Optional[int] = None,
+    ) -> List[TopicReply]:
+        """
+        List replies on a topic
+
+        Args:
+            topic_id: Topic ID
+            page: Page number (default 1)
+            size: Page size (default 20, range 1-50)
+
+        Returns:
+            List of topic replies
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    replies = await ctx.list_topic_replies("123456")
+                    for r in replies:
+                        print(r.id, r.body)
+
+                asyncio.run(main())
+        """
+        ...
+
+    async def create_topic_reply(
+        self,
+        topic_id: str,
+        body: str,
+        reply_to_id: Optional[str] = None,
+    ) -> TopicReply:
+        """
+        Post a reply to a community topic
+
+        Args:
+            topic_id: Topic ID
+            body: Reply body (plain text only)
+            reply_to_id: ID of the parent reply to nest under; empty or "0" for top-level
+
+        Returns:
+            The created reply
+
+        Examples:
+            ::
+
+                import asyncio
+                from longbridge.openapi import OAuthBuilder, AsyncContentContext, Config
+
+                async def main():
+                    oauth = await OAuthBuilder("your-client-id").build_async(
+                        lambda url: print("Visit:", url)
+                    )
+                    config = Config.from_oauth(oauth)
+                    ctx = AsyncContentContext.create(config)
+                    reply = await ctx.create_topic_reply("123456", "Great post!")
+                    print(reply.id)
 
                 asyncio.run(main())
         """

@@ -33,7 +33,7 @@ public:
 
   /// Create a new topic
   void create_topic(const CreateTopicOptions& opts,
-                    AsyncCallback<ContentContext, OwnedTopic> callback) const;
+                    AsyncCallback<ContentContext, std::string> callback) const;
 
   /// Get discussion topics list for a symbol
   void topics(const std::string& symbol,

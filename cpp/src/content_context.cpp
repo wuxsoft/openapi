@@ -105,7 +105,7 @@ ContentContext::my_topics(
 void
 ContentContext::create_topic(
   const CreateTopicOptions& opts,
-  AsyncCallback<ContentContext, OwnedTopic> callback) const
+  AsyncCallback<ContentContext, std::string> callback) const
 {
   const char* topic_type =
     opts.topic_type.empty() ? nullptr : opts.topic_type.c_str();
@@ -128,25 +128,24 @@ ContentContext::create_topic(
     hashtags_cstr.size(),
     [](auto res) {
       auto callback_ptr =
-        callback::get_async_callback<ContentContext, OwnedTopic>(
+        callback::get_async_callback<ContentContext, std::string>(
           res->userdata);
       ContentContext ctx((const lb_content_context_t*)res->ctx);
       Status status(res->error);
 
       if (status) {
-        auto resp = (const lb_owned_topic_t*)res->data;
-        OwnedTopic result = convert(resp);
+        std::string result((const char*)res->data);
 
         (*callback_ptr)(
-          AsyncResult<ContentContext, OwnedTopic>(
+          AsyncResult<ContentContext, std::string>(
             ctx, std::move(status), &result));
       } else {
         (*callback_ptr)(
-          AsyncResult<ContentContext, OwnedTopic>(
+          AsyncResult<ContentContext, std::string>(
             ctx, std::move(status), nullptr));
       }
     },
-    new AsyncCallback<ContentContext, OwnedTopic>(callback));
+    new AsyncCallback<ContentContext, std::string>(callback));
 }
 
 void
