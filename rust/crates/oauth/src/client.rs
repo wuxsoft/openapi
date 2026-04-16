@@ -61,6 +61,30 @@ impl fmt::Debug for OAuth {
 }
 
 impl OAuth {
+    /// Create an OAuth client from a pre-existing access token.
+    ///
+    /// This is useful for server-side scenarios where the token is obtained
+    /// externally (e.g., via an MCP OAuth proxy) and you need to construct
+    /// an [`OAuth`] instance without going through the browser authorization
+    /// flow.
+    ///
+    /// The returned instance does **not** support token refresh — calling
+    /// [`access_token`](OAuth::access_token) simply returns the provided
+    /// token until it expires.
+    pub fn from_token(access_token: impl Into<String>) -> Self {
+        let access_token = access_token.into();
+        Self(Arc::new(OAuthInner {
+            client_id: String::new(),
+            callback_port: DEFAULT_CALLBACK_PORT,
+            token: tokio::sync::Mutex::new(Some(OAuthToken {
+                client_id: String::new(),
+                access_token,
+                refresh_token: None,
+                expires_at: u64::MAX,
+            })),
+        }))
+    }
+
     /// Return the OAuth client ID
     pub fn client_id(&self) -> &str {
         &self.0.client_id
